@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakerLAB Tool Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MakerLAB Tool Finder</h1>
+            <p class="subtitle">Use the search bar to find tools by name or purpose.</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-controls">
+                <div class="search-input-wrapper">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    name="search"
+                    placeholder="Enter tool name or purpose..." 
+                    autocomplete="off"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    data-1p-ignore="true"
+                    data-cursor-ignore="true"
+                    role="searchbox"
+                    aria-label="Search for tools"
+                >
+                    <div id="typeaheadDropdown" class="typeahead-dropdown"></div>
+                </div>
+                <div class="view-toggle">
+                    <button id="gridViewBtn" class="view-btn active" title="Grid View">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <rect x="2" y="2" width="6" height="6" rx="1"/>
+                            <rect x="12" y="2" width="6" height="6" rx="1"/>
+                            <rect x="2" y="12" width="6" height="6" rx="1"/>
+                            <rect x="12" y="12" width="6" height="6" rx="1"/>
+                        </svg>
+                    </button>
+                    <button id="listViewBtn" class="view-btn" title="List View">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <rect x="2" y="2" width="16" height="3" rx="1"/>
+                            <rect x="2" y="8.5" width="16" height="3" rx="1"/>
+                            <rect x="2" y="15" width="16" height="3" rx="1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="searchStatus" class="search-status"></div>
+        </div>
+
+        <div id="resultsContainer" class="results-container">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
