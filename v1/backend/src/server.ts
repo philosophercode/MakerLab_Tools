@@ -13,15 +13,24 @@ dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
-// Excel file is in the root of MakerLab_Tools, not in v1
-const EXCEL_FILE_PATH =
-  process.env.EXCEL_FILE_PATH || path.join(__dirname, '../../../tools.xlsx');
+
+// Determine Excel file path
+// Priority:
+// 1. Environment variable
+// 2. 'data/tools.xlsx' inside backend (for Vercel/self-contained)
+// 3. '../../../tools.xlsx' (original relative path)
+const localExcelPath = path.join(__dirname, '../data/tools.xlsx');
+const defaultExcelPath = path.join(__dirname, '../../../tools.xlsx');
+const EXCEL_FILE_PATH = process.env.EXCEL_FILE_PATH ||
+  (require('fs').existsSync(localExcelPath) ? localExcelPath : defaultExcelPath);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Serve static files from frontend directory
+// Resolve frontend path relative to this file
+// In Vercel/Production, frontend might be adjacent to backend or in a specific output
 const frontendPath = path.join(__dirname, '../../frontend');
 app.use(express.static(frontendPath));
 
@@ -59,9 +68,13 @@ app.use(
   }
 );
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log(`Excel file path: ${EXCEL_FILE_PATH}`);
-});
+// Start server if run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Excel file path: ${EXCEL_FILE_PATH}`);
+  });
+}
+
+export default app;
 

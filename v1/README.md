@@ -199,3 +199,27 @@ Change the `PORT` environment variable or stop the process using port 3000.
 
 ISC
 
+## Deployment
+
+### Deploy to Vercel
+
+This project is configured for deployment on [Vercel](https://vercel.com).
+
+1. Install Vercel CLI:
+   ```bash
+   npm i -g vercel
+   ```
+
+2. Deploy from the `v1` directory:
+   ```bash
+   cd v1
+   vercel
+   ```
+
+3. Follow the prompts. Set the project root to the current directory if asked.
+
+The configuration in `vercel.json` ensures that:
+- The backend runs as a Serverless Function.
+- The frontend is served statically (via the backend).
+- The `tools.xlsx` data file is included in the deployment.
+

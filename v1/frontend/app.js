@@ -1,9 +1,16 @@
 // Configuration
 const API_CONFIG = {
-    host: window.location.hostname || 'localhost',
-    port: window.location.port || '3000',
+    host: window.location.hostname,
+    port: window.location.port,
     get baseUrl() {
-        return `http://${this.host}:${this.port}`;
+        // If we're on localhost, we might need the port if running separately,
+        // but if served by the backend (which is the case for 'npm start' and Vercel monolith),
+        // we can just use relative paths.
+        // However, to be safe for local dev where frontend might be opened directly (file:// or separate server):
+        if (this.host === 'localhost' && this.port === '3000') {
+            return 'http://localhost:3000';
+        }
+        return ''; // Relative path for production/same-origin
     },
     get apiUrl() {
         return `${this.baseUrl}/api/tools`;
@@ -46,22 +53,22 @@ function debounce(func, wait) {
 // Fetch tools from API
 async function fetchTools(searchQuery = '') {
     try {
-        const url = searchQuery 
+        const url = searchQuery
             ? `${API_BASE_URL}?q=${encodeURIComponent(searchQuery)}`
             : API_BASE_URL;
-        
+
         const response = await fetch(url);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (!data.success) {
             throw new Error(data.error || 'Failed to fetch tools');
         }
-        
+
         return data;
     } catch (error) {
         console.error('Error fetching tools:', error);
@@ -77,13 +84,13 @@ function createToolCard(tool, isListView = false) {
     const image = document.createElement('img');
     // Use image proxy to avoid CORS issues
     const imageUrl = tool.imageUrl;
-    image.src = imageUrl.startsWith('http') 
+    image.src = imageUrl.startsWith('http')
         ? `${API_CONFIG.imageProxyUrl}?url=${encodeURIComponent(imageUrl)}`
         : imageUrl;
     image.alt = tool.toolName;
     image.className = isListView ? 'tool-image tool-image-thumbnail' : 'tool-image';
     image.loading = 'lazy';
-    image.onerror = function() {
+    image.onerror = function () {
         console.warn('Image failed to load:', tool.imageUrl);
         this.src = 'https://placehold.co/200x200?text=Image+Not+Available';
         this.onerror = null;
@@ -93,18 +100,18 @@ function createToolCard(tool, isListView = false) {
         // List view layout
         const content = document.createElement('div');
         content.className = 'tool-list-content';
-        
+
         const imageWrapper = document.createElement('div');
         imageWrapper.className = 'tool-list-image-wrapper';
         imageWrapper.appendChild(image);
-        
+
         const info = document.createElement('div');
         info.className = 'tool-list-info';
         info.innerHTML = `
             <h2>${escapeHtml(tool.toolName)}</h2>
             <p class="tool-purpose">${escapeHtml(tool.toolPurpose)}</p>
         `;
-        
+
         content.appendChild(imageWrapper);
         content.appendChild(info);
         card.appendChild(content);
@@ -114,7 +121,7 @@ function createToolCard(tool, isListView = false) {
             <h2>${escapeHtml(tool.toolName)}</h2>
         `;
         card.appendChild(image);
-        
+
         const purpose = document.createElement('p');
         purpose.className = 'tool-purpose';
         purpose.textContent = tool.toolPurpose;
@@ -127,7 +134,7 @@ function createToolCard(tool, isListView = false) {
 // Display tools in grid or list view
 function displayTools(tools, count) {
     currentTools = tools;
-    
+
     if (tools.length === 0) {
         resultsContainer.innerHTML = `
             <div class="no-results">
@@ -154,7 +161,7 @@ function displayTools(tools, count) {
 function setView(view) {
     currentView = view;
     localStorage.setItem('viewPreference', view);
-    
+
     // Update button states
     if (view === 'grid') {
         gridViewBtn.classList.add('active');
@@ -163,7 +170,7 @@ function setView(view) {
         listViewBtn.classList.add('active');
         gridViewBtn.classList.remove('active');
     }
-    
+
     // Re-render with current tools
     if (currentTools.length > 0) {
         displayTools(currentTools, currentTools.length);
@@ -193,7 +200,7 @@ function updateSearchStatus(query, count) {
 // Handle search
 async function handleSearch() {
     const query = searchInput.value.trim();
-    
+
     // Show loading state
     resultsContainer.innerHTML = '<div class="loading">Searching...</div>';
     searchStatus.style.display = 'none';
@@ -202,7 +209,7 @@ async function handleSearch() {
         const data = await fetchTools(query);
         displayTools(data.data || [], data.count || 0);
         updateSearchStatus(query, data.count || 0);
-        
+
         // Store all tools for typeahead (on first load or when showing all)
         if (allTools.length === 0 || query === '') {
             allTools = data.data || [];
@@ -229,10 +236,10 @@ function generateSuggestions(query) {
     allTools.forEach(tool => {
         const toolNameLower = tool.toolName.toLowerCase();
         const toolPurposeLower = tool.toolPurpose.toLowerCase();
-        
+
         let matchType = null;
         let matchText = '';
-        
+
         if (toolNameLower.includes(lowerQuery)) {
             matchType = 'name';
             matchText = tool.toolName;
@@ -346,7 +353,7 @@ const debouncedSearch = debounce(handleSearch, 300);
 // Event listeners
 searchInput.addEventListener('input', (e) => {
     const query = e.target.value.trim();
-    
+
     // Show typeahead if there's a query
     if (query.length >= 2) {
         debouncedTypeahead(query);
@@ -355,7 +362,7 @@ searchInput.addEventListener('input', (e) => {
         suggestions = [];
         selectedSuggestionIndex = -1;
     }
-    
+
     // Also trigger search
     debouncedSearch();
 });
