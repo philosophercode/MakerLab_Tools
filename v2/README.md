@@ -14,12 +14,12 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 ### High-Level System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              USER INTERACTIONS                               │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
+┌────────────────────────────────────────────────────────────────────────────┐
+│                              USER INTERACTIONS                             │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
 │    ┌──────────────┐         ┌──────────────┐         ┌──────────────┐      │
-│    │  Web Browser │         │  QR Scanner  │         │   Intern     │      │
+│    │  Web Browser │         │  QR Scanner  │         │   Inventory  │      │
 │    │   (Student)  │         │   (Mobile)   │         │  (Data Entry)│      │
 │    └──────┬───────┘         └──────┬───────┘         └──────┬───────┘      │
 │           │                        │                        │              │
@@ -27,7 +27,7 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
             │                        │                        │
             ▼                        ▼                        ▼
 ┌───────────────────────────────────────────────────────────────────────────┐
-│                           FRONTEND (Vercel)                                │
+│                           FRONTEND (Vercel)                               │
 │  ┌─────────────────────────────────────────────────────────────────────┐  │
 │  │                     Next.js 16 (App Router)                         │  │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────────┐  │  │
@@ -39,7 +39,7 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
                                      │ REST API
                                      ▼
 ┌───────────────────────────────────────────────────────────────────────────┐
-│                        BACKEND (Railway/Render)                            │
+│                        BACKEND (Railway/Render)                           │
 │  ┌─────────────────────────────────────────────────────────────────────┐  │
 │  │                     FastAPI (Python)                                │  │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────────┐  │  │
@@ -68,16 +68,16 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 ### Backend Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           FastAPI Backend                                    │
-│                                                                             │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                           app/main.py                                 │  │
-│  │                    FastAPI App + CORS Middleware                      │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                                    │                                        │
-│            ┌───────────────────────┼───────────────────────┐               │
-│            ▼                       ▼                       ▼               │
+┌───────────────────────────────────────────────────────────────────────────┐
+│                           FastAPI Backend                                 │
+│                                                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │                           app/main.py                               │  │
+│  │                    FastAPI App + CORS Middleware                    │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+│                                    │                                      │
+│            ┌───────────────────────┼───────────────────────┐              │
+│            ▼                       ▼                       ▼              │
 │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
 │  │   tools.py      │    │    chat.py      │    │  webhooks.py    │        │
 │  │   /tools        │    │    /chat        │    │  /webhooks      │        │
@@ -89,8 +89,8 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 │           └──────────────────────┼──────────────────────┘                 │
 │                                  │                                        │
 │  ┌───────────────────────────────┼───────────────────────────────────┐    │
-│  │                         SERVICES                                   │    │
-│  │                                                                    │    │
+│  │                         SERVICES                                  │    │
+│  │                                                                   │    │
 │  │  ┌─────────────────────────┐    ┌─────────────────────────────┐   │    │
 │  │  │    airtable.py          │    │      gemini.py              │   │    │
 │  │  │    AirtableService      │    │      GeminiService          │   │    │
@@ -99,10 +99,10 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 │  │  │  • get_tool_by_id()     │    │  • chat_with_context()      │   │    │
 │  │  │  • update_gemini_ids()  │    │  • generate_response_stream │   │    │
 │  │  └────────────┬────────────┘    └─────────────┬───────────────┘   │    │
-│  │               │                               │                    │    │
-│  └───────────────┼───────────────────────────────┼────────────────────┘    │
-│                  │                               │                         │
-└──────────────────┼───────────────────────────────┼─────────────────────────┘
+│  │               │                               │                   │    │
+│  └───────────────┼───────────────────────────────┼───────────────────┘    │
+│                  │                               │                        │
+└──────────────────┼───────────────────────────────┼────────────────────────┘
                    │                               │
                    ▼                               ▼
           ┌────────────────┐              ┌────────────────┐
@@ -117,19 +117,19 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 │                         DATA FLOW: Chat Request                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  1. POST /chat {query, tool_id}                                            │
+│  1. POST /chat {query, tool_id}                                             │
 │           │                                                                 │
 │           ▼                                                                 │
-│  2. AirtableService.get_tool_by_id(tool_id)                                │
+│  2. AirtableService.get_tool_by_id(tool_id)                                 │
 │           │                                                                 │
 │           ▼                                                                 │
-│  3. Extract gemini_resource_ids from tool                                  │
+│  3. Extract gemini_resource_ids from tool                                   │
 │           │                                                                 │
 │           ▼                                                                 │
-│  4. GeminiService.generate_response_stream(query, file_ids)                │
+│  4. GeminiService.generate_response_stream(query, file_ids)                 │
 │           │                                                                 │
 │           ▼                                                                 │
-│  5. Stream response chunks back to client                                  │
+│  5. Stream response chunks back to client                                   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -139,12 +139,12 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 ### Frontend Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        Next.js 16 Frontend                                  │
-│                         (App Router)                                        │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  src/                                                                       │
+┌────────────────────────────────────────────────────────────────────────────┐
+│                        Next.js 16 Frontend                                 │
+│                         (App Router)                                       │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  src/                                                                      │
 │  ├── app/                          ← App Router (Server Components)        │
 │  │   ├── layout.tsx                ← Root layout + metadata                │
 │  │   ├── globals.css               ← Global styles + CSS variables         │
@@ -152,16 +152,16 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 │  │   └── tools/                                                            │
 │  │       └── [id]/                                                         │
 │  │           └── page.tsx          ← Tool detail page (SSR)                │
-│  │                                                                          │
+│  │                                                                         │
 │  ├── components/                   ← Client Components                     │
 │  │   ├── Chat.tsx                  ← AI Chat interface                     │
 │  │   └── Manuals.tsx               ← PDF manual list                       │
-│  │                                                                          │
+│  │                                                                         │
 │  └── lib/                          ← Utilities                             │
 │      ├── api.ts                    ← API client functions                  │
 │      └── types.ts                  ← TypeScript interfaces                 │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
 
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -172,16 +172,16 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
 │  │  Header: MakerLab Tools - Cornell University                          │  │
 │  ├───────────────────────────────────────────────────────────────────────┤  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐                  │  │
-│  │  │  Tool   │  │  Tool   │  │  Tool   │  │  Tool   │                  │  │
-│  │  │  Card   │  │  Card   │  │  Card   │  │  Card   │                  │  │
-│  │  │ [Image] │  │ [Image] │  │ [Image] │  │ [Image] │                  │  │
-│  │  │  Name   │  │  Name   │  │  Name   │  │  Name   │                  │  │
-│  │  │  Desc   │  │  Desc   │  │  Desc   │  │  Desc   │                  │  │
-│  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘                  │  │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐                   │  │
+│  │  │  Tool   │  │  Tool   │  │  Tool   │  │  Tool   │                   │  │
+│  │  │  Card   │  │  Card   │  │  Card   │  │  Card   │                   │  │
+│  │  │ [Image] │  │ [Image] │  │ [Image] │  │ [Image] │                   │  │
+│  │  │  Name   │  │  Name   │  │  Name   │  │  Name   │                   │  │
+│  │  │  Desc   │  │  Desc   │  │  Desc   │  │  Desc   │                   │  │
+│  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘                   │  │
 │  └───────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
-│  TOOL PAGE (/tools/[id])                                                   │
+│  TOOL PAGE (/tools/[id])                                                    │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
 │  │  ← Back   Tool Name                                                   │  │
 │  ├────────────────────────────┬──────────────────────────────────────────┤  │
@@ -197,7 +197,7 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 │  │                            │  │  │                              │  │  │  │
 │  │  ┌──────────────────────┐  │  │  └──────────────────────────────┘  │  │  │
 │  │  │   Manuals & Docs     │  │  │  ┌──────────────────────────────┐  │  │  │
-│  │  │   ├─ Manual.pdf      │  │  │  │ [Ask a question...]  [Send] │  │  │  │
+│  │  │   ├─ Manual.pdf      │  │  │  │ [Ask a question...]  [Send]  │  │  │  │
 │  │  │   └─ Guide.pdf       │  │  │  └──────────────────────────────┘  │  │  │
 │  │  └──────────────────────┘  │  └────────────────────────────────────┘  │  │
 │  │        LEFT PANE           │            RIGHT PANE                    │  │
@@ -206,15 +206,15 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 └─────────────────────────────────────────────────────────────────────────────┘
 
 
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        COMPONENT DATA FLOW                                  │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│                    ┌──────────────────────────────┐                        │
-│                    │   Server Component (SSR)     │                        │
-│                    │   tools/[id]/page.tsx        │                        │
-│                    └──────────────┬───────────────┘                        │
-│                                   │                                        │
+┌───────────────────────────────────────────────────────────────────────────┐
+│                        COMPONENT DATA FLOW                                │
+├───────────────────────────────────────────────────────────────────────────┤
+│                                                                           │
+│                    ┌──────────────────────────────┐                       │
+│                    │   Server Component (SSR)     │                       │
+│                    │   tools/[id]/page.tsx        │                       │
+│                    └──────────────┬───────────────┘                       │
+│                                   │                                       │
 │          ┌────────────────────────┼────────────────────────┐              │
 │          │                        │                        │              │
 │          ▼                        ▼                        ▼              │
@@ -235,8 +235,8 @@ A modern tool inventory and AI assistant for Cornell MakerLab. Students can brow
 │                                                  │  POST /chat →   │      │
 │                                                  │  ReadableStream │      │
 │                                                  └─────────────────┘      │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Setup
@@ -289,12 +289,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Create a table named `Inventory` with the following fields:
 
-| Field Name | Type | Description |
-|------------|------|-------------|
-| Name | Single line text | Tool name |
-| Description | Long text | Tool description |
-| Images | Attachment | Tool images |
-| Manual Attachments | Attachment | PDF manuals |
+| Field Name          | Type             | Description                   |
+| ------------------- | ---------------- | ----------------------------- |
+| Name                | Single line text | Tool name                     |
+| Description         | Long text        | Tool description              |
+| Images              | Attachment       | Tool images                   |
+| Manual Attachments  | Attachment       | PDF manuals                   |
 | Gemini_Resource_Ids | Single line text | Auto-populated by sync script |
 
 ### Setting up AirTable Automation (Optional)
@@ -319,12 +319,12 @@ python scripts/sync_all.py
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/tools` | GET | List all tools |
-| `/tools/{id}` | GET | Get a specific tool |
-| `/chat` | POST | Chat with AI about a tool |
-| `/webhooks/airtable` | POST | Receive AirTable webhook |
+| Endpoint               | Method | Description               |
+| ---------------------- | ------ | ------------------------- |
+| `/tools`             | GET    | List all tools            |
+| `/tools/{id}`        | GET    | Get a specific tool       |
+| `/chat`              | POST   | Chat with AI about a tool |
+| `/webhooks/airtable` | POST   | Receive AirTable webhook  |
 
 ## Environment Variables
 
@@ -361,6 +361,5 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 ## QR Code Integration
 
-Each tool can have a QR code that links directly to `/tools/{airtable_record_id}`. 
+Each tool can have a QR code that links directly to `/tools/{airtable_record_id}`.
 When scanned, users are taken directly to that tool's page with all manuals and AI chat ready.
-
