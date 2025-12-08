@@ -1,78 +1,195 @@
-# MakerLAB Tools
+# 🛠️ MakerLab Tools
 
-Welcome to the MakerLAB Tools repository. This project provides a digital catalog and search interface for tools available in the MakerLAB inventory.
+A digital tool inventory and discovery system for the Cornell MakerLab. Browse tools, view documentation, and get AI-powered assistance for operating equipment.
+
+---
 
 ## 📂 Repository Structure
 
-This repository contains two versions of the application:
+This repository contains three iterations of the application, each representing an evolution in features and architecture:
 
-### 1. **v1 (Current Web Application)**
-Located in the [`v1/`](./v1) directory. This is the production-ready web application.
-- **Stack**: Node.js, Express, TypeScript, Vanilla JavaScript.
-- **Features**: Fast search, typeahead suggestions, grid/list views, and optimized image handling.
-- **Deployment**: Configured for easy deployment on Vercel.
-
-### 2. **Prototype (Legacy)**
-Located in the root directory (`makerlab_app.py`).
-- **Stack**: Python, Streamlit.
-- **Description**: The initial proof-of-concept for browsing the tool catalog.
+| Version | Stack | Status | Description |
+|---------|-------|--------|-------------|
+| **[v0](./v0)** | Python, Streamlit | Legacy | Original prototype for proof-of-concept |
+| **[v1](./v1)** | Node.js, Express, TypeScript | Stable | Production web app with search & image proxy |
+| **[v2](./v2)** | FastAPI, Next.js, Gemini AI | Active | AI-powered assistant with RAG capabilities |
 
 ---
 
-## 🚀 Getting Started (v1 Web App)
+## ✨ Features by Version
 
-The V1 web application is the recommended version for use.
+### v0 — Streamlit Prototype
+- Simple search interface
+- Grid display of tools with images
+- Reads from local Excel file
+- Google Drive image support
 
-### Prerequisites
-- Node.js (v16+)
-- npm
+### v1 — Web Application
+- 🔍 Real-time search with typeahead suggestions
+- 📋 Grid/List view toggle
+- 🖼️ CORS-safe image proxy for Google Drive
+- ⚡ Cached Excel data for performance
 
-### Quick Start
-1. Navigate to the backend directory inside `v1`:
-   ```bash
-   cd v1/backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   The app will be running at `http://localhost:3000`.
-
-For full documentation, please refer to the [v1 README](./v1/README.md).
+### v2 — AI-Powered Platform
+- 🤖 **AI Chat Assistant** — Ask questions about any tool, powered by Google Gemini
+- 📄 **RAG Integration** — AI has context from uploaded PDF manuals
+- 📱 **QR Code Support** — Scan a code on physical tools to jump directly to its page
+- ☁️ **AirTable Backend** — Centralized inventory management
+- 🔄 **Webhook Sync** — Auto-upload new manuals to Gemini when AirTable updates
 
 ---
 
-## 🐍 Running the Python Prototype
+## 🚀 Quick Start
 
-If you need to run the original Streamlit script:
+### Recommended: v2 (Full-Featured)
 
-1. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Run the Streamlit app:
-   ```bash
-   streamlit run makerlab_app.py
-   ```
+```bash
+# Backend
+cd v2/backend
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+cp env.example .env  # Add your API keys
+uvicorn app.main:app --reload --port 8000
+
+# Frontend (new terminal)
+cd v2/frontend
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+### Alternative: v1 (Lightweight)
+
+```bash
+cd v1/backend
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+### Legacy: v0 (Prototype)
+
+```bash
+cd v0
+pip install -r requirements.txt
+streamlit run makerlab_app.py
+```
 
 ---
 
-## 📊 Data Management
+## 🔧 Configuration
 
-The application uses an Excel file as its database.
+### v2 Environment Variables
 
-- **File**: `tools.xlsx`
-- **Location**: Root directory (shared source) and `v1/backend/data/` (deployment copy).
-- **Format**:
-  - `Tool_Name`: Name of the tool.
-  - `Image_URL`: Direct link or Google Drive link to the tool's image.
-  - `Tool_Purpose`: Short description of the tool's function.
+**Backend (`v2/backend/.env`)**
+```env
+AIRTABLE_API_KEY=your_airtable_key
+AIRTABLE_BASE_ID=your_base_id
+AIRTABLE_TABLE_NAME=Inventory
+GEMINI_API_KEY=your_gemini_key
+```
 
-## License
+**Frontend (`v2/frontend/.env.local`)**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-This project is licensed under the ISC License.
+### v1 Environment Variables
+
+**Backend (`v1/backend/.env`)**
+```env
+PORT=3000
+EXCEL_FILE_PATH=./data/tools.xlsx
+```
+
+---
+
+## 📊 Data Sources
+
+| Version | Data Source | Format |
+|---------|-------------|--------|
+| v0 | Local file | `tools.xlsx` |
+| v1 | Local file | `tools.xlsx` |
+| v2 | AirTable | Cloud-hosted Inventory table |
+
+### Excel Schema (v0/v1)
+
+| Column | Description |
+|--------|-------------|
+| `Tool_Name` | Name of the tool |
+| `Image_URL` | Direct link or Google Drive URL |
+| `Tool_Purpose` | Short description |
+
+### AirTable Schema (v2)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| Name | Text | Tool name |
+| Description | Long text | Tool description |
+| Images | Attachment | Tool photos |
+| Manual Attachments | Attachment | PDF manuals |
+| Gemini_Resource_Ids | Text | Auto-populated file IDs |
+
+---
+
+## 🏗️ Architecture (v2)
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Browser    │────▶│   Next.js    │────▶│   FastAPI    │
+│   (User)     │     │   Frontend   │     │   Backend    │
+└──────────────┘     └──────────────┘     └──────┬───────┘
+                                                 │
+                          ┌──────────────────────┼──────────────────────┐
+                          ▼                      ▼                      ▼
+                   ┌──────────────┐       ┌──────────────┐       ┌──────────────┐
+                   │   AirTable   │       │   Gemini     │       │   Webhooks   │
+                   │  (Inventory) │       │   (AI/RAG)   │       │  (Auto-sync) │
+                   └──────────────┘       └──────────────┘       └──────────────┘
+```
+
+For detailed architecture diagrams, see the [v2 README](./v2/README.md).
+
+---
+
+## 🚢 Deployment
+
+### v2
+
+- **Frontend**: Deploy to [Vercel](https://vercel.com) — set `NEXT_PUBLIC_API_URL`
+- **Backend**: Deploy to [Railway](https://railway.app) or [Render](https://render.com)
+  - Root directory: `v2/backend`
+  - Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+### v1
+
+- Deploy to [Vercel](https://vercel.com) from the `v1/` directory
+- Configuration is pre-set in `vercel.json`
+
+---
+
+## 📱 QR Code Integration (v2)
+
+Physical tools can have QR codes linking to `/tools/{airtable_record_id}`. When scanned:
+
+1. User lands on the tool's dedicated page
+2. Manuals and documentation are immediately accessible
+3. AI assistant is ready with full context from the tool's PDFs
+
+---
+
+## 📝 License
+
+ISC
+
+---
+
+## 🤝 Contributing
+
+1. Choose the appropriate version directory for your changes
+2. Follow the existing code style and conventions
+3. Test locally before submitting
+4. Update the relevant README if adding new features
 
