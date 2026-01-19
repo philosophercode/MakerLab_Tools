@@ -15,13 +15,25 @@ class AirtableService:
             fields = record.get('fields', {})
             tools.append(Tool(
                 id=record['id'],
-                name=fields.get('Name', 'Unknown'),
-                description=fields.get('Description'),
-                images=[img['url'] for img in fields.get('Images', [])] if 'Images' in fields else [],
+                name=fields.get('name', 'Unknown'), #Note: changed 'Name' to 'name'. Match case with airtable field names.
+                description=fields.get('description'), #changed description, and image to lowercase to match airtable field names.
+                images=[img['url'] for img in fields.get('images', [])] if 'images' in fields else [],
                 manual_attachments=fields.get('Manual Attachments', []),
                 gemini_resource_ids=fields.get('Gemini_Resource_Ids')
             ))
         return tools
+
+    def create_maintenance_ticket(self, request: 'MaintenanceRequest') -> dict: #setup for future user system
+        maintenance_table = self.api.table(settings.AIRTABLE_BASE_ID, "Maintenance_Logs")
+        
+        record = maintenance_table.create({
+            "Tool_ID": [request.tool_id], 
+            "Issue": request.issue_description,
+            "Reported_By": request.reported_by,
+            "Priority": request.priority,
+            "Status": "Open"
+        })
+        return record
 
     def get_tool_by_id(self, tool_id: str) -> Optional[Tool]:
         try:
@@ -29,9 +41,9 @@ class AirtableService:
             fields = record.get('fields', {})
             return Tool(
                 id=record['id'],
-                name=fields.get('Name', 'Unknown'),
-                description=fields.get('Description'),
-                images=[img['url'] for img in fields.get('Images', [])] if 'Images' in fields else [],
+                name=fields.get('name', 'Unknown'),
+                description=fields.get('description'),
+                images=[img['url'] for img in fields.get('images', [])] if 'images' in fields else [],
                 manual_attachments=fields.get('Manual Attachments', []),
                 gemini_resource_ids=fields.get('Gemini_Resource_Ids')
             )

@@ -34,6 +34,7 @@ This repository contains three iterations of the application, each representing 
 - 🤖 **AI Chat Assistant** — Ask questions about any tool, powered by Google Gemini
 - 📄 **RAG Integration** — AI has context from uploaded PDF manuals
 - 📱 **QR Code Support** — Scan a code on physical tools to jump directly to its page
+- 🛠️ **Maintenance Reporting** — Submit issue tickets for broken tools directly to AirTable
 - ☁️ **AirTable Backend** — Centralized inventory management
 - 🔄 **Webhook Sync** — Auto-upload new manuals to Gemini when AirTable updates
 
@@ -42,6 +43,8 @@ This repository contains three iterations of the application, each representing 
 ## 🚀 Quick Start
 
 ### Recommended: v2 (Full-Featured)
+
+
 
 ```bash
 # Backend
@@ -83,13 +86,15 @@ streamlit run makerlab_app.py
 
 ### v2 Environment Variables
 
-**Backend (`v2/backend/.env`)**
+Create a `.env` file in the `v2/backend` folder.
+⚠️ **IMPORTANT:** Ensure there are NO spaces around the `=` sign or at the start of your keys.
+
 ```env
-AIRTABLE_API_KEY=your_airtable_key
+AIRTABLE_API_KEY=patYourRealKeyHere
 AIRTABLE_BASE_ID=your_base_id
-AIRTABLE_TABLE_NAME=Inventory
+AIRTABLE_TABLE_NAME=Tools
 GEMINI_API_KEY=your_gemini_key
-```
+
 
 **Frontend (`v2/frontend/.env.local`)**
 ```env
@@ -124,14 +129,27 @@ EXCEL_FILE_PATH=./data/tools.xlsx
 
 ### AirTable Schema (v2)
 
+**Table 1: Tools**
+*Note: Column names must be lowercase to match the API.*
+
 | Field | Type | Description |
 |-------|------|-------------|
-| Name | Text | Tool name |
-| Description | Long text | Tool description |
-| Images | Attachment | Tool photos |
-| Manual Attachments | Attachment | PDF manuals |
-| Gemini_Resource_Ids | Text | Auto-populated file IDs |
+| `name` | Single line text | Tool name |
+| `description` | Long text | Tool description |
+| `images` | Attachment | Tool photos |
+| `manual_attachments` | Attachment | PDF manuals |
+| `gemini_resource_ids` | Single line text | Auto-populated file IDs |
 
+**Table 2: Maintenance_Logs**
+*Required for the issue reporting feature.*
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Tool_ID` | Link to another record | Links to the **Tools** table |
+| `Issue` | Long text | Description of the problem |
+| `Reported_By` | Single line text | Name of the reporter (or "Anonymous") |
+| `Priority` | Single select | Low, Normal, High, Critical |
+| `Status` | Single select | Open, In Progress, Resolved |
 ---
 
 ## 🏗️ Architecture (v2)
