@@ -8,7 +8,7 @@ from typing import List, Generator, Optional
 class GeminiService:
     def __init__(self):
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
 
     def upload_file_from_url(self, url: str, filename: str) -> str:
 
@@ -59,7 +59,7 @@ class GeminiService:
             )
 
         try:
-            response_stream = self.model.generate_content_stream(content_parts)
+            response_stream = self.model.generate_content(content_parts, stream=True)
             
             for chunk in response_stream:
                 if chunk.text:
