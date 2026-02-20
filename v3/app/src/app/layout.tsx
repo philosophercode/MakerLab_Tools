@@ -39,6 +39,9 @@ export default function RootLayout({
               <a href="/" className="text-muted hover:text-foreground transition-colors">
                 Browse
               </a>
+              <a href="/scan" className="text-muted hover:text-foreground transition-colors">
+                Scan
+              </a>
               <a href="/chat" className="text-muted hover:text-foreground transition-colors">
                 Chat
               </a>

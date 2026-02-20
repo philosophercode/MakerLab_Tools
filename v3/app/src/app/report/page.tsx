@@ -10,8 +10,13 @@ export const metadata = {
 };
 
 export default async function ReportPage() {
-  // Fetch units + tools to build a searchable unit list
-  let unitOptions: { id: string; label: string; toolName?: string }[] = [];
+  let toolOptions: { id: string; name: string }[] = [];
+  let unitOptions: {
+    id: string;
+    label: string;
+    toolId: string;
+    serialNumber?: string;
+  }[] = [];
 
   try {
     const [units, tools] = await Promise.all([
@@ -19,15 +24,21 @@ export default async function ReportPage() {
       fetchAllTools(),
     ]);
 
-    const toolMap = new Map(tools.map((t) => [t.id, t.fields.name]));
-
-    unitOptions = units.map((u) => ({
-      id: u.id,
-      label: u.fields.unit_label,
-      toolName: u.fields.tool?.[0] ? toolMap.get(u.fields.tool[0]) : undefined,
+    toolOptions = tools.map((t) => ({
+      id: t.id,
+      name: t.fields.name,
     }));
+
+    unitOptions = units
+      .filter((u) => u.fields.tool?.[0])
+      .map((u) => ({
+        id: u.id,
+        label: u.fields.unit_label,
+        toolId: u.fields.tool![0],
+        serialNumber: u.fields.serial_number || undefined,
+      }));
   } catch {
-    // Continue with empty unit list — form still works without it
+    // Continue with empty lists — form still works without them
   }
 
   return (
@@ -40,7 +51,7 @@ export default async function ReportPage() {
       </div>
       <div className="rounded-xl border border-card-border bg-card-bg p-6">
         <Suspense fallback={<div className="py-8 text-center text-muted text-sm">Loading form...</div>}>
-          <MaintenanceForm units={unitOptions} />
+          <MaintenanceForm tools={toolOptions} units={unitOptions} />
         </Suspense>
       </div>
     </div>

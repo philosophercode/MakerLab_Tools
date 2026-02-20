@@ -158,6 +158,15 @@ export async function fetchAllUnits(): Promise<UnitRecord[]> {
   });
 }
 
+export async function fetchUnitByQrCode(
+  qrCodeId: string
+): Promise<UnitRecord | null> {
+  const records = await fetchTable<UnitFields>(TABLES.units, {
+    filterByFormula: `{qr_code_id} = "${qrCodeId}"`,
+  });
+  return records[0] || null;
+}
+
 export async function fetchMaintenanceLogsByUnit(
   unitRecordId: string
 ): Promise<MaintenanceLogRecord[]> {

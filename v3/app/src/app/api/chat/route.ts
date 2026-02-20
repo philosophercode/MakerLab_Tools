@@ -16,7 +16,7 @@ import {
   resolveTools,
   createMaintenanceLog,
 } from "@/lib/airtable";
-import { fetchGoogleDocText } from "@/lib/google-docs";
+import { fetchDocContent } from "@/lib/doc-fetcher";
 
 export const maxDuration = 30;
 
@@ -87,16 +87,18 @@ ${inventory}
 - Help students find the right tool for their project.
 - When recommending tools, mention their location and any safety requirements.
 - Be concise but thorough. Use bullet points for lists.
-- If a student asks about a specific tool, provide what you know and suggest they visit the tool's detail page for more info.
+- When a student asks detailed questions about a specific tool (how to use it, safety, materials, setup), use the get_tool_details tool to fetch full information and documentation before answering. This gives you access to safety docs, SOPs, and detailed specs.
 - You are speaking to Cornell students who may be beginners.
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.`;
 }
 
 export async function POST(req: Request) {
+  try {
   const { messages, toolId }: { messages: UIMessage[]; toolId?: string } =
     await req.json();
 
   let systemPrompt: string;
+  let resolvedTools: ReturnType<typeof resolveTools> = [];
 
   if (toolId) {
     // Tool-specific chat
@@ -105,15 +107,15 @@ export async function POST(req: Request) {
       fetchAllCategories(),
       fetchAllLocations(),
     ]);
-    const [tool] = resolveTools([toolRecord], categories, locations);
+    const [resolved] = resolveTools([toolRecord], categories, locations);
 
-    // Fetch Google Doc text content for linked docs
-    const docUrls = [tool.safety_doc_url, tool.sop_url].filter(Boolean) as string[];
+    // Fetch text content from all linked docs (PDFs, Google Docs, YouTube)
+    const docUrls = [resolved.safety_doc_url, resolved.sop_url, resolved.video_url].filter(Boolean) as string[];
     const docTexts = (
-      await Promise.all(docUrls.map(fetchGoogleDocText))
+      await Promise.all(docUrls.map(fetchDocContent))
     ).filter(Boolean) as string[];
 
-    systemPrompt = buildToolSystemPrompt(tool, docTexts);
+    systemPrompt = buildToolSystemPrompt(resolved, docTexts);
   } else {
     // General chat
     const [tools, categories, locations] = await Promise.all([
@@ -121,8 +123,8 @@ export async function POST(req: Request) {
       fetchAllCategories(),
       fetchAllLocations(),
     ]);
-    const resolved = resolveTools(tools, categories, locations);
-    systemPrompt = buildGeneralSystemPrompt(resolved);
+    resolvedTools = resolveTools(tools, categories, locations);
+    systemPrompt = buildGeneralSystemPrompt(resolvedTools);
   }
 
   // Build unit lookup for the report tool (lazy — only fetched if tool is called)
@@ -143,6 +145,53 @@ export async function POST(req: Request) {
     system: systemPrompt,
     messages: await convertToModelMessages(messages),
     tools: {
+      ...(!toolId && {
+        get_tool_details: tool({
+          description:
+            "Fetch detailed information and documentation for a specific tool. Use this when a student asks detailed questions about a tool — how to use it, safety info, materials, etc.",
+          inputSchema: z.object({
+            tool_name: z
+              .string()
+              .describe("The name of the tool to look up, e.g. 'Trotec Speedy 400' or 'Prusa MK4S'"),
+          }),
+          execute: async ({ tool_name }) => {
+            const match = resolvedTools.find(
+              (t) => t.name.toLowerCase() === tool_name.toLowerCase()
+            ) || resolvedTools.find(
+              (t) => t.name.toLowerCase().includes(tool_name.toLowerCase())
+            );
+
+            if (!match) {
+              return { found: false, message: `No tool found matching "${tool_name}".` };
+            }
+
+            // Fetch linked docs (PDFs, Google Docs, YouTube transcripts)
+            const docUrls = [match.safety_doc_url, match.sop_url, match.video_url].filter(Boolean) as string[];
+            const docTexts = (
+              await Promise.all(docUrls.map(fetchDocContent))
+            ).filter(Boolean) as string[];
+
+            return {
+              found: true,
+              name: match.name,
+              description: match.description,
+              category: `${match.category_group} — ${match.category_sub}`,
+              location: `${match.location_room} — ${match.location_zone}`,
+              materials: match.materials,
+              ppe_required: match.ppe_required,
+              training_required: match.training_required,
+              authorized_only: match.authorized_only,
+              use_restrictions: match.use_restrictions || null,
+              emergency_stop: match.emergency_stop || null,
+              safety_doc_url: match.safety_doc_url || null,
+              sop_url: match.sop_url || null,
+              video_url: match.video_url || null,
+              documentation: docTexts.length > 0 ? docTexts.join("\n\n---\n\n") : null,
+              detail_page: `/tools/${match.id}`,
+            };
+          },
+        }),
+      }),
       report_issue: tool({
         description:
           "Report an equipment issue or maintenance request. Use this when a student describes a problem with a tool or unit.",
@@ -189,8 +238,12 @@ export async function POST(req: Request) {
         },
       }),
     },
-    stopWhen: stepCountIs(3),
+    stopWhen: stepCountIs(5),
   });
 
   return result.toUIMessageStreamResponse();
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Chat request failed";
+    return Response.json({ error: message }, { status: 500 });
+  }
 }

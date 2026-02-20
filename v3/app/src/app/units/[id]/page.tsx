@@ -62,7 +62,7 @@ export default async function UnitDetailPage({
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-muted">
+      <nav className="sticky top-14 z-40 -mx-4 mb-6 border-b border-card-border bg-background/90 px-4 py-2.5 text-sm text-muted backdrop-blur-sm">
         <a href="/" className="hover:text-foreground">
           Tools
         </a>
@@ -78,7 +78,7 @@ export default async function UnitDetailPage({
           </>
         )}
         <span className="mx-2">/</span>
-        <span className="text-foreground">{fields.unit_label}</span>
+        <span className="text-foreground font-medium">{fields.unit_label}</span>
       </nav>
 
       {/* Unit header */}
@@ -157,7 +157,7 @@ export default async function UnitDetailPage({
       {/* Report Issue button */}
       <div className="mb-8">
         <a
-          href={`/report?unit=${id}&tool=${encodeURIComponent(parentTool?.name || fields.unit_label)}`}
+          href={`/report?unit=${id}`}
           className="inline-flex items-center gap-2 rounded-lg bg-cornell-red px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cornell-dark"
         >
           Report an Issue

@@ -47,12 +47,12 @@ export default async function ToolDetailPage({
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-muted">
+      <nav className="sticky top-14 z-40 -mx-4 mb-6 border-b border-card-border bg-background/90 px-4 py-2.5 text-sm text-muted backdrop-blur-sm">
         <a href="/" className="hover:text-foreground">
           Tools
         </a>
         <span className="mx-2">/</span>
-        <span className="text-foreground">{tool.name}</span>
+        <span className="text-foreground font-medium">{tool.name}</span>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-2">
@@ -172,18 +172,27 @@ export default async function ToolDetailPage({
         </div>
 
         {/* Right column: Chat */}
-        <div className="lg:sticky lg:top-20 lg:self-start">
+        <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="h-[600px] rounded-xl border border-card-border bg-card-bg overflow-hidden flex flex-col">
             <div className="border-b border-card-border px-4 py-3">
               <h2 className="font-semibold text-sm">Ask about {tool.name}</h2>
             </div>
             <Chat
               toolId={id}
-              suggestions={[
-                "How do I get started?",
-                "Safety precautions?",
-                "What materials can I use?",
-              ]}
+              suggestions={(() => {
+                const s: string[] = [`How do I use the ${tool.name}?`];
+                if (tool.ppe_required.length > 0)
+                  s.push("What PPE do I need?");
+                if (tool.training_required)
+                  s.push("How do I get trained on this?");
+                else
+                  s.push("Any safety precautions?");
+                if (tool.materials.length > 0)
+                  s.push(`What ${tool.materials.slice(0, 2).join(" and ")} settings should I use?`);
+                else
+                  s.push("What can I make with this?");
+                return s.slice(0, 3);
+              })()}
             />
           </div>
         </div>

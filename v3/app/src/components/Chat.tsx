@@ -14,8 +14,9 @@ interface ChatProps {
 export default function Chat({ toolId, suggestions }: ChatProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: toolId ? { toolId } : undefined,
@@ -35,14 +36,16 @@ export default function Chat({ toolId, suggestions }: ChatProps) {
     if (!text.trim() || isLoading) return;
     sendMessage({ text: text.trim() });
     setInput("");
+    // Re-focus input after sending
+    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 p-4"
+        className="min-h-0 flex-1 overflow-y-auto space-y-4 p-4"
       >
         {messages.length === 0 && suggestions && (
           <div className="space-y-2">
@@ -77,7 +80,7 @@ export default function Chat({ toolId, suggestions }: ChatProps) {
                     return <span key={i}>{part.text}</span>;
                   }
                   return (
-                    <div key={i} className="prose prose-sm max-w-none dark:prose-invert">
+                    <div key={i} className="chat-markdown">
                       <Markdown remarkPlugins={[remarkGfm]}>
                         {part.text}
                       </Markdown>
@@ -97,6 +100,12 @@ export default function Chat({ toolId, suggestions }: ChatProps) {
             </div>
           </div>
         )}
+
+        {error && (
+          <div className="rounded-lg border border-danger/20 bg-danger/5 p-3 text-sm text-danger">
+            Something went wrong: {error.message || "Unknown error"}
+          </div>
+        )}
       </div>
 
       {/* Input */}
@@ -109,12 +118,12 @@ export default function Chat({ toolId, suggestions }: ChatProps) {
       >
         <div className="flex gap-2">
           <input
+            ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question..."
+            placeholder={isLoading ? "Waiting for response..." : "Ask a question..."}
             className="flex-1 rounded-lg border border-card-border bg-card-bg px-3 py-2 text-sm placeholder:text-muted focus:border-cornell-red focus:outline-none focus:ring-1 focus:ring-cornell-red"
-            disabled={isLoading}
           />
           <button
             type="submit"

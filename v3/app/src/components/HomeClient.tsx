@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useDeferredValue, useMemo, useRef, useState } from "react";
 import type { ToolWithMeta } from "@/lib/types";
 import ToolGrid from "./ToolGrid";
 import SearchAndFilters from "./SearchAndFilters";
@@ -23,10 +23,14 @@ export default function HomeClient({
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const query = searchParams.get("q") || "";
+  const urlQuery = searchParams.get("q") || "";
   const selectedCategories = searchParams.getAll("category");
   const selectedRooms = searchParams.getAll("room");
   const selectedMaterials = searchParams.getAll("material");
+
+  // Local state for instant typing — debounced sync to URL
+  const [localQuery, setLocalQuery] = useState(urlQuery);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const updateParams = useCallback(
     (updates: Record<string, string | string[] | null>) => {
@@ -47,9 +51,24 @@ export default function HomeClient({
     [searchParams, router]
   );
 
+  const handleQueryChange = useCallback(
+    (q: string) => {
+      setLocalQuery(q);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        updateParams({ q: q || null });
+      }, 200);
+    },
+    [updateParams]
+  );
+
+  // Defer the query used for filtering so React prioritizes input responsiveness
+  const deferredQuery = useDeferredValue(localQuery);
+
   const filtered = useMemo(() => {
     let result = tools;
 
+    const query = deferredQuery;
     if (query) {
       const q = query.toLowerCase();
       result = result.filter(
@@ -78,10 +97,10 @@ export default function HomeClient({
     }
 
     return result;
-  }, [tools, query, selectedCategories, selectedRooms, selectedMaterials]);
+  }, [tools, deferredQuery, selectedCategories, selectedRooms, selectedMaterials]);
 
   const hasFilters =
-    query ||
+    localQuery ||
     selectedCategories.length > 0 ||
     selectedRooms.length > 0 ||
     selectedMaterials.length > 0;
@@ -89,14 +108,14 @@ export default function HomeClient({
   return (
     <>
       <SearchAndFilters
-        query={query}
+        query={localQuery}
         categoryGroups={categoryGroups}
         rooms={rooms}
         materials={materials}
         selectedCategories={selectedCategories}
         selectedRooms={selectedRooms}
         selectedMaterials={selectedMaterials}
-        onQueryChange={(q) => updateParams({ q: q || null })}
+        onQueryChange={handleQueryChange}
         onCategoryChange={(cats) =>
           updateParams({ category: cats.length ? cats : null })
         }
@@ -110,11 +129,11 @@ export default function HomeClient({
 
       {hasFilters && (
         <FilterChips
-          query={query}
+          query={localQuery}
           selectedCategories={selectedCategories}
           selectedRooms={selectedRooms}
           selectedMaterials={selectedMaterials}
-          onRemoveQuery={() => updateParams({ q: null })}
+          onRemoveQuery={() => { setLocalQuery(""); updateParams({ q: null }); }}
           onRemoveCategory={(cat) =>
             updateParams({
               category: selectedCategories.filter((c) => c !== cat),
@@ -130,14 +149,15 @@ export default function HomeClient({
               material: selectedMaterials.filter((m) => m !== mat),
             })
           }
-          onClearAll={() =>
+          onClearAll={() => {
+            setLocalQuery("");
             updateParams({
               q: null,
               category: null,
               room: null,
               material: null,
-            })
-          }
+            });
+          }}
           resultCount={filtered.length}
         />
       )}

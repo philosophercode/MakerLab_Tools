@@ -1,11 +1,24 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import type { MaintenanceType, MaintenancePriority } from "@/lib/types";
 
+interface ToolOption {
+  id: string;
+  name: string;
+}
+
+interface UnitOption {
+  id: string;
+  label: string;
+  toolId: string;
+  serialNumber?: string;
+}
+
 interface MaintenanceFormProps {
-  units: { id: string; label: string; toolName?: string }[];
+  tools: ToolOption[];
+  units: UnitOption[];
 }
 
 interface PhotoFile {
@@ -30,7 +43,6 @@ function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      // Strip the data:...;base64, prefix — AirTable content API wants raw base64
       const result = reader.result as string;
       const base64 = result.split(",")[1];
       resolve(base64);
@@ -40,12 +52,32 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-export default function MaintenanceForm({ units }: MaintenanceFormProps) {
+export default function MaintenanceForm({ tools, units }: MaintenanceFormProps) {
   const searchParams = useSearchParams();
   const prefilledUnit = searchParams.get("unit") || "";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [unitId, setUnitId] = useState(prefilledUnit);
+  // Step 1: Tool selection
+  const [toolSearch, setToolSearch] = useState("");
+  const [selectedToolId, setSelectedToolId] = useState("");
+
+  // Step 2: Unit selection (filtered by tool)
+  const [unitId, setUnitId] = useState("");
+
+  // Prefill from ?unit= param (e.g. from QR code or unit page link)
+  useEffect(() => {
+    if (!prefilledUnit) return;
+    const unit = units.find((u) => u.id === prefilledUnit);
+    if (!unit) return;
+    const tool = tools.find((t) => t.id === unit.toolId);
+    if (tool) {
+      setSelectedToolId(tool.id);
+      setToolSearch(tool.name);
+    }
+    setUnitId(unit.id);
+  }, [prefilledUnit, units, tools]);
+
+  // Form fields
   const [type, setType] = useState<MaintenanceType>("Issue Report");
   const [priority, setPriority] = useState<MaintenancePriority>("Medium");
   const [title, setTitle] = useState("");
@@ -59,12 +91,36 @@ export default function MaintenanceForm({ units }: MaintenanceFormProps) {
     error?: string;
   } | null>(null);
 
-  const [unitSearch, setUnitSearch] = useState("");
-  const filteredUnits = units.filter(
-    (u) =>
-      u.label.toLowerCase().includes(unitSearch.toLowerCase()) ||
-      u.toolName?.toLowerCase().includes(unitSearch.toLowerCase())
-  );
+  // Filter tools by search
+  const filteredTools = useMemo(() => {
+    if (!toolSearch) return [];
+    const q = toolSearch.toLowerCase();
+    return tools.filter((t) => t.name.toLowerCase().includes(q)).slice(0, 10);
+  }, [tools, toolSearch]);
+
+  // Units for the selected tool
+  const toolUnits = useMemo(() => {
+    if (!selectedToolId) return [];
+    return units.filter((u) => u.toolId === selectedToolId);
+  }, [units, selectedToolId]);
+
+  // Auto-select unit if tool has exactly one
+  const handleSelectTool = (tool: ToolOption) => {
+    setSelectedToolId(tool.id);
+    setToolSearch(tool.name);
+    setUnitId(""); // reset unit selection
+
+    const matchingUnits = units.filter((u) => u.toolId === tool.id);
+    if (matchingUnits.length === 1) {
+      setUnitId(matchingUnits[0].id);
+    }
+  };
+
+  const handleClearTool = () => {
+    setSelectedToolId("");
+    setToolSearch("");
+    setUnitId("");
+  };
 
   const handleAddPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -83,8 +139,6 @@ export default function MaintenanceForm({ units }: MaintenanceFormProps) {
     }));
 
     setPhotos((prev) => [...prev, ...newPhotos]);
-
-    // Reset input so the same file can be selected again
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -101,7 +155,6 @@ export default function MaintenanceForm({ units }: MaintenanceFormProps) {
     setResult(null);
 
     try {
-      // Convert photos to base64
       const photoData = await Promise.all(
         photos.map(async (p) => ({
           contentType: p.file.type,
@@ -163,53 +216,90 @@ export default function MaintenanceForm({ units }: MaintenanceFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Unit selector */}
+      {/* Step 1: Tool selector */}
       <div>
         <label className="mb-1.5 block text-sm font-medium">
-          Unit <span className="text-muted">(optional)</span>
+          Which tool or equipment?
         </label>
         <input
           type="text"
-          placeholder="Search for a unit..."
-          value={unitSearch}
-          onChange={(e) => setUnitSearch(e.target.value)}
+          placeholder="Search by name (e.g. Prusa, laser cutter, Dremel)..."
+          value={toolSearch}
+          onChange={(e) => {
+            setToolSearch(e.target.value);
+            if (selectedToolId) {
+              // User is editing after selection — clear
+              setSelectedToolId("");
+              setUnitId("");
+            }
+          }}
           className="w-full rounded-lg border border-card-border bg-card-bg px-3 py-2 text-sm placeholder:text-muted focus:border-cornell-red focus:outline-none focus:ring-1 focus:ring-cornell-red"
         />
-        {unitSearch && filteredUnits.length > 0 && (
-          <div className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-card-border bg-card-bg">
-            {filteredUnits.slice(0, 10).map((u) => (
+        {toolSearch && !selectedToolId && filteredTools.length > 0 && (
+          <div className="mt-1 max-h-48 overflow-y-auto rounded-lg border border-card-border bg-card-bg">
+            {filteredTools.map((t) => (
               <button
-                key={u.id}
+                key={t.id}
                 type="button"
-                onClick={() => {
-                  setUnitId(u.id);
-                  setUnitSearch(u.label + (u.toolName ? ` (${u.toolName})` : ""));
-                }}
-                className={`block w-full px-3 py-2 text-left text-sm hover:bg-muted-bg ${
-                  unitId === u.id ? "bg-cornell-red/5 text-cornell-red" : ""
-                }`}
+                onClick={() => handleSelectTool(t)}
+                className="block w-full px-3 py-2 text-left text-sm hover:bg-muted-bg"
               >
-                {u.label}
-                {u.toolName && (
-                  <span className="ml-1 text-muted">— {u.toolName}</span>
-                )}
+                {t.name}
               </button>
             ))}
           </div>
         )}
-        {unitId && (
+        {selectedToolId && (
           <button
             type="button"
-            onClick={() => {
-              setUnitId("");
-              setUnitSearch("");
-            }}
+            onClick={handleClearTool}
             className="mt-1 text-xs text-muted hover:text-foreground"
           >
-            Clear selection
+            Change tool
           </button>
         )}
       </div>
+
+      {/* Step 2: Unit selector (shown after tool is selected, if multiple units) */}
+      {selectedToolId && toolUnits.length > 1 && (
+        <div>
+          <label className="mb-1.5 block text-sm font-medium">
+            Which specific unit?{" "}
+            <span className="text-muted">(optional — skip if unsure)</span>
+          </label>
+          <div className="space-y-1 rounded-lg border border-card-border bg-card-bg p-2">
+            {toolUnits.map((u) => (
+              <button
+                key={u.id}
+                type="button"
+                onClick={() => setUnitId(unitId === u.id ? "" : u.id)}
+                className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors ${
+                  unitId === u.id
+                    ? "bg-cornell-red/5 text-cornell-red border border-cornell-red/20"
+                    : "hover:bg-muted-bg"
+                }`}
+              >
+                <span className="font-medium">{u.label}</span>
+                {u.serialNumber && (
+                  <span className="ml-2 text-xs text-muted font-mono">
+                    {u.serialNumber}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Single unit auto-selected confirmation */}
+      {selectedToolId && toolUnits.length === 1 && (
+        <p className="text-xs text-muted">
+          Unit auto-selected: <span className="font-medium">{toolUnits[0].label}</span>
+          {toolUnits[0].serialNumber && (
+            <span className="ml-1 font-mono">({toolUnits[0].serialNumber})</span>
+          )}
+        </p>
+      )}
 
       {/* Type */}
       <div>
@@ -251,7 +341,7 @@ export default function MaintenanceForm({ units }: MaintenanceFormProps) {
       {/* Title */}
       <div>
         <label className="mb-1.5 block text-sm font-medium">
-          Title <span className="text-danger">*</span>
+          What&apos;s wrong? <span className="text-danger">*</span>
         </label>
         <input
           type="text"
@@ -265,12 +355,14 @@ export default function MaintenanceForm({ units }: MaintenanceFormProps) {
 
       {/* Description */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium">Description</label>
+        <label className="mb-1.5 block text-sm font-medium">
+          Details <span className="text-muted">(optional)</span>
+        </label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Detailed description of the issue..."
-          rows={4}
+          placeholder="What happened? What were you trying to do?"
+          rows={3}
           className="w-full rounded-lg border border-card-border bg-card-bg px-3 py-2 text-sm placeholder:text-muted focus:border-cornell-red focus:outline-none focus:ring-1 focus:ring-cornell-red resize-y"
         />
       </div>
@@ -281,7 +373,6 @@ export default function MaintenanceForm({ units }: MaintenanceFormProps) {
           Photos <span className="text-muted">(optional, max {MAX_PHOTOS})</span>
         </label>
 
-        {/* Photo previews */}
         {photos.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
             {photos.map((p, i) => (
