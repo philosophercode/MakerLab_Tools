@@ -2,8 +2,12 @@ node_modules/
 dist/
 public/
 .env
+.env.local
 *.log
 .DS_Store
+**/.DS_Store
 __pycache__/
+**/__pycache__/
 
 v3/scripts/tool_images/
+*.xlsx
