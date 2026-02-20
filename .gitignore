@@ -4,4 +4,6 @@ public/
 .env
 *.log
 .DS_Store
+__pycache__/
 
+v3/scripts/tool_images/
