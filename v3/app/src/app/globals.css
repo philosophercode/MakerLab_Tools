@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  --cornell-red: #B31B1B;
+  --cornell-dark: #7E1416;
+  --background: #FAFAFA;
+  --foreground: #1A1A2E;
+  --card-bg: #FFFFFF;
+  --card-border: #E5E7EB;
+  --muted: #6B7280;
+  --muted-bg: #F3F4F6;
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --danger: #DC2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0F0F1A;
+    --foreground: #F0F0F5;
+    --card-bg: #1A1A2E;
+    --card-border: #2D2D44;
+    --muted: #9CA3AF;
+    --muted-bg: #1F1F35;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cornell-red: var(--cornell-red);
+  --color-cornell-dark: var(--cornell-dark);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-muted: var(--muted);
+  --color-muted-bg: var(--muted-bg);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 3px;
+}
