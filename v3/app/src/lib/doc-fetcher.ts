@@ -32,15 +32,27 @@ async function fetchGoogleDocText(url: string): Promise<string | null> {
   return await res.text();
 }
 
+async function extractPdfWithPages(buffer: Uint8Array): Promise<string> {
+  const { getDocumentProxy, extractText } = await import("unpdf");
+  const pdf = await getDocumentProxy(buffer);
+  const { text: pages } = await extractText(pdf, { mergePages: false });
+  // pages is an array of strings, one per page
+  const pageArray = Array.isArray(pages) ? pages : [pages];
+  return pageArray
+    .map((pageText, i) => {
+      const trimmed = (typeof pageText === "string" ? pageText : "").trim();
+      return trimmed ? `[Page ${i + 1}]\n${trimmed}` : "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 async function fetchPdfText(url: string): Promise<string | null> {
   const res = await fetch(url, { next: { revalidate: 300 } });
   if (!res.ok) return null;
 
   const buffer = new Uint8Array(await res.arrayBuffer());
-  const { getDocumentProxy, extractText } = await import("unpdf");
-  const pdf = await getDocumentProxy(buffer);
-  const { text } = await extractText(pdf, { mergePages: true });
-  return text;
+  return extractPdfWithPages(buffer);
 }
 
 async function fetchWebPageText(url: string): Promise<string | null> {
@@ -52,10 +64,7 @@ async function fetchWebPageText(url: string): Promise<string | null> {
   // Response is actually a PDF
   if (contentType.includes("application/pdf")) {
     const buffer = new Uint8Array(await res.arrayBuffer());
-    const { getDocumentProxy, extractText } = await import("unpdf");
-    const pdf = await getDocumentProxy(buffer);
-    const { text } = await extractText(pdf, { mergePages: true });
-    return text;
+    return extractPdfWithPages(buffer);
   }
 
   if (contentType.includes("text/plain")) {

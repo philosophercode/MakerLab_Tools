@@ -18,9 +18,15 @@ import {
 } from "@/lib/airtable";
 import { fetchDocContent } from "@/lib/doc-fetcher";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
-function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docTexts: string[]) {
+interface LabeledDoc {
+  label: string;
+  url: string;
+  text: string;
+}
+
+function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docs: LabeledDoc[]) {
   let prompt = `You are a helpful assistant for the Cornell MakerLab. You are answering questions about a specific tool.
 
 ## Tool Information
@@ -57,18 +63,21 @@ function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docText
     prompt += `\n- **Video Tutorial:** ${tool.video_url}`;
   }
 
-  if (docTexts.length > 0) {
-    prompt += `\n\n## Linked Documentation Content\n`;
-    prompt += docTexts.join("\n\n---\n\n");
+  if (docs.length > 0) {
+    prompt += `\n\n## Source Documents\n`;
+    for (const doc of docs) {
+      prompt += `\n### ${doc.label}\nURL: ${doc.url}\n\n${doc.text}\n\n---\n`;
+    }
   }
 
   prompt += `\n\n## Guidelines
 - Answer questions about this tool's capabilities, safety, setup, and materials.
-- If you reference safety or SOP documents, mention that students should review the linked docs.
+- When your answer uses information from the source documents above, cite the source with the page number. Use the format: *Source: [document name](url), p. X* at the end of the relevant point or paragraph. Page numbers are marked as [Page N] in the document text.
 - Be concise but thorough. Use bullet points for lists.
 - If you don't know something specific about this tool, say so rather than guessing.
 - You are speaking to Cornell students who may be beginners.
-- If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.`;
+- If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
+- You have access to web search. Use it when a student asks about something not covered in the source documents — for example, material settings, techniques, troubleshooting tips, or comparisons with other equipment. Cite web sources when you use them.`;
 
   return prompt;
 }
@@ -88,8 +97,10 @@ ${inventory}
 - When recommending tools, mention their location and any safety requirements.
 - Be concise but thorough. Use bullet points for lists.
 - When a student asks detailed questions about a specific tool (how to use it, safety, materials, setup), use the get_tool_details tool to fetch full information and documentation before answering. This gives you access to safety docs, SOPs, and detailed specs.
+- When your answer uses information from fetched documentation, cite the source. Use the format: *Source: [document name](url)* at the end of the relevant point or paragraph.
 - You are speaking to Cornell students who may be beginners.
-- If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.`;
+- If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
+- You have access to web search. Use it when a student asks about something not covered in the tool inventory — for example, material recommendations, techniques, or general makerspace questions. Cite web sources when you use them.`;
 }
 
 export async function POST(req: Request) {
@@ -109,13 +120,23 @@ export async function POST(req: Request) {
     ]);
     const [resolved] = resolveTools([toolRecord], categories, locations);
 
-    // Fetch text content from all linked docs (PDFs, Google Docs, YouTube)
-    const docUrls = [resolved.safety_doc_url, resolved.sop_url, resolved.video_url].filter(Boolean) as string[];
-    const docTexts = (
-      await Promise.all(docUrls.map(fetchDocContent))
-    ).filter(Boolean) as string[];
+    // Fetch text content from all linked docs (PDFs, Google Docs, etc.)
+    const docSources = [
+      { label: "Safety Document", url: resolved.safety_doc_url },
+      { label: "Operating Manual / SOP", url: resolved.sop_url },
+      { label: "Video Tutorial", url: resolved.video_url },
+    ].filter((d) => d.url) as { label: string; url: string }[];
 
-    systemPrompt = buildToolSystemPrompt(resolved, docTexts);
+    const docs: LabeledDoc[] = (
+      await Promise.all(
+        docSources.map(async (d) => {
+          const text = await fetchDocContent(d.url);
+          return text ? { label: d.label, url: d.url, text } : null;
+        })
+      )
+    ).filter(Boolean) as LabeledDoc[];
+
+    systemPrompt = buildToolSystemPrompt(resolved, docs);
   } else {
     // General chat
     const [tools, categories, locations] = await Promise.all([
@@ -141,10 +162,13 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
-    model: anthropic("claude-sonnet-4-5-20250929"),
+    model: anthropic("claude-sonnet-4-6"),
     system: systemPrompt,
     messages: await convertToModelMessages(messages),
     tools: {
+      web_search: anthropic.tools.webSearch_20250305({
+        maxUses: 3,
+      }),
       ...(!toolId && {
         get_tool_details: tool({
           description:
@@ -165,11 +189,21 @@ export async function POST(req: Request) {
               return { found: false, message: `No tool found matching "${tool_name}".` };
             }
 
-            // Fetch linked docs (PDFs, Google Docs, YouTube transcripts)
-            const docUrls = [match.safety_doc_url, match.sop_url, match.video_url].filter(Boolean) as string[];
-            const docTexts = (
-              await Promise.all(docUrls.map(fetchDocContent))
-            ).filter(Boolean) as string[];
+            // Fetch linked docs (PDFs, Google Docs, etc.)
+            const docSources = [
+              { label: "Safety Document", url: match.safety_doc_url },
+              { label: "Operating Manual / SOP", url: match.sop_url },
+              { label: "Video Tutorial", url: match.video_url },
+            ].filter((d) => d.url) as { label: string; url: string }[];
+
+            const fetchedDocs = (
+              await Promise.all(
+                docSources.map(async (d) => {
+                  const text = await fetchDocContent(d.url);
+                  return text ? { label: d.label, url: d.url, text } : null;
+                })
+              )
+            ).filter(Boolean) as LabeledDoc[];
 
             return {
               found: true,
@@ -186,7 +220,7 @@ export async function POST(req: Request) {
               safety_doc_url: match.safety_doc_url || null,
               sop_url: match.sop_url || null,
               video_url: match.video_url || null,
-              documentation: docTexts.length > 0 ? docTexts.join("\n\n---\n\n") : null,
+              sources: fetchedDocs.map((d) => ({ label: d.label, url: d.url, excerpt: d.text.slice(0, 5000) })),
               detail_page: `/tools/${match.id}`,
             };
           },

@@ -9,14 +9,24 @@ import remarkGfm from "remark-gfm";
 interface ChatProps {
   toolId?: string;
   suggestions?: string[];
+  header?: string;
 }
 
-export default function Chat({ toolId, suggestions }: ChatProps) {
+/** Fix malformed markdown lists where the bullet and content are on separate lines */
+function normalizeMarkdown(text: string): string {
+  return text
+    // Fix: "- \n\nContent" or "* \n\nContent" → "- Content"
+    .replace(/^([*-])\s*\n\n+/gm, "$1 ")
+    // Fix: "- \nContent" → "- Content"
+    .replace(/^([*-])\s*\n(?!\n)/gm, "$1 ");
+}
+
+export default function Chat({ toolId, suggestions, header }: ChatProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, stop, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: toolId ? { toolId } : undefined,
@@ -42,6 +52,11 @@ export default function Chat({ toolId, suggestions }: ChatProps) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
+      {header && (
+        <div className="border-b border-card-border px-4 py-3">
+          <h2 className="font-semibold text-sm">{header}</h2>
+        </div>
+      )}
       {/* Messages */}
       <div
         ref={scrollRef}
@@ -82,7 +97,7 @@ export default function Chat({ toolId, suggestions }: ChatProps) {
                   return (
                     <div key={i} className="chat-markdown">
                       <Markdown remarkPlugins={[remarkGfm]}>
-                        {part.text}
+                        {normalizeMarkdown(part.text)}
                       </Markdown>
                     </div>
                   );
@@ -125,13 +140,23 @@ export default function Chat({ toolId, suggestions }: ChatProps) {
             placeholder={isLoading ? "Waiting for response..." : "Ask a question..."}
             className="flex-1 rounded-lg border border-card-border bg-card-bg px-3 py-2 text-sm placeholder:text-muted focus:border-cornell-red focus:outline-none focus:ring-1 focus:ring-cornell-red"
           />
-          <button
-            type="submit"
-            disabled={!input.trim() || isLoading}
-            className="rounded-lg bg-cornell-red px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cornell-dark disabled:opacity-50"
-          >
-            Send
-          </button>
+          {isLoading ? (
+            <button
+              type="button"
+              onClick={stop}
+              className="rounded-lg border border-card-border bg-card-bg px-4 py-2 text-sm font-medium transition-colors hover:bg-muted-bg"
+            >
+              Stop
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={!input.trim()}
+              className="rounded-lg bg-cornell-red px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cornell-dark disabled:opacity-50"
+            >
+              Send
+            </button>
+          )}
         </div>
       </form>
     </div>

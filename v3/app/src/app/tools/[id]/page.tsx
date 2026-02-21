@@ -174,11 +174,9 @@ export default async function ToolDetailPage({
         {/* Right column: Chat */}
         <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="h-[600px] rounded-xl border border-card-border bg-card-bg overflow-hidden flex flex-col">
-            <div className="border-b border-card-border px-4 py-3">
-              <h2 className="font-semibold text-sm">Ask about {tool.name}</h2>
-            </div>
             <Chat
               toolId={id}
+              header={`Ask about ${tool.name}`}
               suggestions={(() => {
                 const s: string[] = [`How do I use the ${tool.name}?`];
                 if (tool.ppe_required.length > 0)
