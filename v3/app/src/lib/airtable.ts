@@ -179,6 +179,26 @@ export async function fetchMaintenanceLogsByUnit(
   });
 }
 
+export async function fetchMaintenanceLogsByTool(
+  toolRecordId: string
+): Promise<MaintenanceLogRecord[]> {
+  // First get all units for this tool, then get logs for each
+  const units = await fetchUnitsByTool(toolRecordId);
+  if (units.length === 0) return [];
+
+  const allLogs = await Promise.all(
+    units.map((u) => fetchMaintenanceLogsByUnit(u.id).catch(() => [] as MaintenanceLogRecord[]))
+  );
+  // Flatten, then sort by date descending
+  return allLogs
+    .flat()
+    .sort((a, b) => {
+      const da = a.fields.date_reported || "";
+      const db = b.fields.date_reported || "";
+      return db.localeCompare(da);
+    });
+}
+
 export async function createMaintenanceLog(
   fields: Partial<MaintenanceLogFields>
 ): Promise<MaintenanceLogRecord> {

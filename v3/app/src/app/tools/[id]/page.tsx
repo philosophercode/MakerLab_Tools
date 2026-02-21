@@ -4,8 +4,10 @@ import {
   fetchAllCategories,
   fetchAllLocations,
   fetchUnitsByTool,
+  fetchMaintenanceLogsByTool,
   resolveTools,
 } from "@/lib/airtable";
+import type { MaintenanceLogRecord } from "@/lib/types";
 import ImageGallery from "@/components/ImageGallery";
 import SafetyBadges from "@/components/SafetyBadges";
 import DocLinks from "@/components/DocLinks";
@@ -24,16 +26,19 @@ export default async function ToolDetailPage({
 
   let tool;
   let units: Awaited<ReturnType<typeof fetchUnitsByTool>> = [];
+  let maintenanceLogs: MaintenanceLogRecord[] = [];
   try {
-    const [toolRecord, categories, locations, fetchedUnits] = await Promise.all([
+    const [toolRecord, categories, locations, fetchedUnits, fetchedLogs] = await Promise.all([
       fetchTool(id),
       fetchAllCategories(),
       fetchAllLocations(),
       fetchUnitsByTool(id).catch(() => [] as Awaited<ReturnType<typeof fetchUnitsByTool>>),
+      fetchMaintenanceLogsByTool(id).catch(() => [] as MaintenanceLogRecord[]),
     ]);
     const resolved = resolveTools([toolRecord], categories, locations);
     tool = resolved[0];
     units = fetchedUnits;
+    maintenanceLogs = fetchedLogs;
   } catch {
     notFound();
   }
@@ -187,7 +192,7 @@ export default async function ToolDetailPage({
           )}
 
           {/* Units table */}
-          <UnitStatusTable units={units} />
+          <UnitStatusTable units={units} maintenanceLogs={maintenanceLogs} />
         </div>
 
         {/* Right column: Chat */}

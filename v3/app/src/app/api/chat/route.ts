@@ -13,9 +13,12 @@ import {
   fetchAllLocations,
   fetchAllTools,
   fetchAllUnits,
+  fetchUnitsByTool,
+  fetchMaintenanceLogsByTool,
   resolveTools,
   createMaintenanceLog,
 } from "@/lib/airtable";
+import type { UnitRecord, MaintenanceLogRecord } from "@/lib/types";
 import { fetchDocContent } from "@/lib/doc-fetcher";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -27,7 +30,12 @@ interface LabeledDoc {
   text: string;
 }
 
-function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docs: LabeledDoc[]) {
+function buildToolSystemPrompt(
+  tool: ReturnType<typeof resolveTools>[0],
+  docs: LabeledDoc[],
+  units: UnitRecord[] = [],
+  maintenanceLogs: MaintenanceLogRecord[] = [],
+) {
   let prompt = `You are a helpful assistant for the Cornell MakerLab. You are answering questions about a specific tool.
 
 ## Tool Information
@@ -71,12 +79,45 @@ function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docs: L
     }
   }
 
+  // Unit status and maintenance context
+  if (units.length > 0) {
+    prompt += `\n\n## Units`;
+    for (const unit of units) {
+      prompt += `\n- **${unit.fields.unit_label}**: Status: ${unit.fields.status || "Unknown"}, Condition: ${unit.fields.condition || "Unknown"}`;
+      if (unit.fields.serial_number) prompt += `, Serial: ${unit.fields.serial_number}`;
+      if (unit.fields.notes) prompt += ` — ${unit.fields.notes}`;
+    }
+  }
+
+  const openLogs = maintenanceLogs.filter(
+    (l) => l.fields.status === "Open" || l.fields.status === "In Progress"
+  );
+  if (openLogs.length > 0) {
+    prompt += `\n\n## ⚠ Open Maintenance Issues (${openLogs.length})`;
+    for (const log of openLogs) {
+      const unitLabel = log.fields.unit?.[0]
+        ? units.find((u) => u.id === log.fields.unit![0])?.fields.unit_label || "Unknown unit"
+        : "Unspecified unit";
+      prompt += `\n- **${log.fields.title}** (${unitLabel}) — Priority: ${log.fields.priority || "Medium"}, Status: ${log.fields.status}`;
+      if (log.fields.description) prompt += `\n  ${log.fields.description}`;
+      if (log.fields.date_reported) prompt += `\n  Reported: ${log.fields.date_reported}`;
+    }
+  }
+
   prompt += `\n\n## Guidelines
 - Answer questions about this tool's capabilities, safety, setup, and materials.
 - When your answer uses information from the source documents above, cite the source with the page number. Use the format: *Source: [document name](url), p. X* at the end of the relevant point or paragraph. Page numbers are marked as [Page N] in the document text.
 - Be concise but thorough. Use bullet points for lists.
 - If you don't know something specific about this tool, say so rather than guessing.
-- You are speaking to Cornell students who may be beginners.
+- You are speaking to Cornell students who may be beginners.`;
+
+  if (openLogs.length > 0) {
+    prompt += `
+- **IMPORTANT:** This tool has ${openLogs.length} open maintenance ${openLogs.length === 1 ? "issue" : "issues"}. Proactively inform the student about any issues that may affect their work. If a unit is under maintenance or has an open issue, recommend they use a different available unit if possible.
+- If a student describes a problem that matches an existing open issue, let them know it has already been reported and ask if they'd like to add details. Do NOT create a duplicate report.`;
+  }
+
+  prompt += `
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
 - You have access to web search. Use it when a student asks about something not covered in the source documents — for example, material settings, techniques, troubleshooting tips, or comparisons with other equipment. Cite web sources when you use them.
 - Students may share photos. If they share an image of equipment, identify it from the inventory if possible. If they share an image showing damage or a problem, help diagnose it and suggest filing a maintenance report.
@@ -158,10 +199,12 @@ export async function POST(req: Request) {
 
   if (toolId) {
     // Tool-specific chat
-    const [toolRecord, categories, locations] = await Promise.all([
+    const [toolRecord, categories, locations, toolUnits, toolLogs] = await Promise.all([
       fetchTool(toolId),
       fetchAllCategories(),
       fetchAllLocations(),
+      fetchUnitsByTool(toolId).catch(() => [] as UnitRecord[]),
+      fetchMaintenanceLogsByTool(toolId).catch(() => [] as MaintenanceLogRecord[]),
     ]);
     const [resolved] = resolveTools([toolRecord], categories, locations);
 
@@ -181,7 +224,7 @@ export async function POST(req: Request) {
       )
     ).filter(Boolean) as LabeledDoc[];
 
-    systemPrompt = buildToolSystemPrompt(resolved, docs);
+    systemPrompt = buildToolSystemPrompt(resolved, docs, toolUnits, toolLogs);
   } else {
     // General or planner chat
     const [tools, categories, locations] = await Promise.all([
