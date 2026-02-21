@@ -106,6 +106,46 @@ ${inventory}
 - Students may share photos of equipment. Help identify tools from images, diagnose problems shown in photos, or suggest next steps based on what you see.`;
 }
 
+function buildPlannerSystemPrompt(tools: ReturnType<typeof resolveTools>) {
+  const inventory = tools
+    .map(
+      (t) =>
+        `- **${t.name}** (${t.category_group} — ${t.category_sub}, ${t.location_room}): ${t.description?.slice(0, 120) || "No description"}${t.materials.length > 0 ? `. Materials: ${t.materials.join(", ")}` : ""}`
+    )
+    .join("\n");
+
+  return `You are a project planning assistant for the Cornell MakerLab. Your job is to help students plan their builds using the tools and equipment available in the MakerLab.
+
+## Available Equipment (${tools.length} tools)
+${inventory}
+
+## Your Process
+Guide students through a structured conversation to create a project plan:
+
+1. **Understand the project:** Ask what they want to make. Get a clear picture before suggesting tools.
+2. **Clarify constraints:** Ask follow-up questions one at a time:
+   - What material are they thinking? (or suggest options based on the project)
+   - How precise does it need to be? (rough prototype vs. finished piece)
+   - What's their skill level with makerspace tools?
+   - Any size constraints or timeline?
+3. **Generate a plan:** Once you understand the project, provide a structured plan:
+   - **Materials needed** — specific materials and approximate quantities
+   - **Tools & steps** — ordered list of MakerLab tools they'll use, with a brief description of what to do at each step. Link to tool detail pages using the format: [Tool Name](/tools/{tool_id})
+   - **Safety requirements** — PPE needed, training required, any authorization needed
+   - **Estimated time** — rough time per step
+   - **Tips** — common mistakes to avoid, helpful techniques
+
+## Guidelines
+- Always ask clarifying questions before generating a plan. Don't assume.
+- Ask ONE question at a time — don't overwhelm the student.
+- Only recommend tools that are in the MakerLab inventory above.
+- Be encouraging and supportive — many students are beginners.
+- If a project isn't feasible with MakerLab equipment, explain why and suggest alternatives.
+- When a student asks detailed questions about a specific tool, use the get_tool_details tool.
+- If a student reports an issue with equipment, use the report_issue tool.
+- You have access to web search for techniques, material properties, or design tips not covered in the inventory.`;
+}
+
 export async function POST(req: Request) {
   const ip = getClientIp(req);
   const { allowed } = rateLimit(`chat:${ip}`, { limit: 20, windowMs: 60_000 });
@@ -117,7 +157,7 @@ export async function POST(req: Request) {
   }
 
   try {
-  const { messages, toolId }: { messages: UIMessage[]; toolId?: string } =
+  const { messages, toolId, mode }: { messages: UIMessage[]; toolId?: string; mode?: string } =
     await req.json();
 
   let systemPrompt: string;
@@ -150,14 +190,16 @@ export async function POST(req: Request) {
 
     systemPrompt = buildToolSystemPrompt(resolved, docs);
   } else {
-    // General chat
+    // General or planner chat
     const [tools, categories, locations] = await Promise.all([
       fetchAllTools(),
       fetchAllCategories(),
       fetchAllLocations(),
     ]);
     resolvedTools = resolveTools(tools, categories, locations);
-    systemPrompt = buildGeneralSystemPrompt(resolvedTools);
+    systemPrompt = mode === "planner"
+      ? buildPlannerSystemPrompt(resolvedTools)
+      : buildGeneralSystemPrompt(resolvedTools);
   }
 
   // Build unit lookup for the report tool (lazy — only fetched if tool is called)
