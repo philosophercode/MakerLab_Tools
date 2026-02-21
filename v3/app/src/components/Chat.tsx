@@ -5,11 +5,13 @@ import { DefaultChatTransport } from "ai";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useChatStore } from "@/components/ChatProvider";
 
 interface ChatProps {
   toolId?: string;
   suggestions?: string[];
   header?: string;
+  mode?: "general" | "planner";
 }
 
 /** Fix malformed markdown lists where the bullet and content are on separate lines */
@@ -21,18 +23,32 @@ function normalizeMarkdown(text: string): string {
     .replace(/^([*-])\s*\n(?!\n)/gm, "$1 ");
 }
 
-export default function Chat({ toolId, suggestions, header }: ChatProps) {
+export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const userScrolledUp = useRef(false);
 
+  const conversationId = toolId ? `tool:${toolId}` : mode === "planner" ? "planner" : "general";
+  const { getMessages, setMessages: storeMessages, clearConversation } = useChatStore();
+  const initialMessages = getMessages(conversationId);
+
   const { messages, sendMessage, stop, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: toolId ? { toolId } : undefined,
+      body: toolId ? { toolId } : mode === "planner" ? { mode: "planner" } : undefined,
     }),
+    messages: initialMessages.length > 0 ? initialMessages : undefined,
   });
+
+  // Sync messages to localStorage store
+  const prevLengthRef = useRef(initialMessages.length);
+  useEffect(() => {
+    if (messages.length !== prevLengthRef.current && messages.length > 0) {
+      storeMessages(conversationId, messages);
+      prevLengthRef.current = messages.length;
+    }
+  }, [messages, conversationId, storeMessages]);
 
   const isLoading = status === "streaming" || status === "submitted";
 
@@ -62,8 +78,20 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {header && (
-        <div className="border-b border-card-border px-4 py-3">
+        <div className="flex items-center justify-between border-b border-card-border px-4 py-3">
           <h2 className="font-semibold text-sm">{header}</h2>
+          {messages.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                clearConversation(conversationId);
+                window.location.reload();
+              }}
+              className="text-xs text-muted hover:text-foreground transition-colors"
+            >
+              New chat
+            </button>
+          )}
         </div>
       )}
       {/* Messages */}
