@@ -23,11 +23,25 @@ function normalizeMarkdown(text: string): string {
     .replace(/^([*-])\s*\n(?!\n)/gm, "$1 ");
 }
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const userScrolledUp = useRef(false);
+  const [pendingImage, setPendingImage] = useState<{ file: File; preview: string } | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const conversationId = toolId ? `tool:${toolId}` : mode === "planner" ? "planner" : "general";
   const { getMessages, setMessages: storeMessages, clearConversation } = useChatStore();
@@ -67,11 +81,48 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
     }
   }, [messages]);
 
-  const handleSubmit = (text: string) => {
-    if (!text.trim() || isLoading) return;
-    sendMessage({ text: text.trim() });
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 5 * 1024 * 1024) return; // 5MB max
+    if (pendingImage) URL.revokeObjectURL(pendingImage.preview);
+    setPendingImage({ file, preview: URL.createObjectURL(file) });
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  };
+
+  const removePendingImage = () => {
+    if (pendingImage) {
+      URL.revokeObjectURL(pendingImage.preview);
+      setPendingImage(null);
+    }
+  };
+
+  const handleSubmit = async (text: string) => {
+    if ((!text.trim() && !pendingImage) || isLoading) return;
+
+    const parts: Array<
+      | { type: "text"; text: string }
+      | { type: "file"; url: string; mediaType: string }
+    > = [];
+
+    if (pendingImage) {
+      const dataUrl = await fileToBase64(pendingImage.file);
+      parts.push({
+        type: "file",
+        url: dataUrl,
+        mediaType: pendingImage.file.type,
+      });
+      removePendingImage();
+    }
+
+    if (text.trim()) {
+      parts.push({ type: "text", text: text.trim() });
+    }
+
+    sendMessage({ parts });
     setInput("");
-    userScrolledUp.current = false; // Reset on new message
+    userScrolledUp.current = false;
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
@@ -144,6 +195,20 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
                     </div>
                   );
                 }
+                if (
+                  part.type === "file" &&
+                  typeof part.mediaType === "string" &&
+                  part.mediaType.startsWith("image/")
+                ) {
+                  return (
+                    <img
+                      key={i}
+                      src={part.url}
+                      alt="User uploaded image"
+                      className="max-h-48 rounded-lg mb-1"
+                    />
+                  );
+                }
                 return null;
               })}
             </div>
@@ -188,7 +253,53 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
         }}
         className="border-t border-card-border p-3"
       >
+        {/* Pending image preview */}
+        {pendingImage && (
+          <div className="mb-2 flex items-start gap-2">
+            <div className="relative h-16 w-16 flex-shrink-0">
+              <img
+                src={pendingImage.preview}
+                alt="Pending upload"
+                className="h-full w-full rounded-lg border border-card-border object-cover"
+              />
+              <button
+                type="button"
+                onClick={removePendingImage}
+                className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-danger text-white text-xs"
+                aria-label="Remove image"
+              >
+                &times;
+              </button>
+            </div>
+            <p className="text-xs text-muted pt-1">Image attached</p>
+          </div>
+        )}
+
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageSelect}
+          className="hidden"
+        />
+
         <div className="flex gap-2">
+          {/* Camera button */}
+          <button
+            type="button"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={isLoading || !!pendingImage}
+            className="rounded-lg border border-card-border bg-card-bg px-3 py-2 text-muted transition-colors hover:bg-muted-bg hover:text-foreground disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cornell-red"
+            aria-label="Attach photo"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+
           <input
             ref={inputRef}
             type="text"
@@ -208,7 +319,7 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
           ) : (
             <button
               type="submit"
-              disabled={!input.trim()}
+              disabled={!input.trim() && !pendingImage}
               className="rounded-lg bg-cornell-red px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cornell-dark disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cornell-red focus:ring-offset-2"
             >
               Send
