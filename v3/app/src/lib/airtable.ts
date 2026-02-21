@@ -12,6 +12,8 @@ import type {
   UnitRecord,
   MaintenanceLogFields,
   MaintenanceLogRecord,
+  FlagFields,
+  FlagRecord,
 } from "./types";
 
 const API_URL = "https://api.airtable.com/v0";
@@ -181,6 +183,12 @@ export async function createMaintenanceLog(
   fields: Partial<MaintenanceLogFields>
 ): Promise<MaintenanceLogRecord> {
   return createRecord<MaintenanceLogFields>(TABLES.maintenance_logs, fields);
+}
+
+export async function createFlag(
+  fields: Partial<FlagFields>
+): Promise<FlagRecord> {
+  return createRecord<FlagFields>(TABLES.flags, fields);
 }
 
 // ── Upload attachment via content API ────────────────────────────────
