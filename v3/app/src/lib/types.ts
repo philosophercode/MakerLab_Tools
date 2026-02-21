@@ -143,3 +143,28 @@ export interface MaintenanceLogFields {
 }
 
 export type MaintenanceLogRecord = AirtableRecord<MaintenanceLogFields>;
+
+// ── Flags table ─────────────────────────────────────────────────────
+
+export type FlaggedField =
+  | "description"
+  | "image"
+  | "name"
+  | "category"
+  | "location"
+  | "materials"
+  | "safety_info";
+
+export type FlagStatus = "New" | "Reviewed" | "Fixed" | "Dismissed";
+
+export interface FlagFields {
+  tool?: string[]; // linked record IDs
+  field_flagged?: FlaggedField;
+  issue_description?: string;
+  suggested_fix?: string;
+  reporter?: string;
+  status?: FlagStatus;
+  created_at?: string;
+}
+
+export type FlagRecord = AirtableRecord<FlagFields>;

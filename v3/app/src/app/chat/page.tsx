@@ -14,8 +14,8 @@ export default function ChatPage() {
           suggestions={[
             "What can cut acrylic?",
             "Which 3D printers are available?",
-            "What PPE do I need for the laser cutter?",
-            "How do I get started with electronics?",
+            "I want to build something",
+            "I have a class project idea",
           ]}
         />
       </div>
