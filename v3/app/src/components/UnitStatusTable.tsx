@@ -20,16 +20,16 @@ export default function UnitStatusTable({ units }: { units: UnitRecord[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-card-border bg-muted-bg/50">
-              <th className="px-3 py-2 text-left font-medium text-muted">
+              <th scope="col" className="px-3 py-2 text-left font-medium text-muted">
                 Unit
               </th>
-              <th className="px-3 py-2 text-left font-medium text-muted">
+              <th scope="col" className="px-3 py-2 text-left font-medium text-muted">
                 Status
               </th>
-              <th className="px-3 py-2 text-left font-medium text-muted">
+              <th scope="col" className="px-3 py-2 text-left font-medium text-muted">
                 Condition
               </th>
-              <th className="px-3 py-2 text-right font-medium text-muted"></th>
+              <th scope="col" className="px-3 py-2 text-right font-medium text-muted"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>

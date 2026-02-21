@@ -1,9 +1,23 @@
 import { z } from "zod";
 import { createMaintenanceLog, uploadAttachment } from "@/lib/airtable";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
+
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+];
+
+const MAX_BASE64_LENGTH = 7_000_000; // ~5MB file ≈ ~6.7MB base64
 
 const maintenanceSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
-  unit_id: z.string().optional(),
+  unit_id: z
+    .string()
+    .regex(/^rec[A-Za-z0-9]{14}$/, "Invalid unit ID")
+    .optional(),
   type: z.enum([
     "Issue Report",
     "Preventive Maintenance",
@@ -17,9 +31,11 @@ const maintenanceSchema = z.object({
   photos: z
     .array(
       z.object({
-        contentType: z.string(),
-        filename: z.string(),
-        base64: z.string(),
+        contentType: z.enum(ALLOWED_IMAGE_TYPES as [string, ...string[]], {
+          message: "Only JPEG, PNG, WebP, and HEIC images are allowed",
+        }),
+        filename: z.string().max(255),
+        base64: z.string().max(MAX_BASE64_LENGTH, "Photo exceeds 5MB limit"),
       })
     )
     .max(5, "Maximum 5 photos")
@@ -27,6 +43,15 @@ const maintenanceSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const { allowed } = rateLimit(`maint:${ip}`, { limit: 5, windowMs: 60_000 });
+  if (!allowed) {
+    return Response.json(
+      { success: false, error: "Too many requests. Please wait a moment." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await req.json();
     const parsed = maintenanceSchema.parse(body);

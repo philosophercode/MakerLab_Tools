@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ChatButton from "@/components/ChatButton";
+import NavLinks from "@/components/NavLinks";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,20 +36,7 @@ export default function RootLayout({
               <span className="text-cornell-red text-lg">◆</span>
               <span>MakerLab Tools</span>
             </a>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="/" className="text-muted hover:text-foreground transition-colors">
-                Browse
-              </a>
-              <a href="/scan" className="text-muted hover:text-foreground transition-colors">
-                Scan
-              </a>
-              <a href="/chat" className="text-muted hover:text-foreground transition-colors">
-                Chat
-              </a>
-              <a href="/report" className="text-muted hover:text-foreground transition-colors">
-                Report Issue
-              </a>
-            </div>
+            <NavLinks />
           </nav>
         </header>
         <main>{children}</main>

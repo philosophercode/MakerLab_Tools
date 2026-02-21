@@ -50,6 +50,8 @@ export default function ImageGallery({ images, toolName }: ImageGalleryProps) {
               <button
                 key={img.id}
                 onClick={() => setSelectedIndex(i)}
+                aria-label={`View image ${i + 1} of ${images.length}`}
+                aria-current={i === selectedIndex ? "true" : undefined}
                 className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-colors ${
                   i === selectedIndex
                     ? "border-cornell-red"

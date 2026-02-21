@@ -195,7 +195,7 @@ export default function MaintenanceForm({ tools, units }: MaintenanceFormProps) 
 
   if (result?.success) {
     return (
-      <div className="rounded-xl border border-success/20 bg-success/5 p-8 text-center">
+      <div className="rounded-xl border border-success/20 bg-success/5 p-8 text-center" role="status" tabIndex={-1} ref={(el) => el?.focus()}>
         <div className="text-4xl mb-3">✓</div>
         <h2 className="text-lg font-semibold">Report Submitted</h2>
         <p className="mt-1 text-sm text-muted">
@@ -242,7 +242,8 @@ export default function MaintenanceForm({ tools, units }: MaintenanceFormProps) 
                 key={t.id}
                 type="button"
                 onClick={() => handleSelectTool(t)}
-                className="block w-full px-3 py-2 text-left text-sm hover:bg-muted-bg"
+                aria-label={`Select ${t.name}`}
+                className="block w-full px-3 py-2.5 text-left text-sm hover:bg-muted-bg"
               >
                 {t.name}
               </button>

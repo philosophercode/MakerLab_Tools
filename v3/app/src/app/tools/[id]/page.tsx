@@ -22,27 +22,22 @@ export default async function ToolDetailPage({
   const { id } = await params;
 
   let tool;
+  let units: Awaited<ReturnType<typeof fetchUnitsByTool>> = [];
   try {
-    const [toolRecord, categories, locations] = await Promise.all([
+    const [toolRecord, categories, locations, fetchedUnits] = await Promise.all([
       fetchTool(id),
       fetchAllCategories(),
       fetchAllLocations(),
+      fetchUnitsByTool(id).catch(() => [] as Awaited<ReturnType<typeof fetchUnitsByTool>>),
     ]);
     const resolved = resolveTools([toolRecord], categories, locations);
     tool = resolved[0];
+    units = fetchedUnits;
   } catch {
     notFound();
   }
 
   if (!tool) notFound();
-
-  // Fetch units separately (may fail independently)
-  let units: Awaited<ReturnType<typeof fetchUnitsByTool>> = [];
-  try {
-    units = await fetchUnitsByTool(id);
-  } catch {
-    // Units are optional — continue without them
-  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">

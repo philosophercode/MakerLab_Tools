@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -25,6 +25,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const userScrolledUp = useRef(false);
 
   const { messages, sendMessage, stop, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -35,9 +36,17 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
 
   const isLoading = status === "streaming" || status === "submitted";
 
-  // Auto-scroll to bottom
+  // Track if user has scrolled up
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    userScrolledUp.current = distanceFromBottom > 100;
+  }, []);
+
+  // Smart auto-scroll: only scroll if user is near the bottom
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && !userScrolledUp.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
@@ -46,7 +55,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
     if (!text.trim() || isLoading) return;
     sendMessage({ text: text.trim() });
     setInput("");
-    // Re-focus input after sending
+    userScrolledUp.current = false; // Reset on new message
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
@@ -60,7 +69,11 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
       {/* Messages */}
       <div
         ref={scrollRef}
+        onScroll={handleScroll}
         className="min-h-0 flex-1 overflow-y-auto space-y-4 p-4"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat messages"
       >
         {messages.length === 0 && suggestions && (
           <div className="space-y-2">
@@ -69,7 +82,8 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
               <button
                 key={q}
                 onClick={() => handleSubmit(q)}
-                className="block w-full rounded-lg border border-card-border px-3 py-2 text-left text-sm hover:bg-muted-bg transition-colors"
+                aria-label={`Ask: ${q}`}
+                className="block w-full rounded-lg border border-card-border px-3 py-2.5 text-left text-sm hover:bg-muted-bg transition-colors focus:outline-none focus:ring-2 focus:ring-cornell-red"
               >
                 {q}
               </button>
@@ -83,7 +97,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[85%] rounded-xl px-4 py-2.5 text-sm ${
+              className={`max-w-[85%] break-words rounded-xl px-4 py-2.5 text-sm ${
                 m.role === "user"
                   ? "bg-cornell-red text-white"
                   : "bg-muted-bg"
@@ -123,6 +137,21 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
         )}
       </div>
 
+      {/* Collapsed suggestions after conversation starts */}
+      {messages.length > 0 && suggestions && !isLoading && (
+        <div className="flex gap-2 overflow-x-auto border-t border-card-border px-3 py-2">
+          {suggestions.map((q) => (
+            <button
+              key={q}
+              onClick={() => handleSubmit(q)}
+              className="shrink-0 rounded-full border border-card-border px-3 py-1.5 text-xs text-muted hover:bg-muted-bg hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-cornell-red"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Input */}
       <form
         onSubmit={(e) => {
@@ -138,13 +167,13 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={isLoading ? "Waiting for response..." : "Ask a question..."}
-            className="flex-1 rounded-lg border border-card-border bg-card-bg px-3 py-2 text-sm placeholder:text-muted focus:border-cornell-red focus:outline-none focus:ring-1 focus:ring-cornell-red"
+            className="flex-1 rounded-lg border border-card-border bg-card-bg px-3 py-2 text-sm placeholder:text-muted focus:border-cornell-red focus:outline-none focus:ring-2 focus:ring-cornell-red"
           />
           {isLoading ? (
             <button
               type="button"
               onClick={stop}
-              className="rounded-lg border border-card-border bg-card-bg px-4 py-2 text-sm font-medium transition-colors hover:bg-muted-bg"
+              className="rounded-lg border border-card-border bg-card-bg px-4 py-2 text-sm font-medium transition-colors hover:bg-muted-bg focus:outline-none focus:ring-2 focus:ring-cornell-red"
             >
               Stop
             </button>
@@ -152,7 +181,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
             <button
               type="submit"
               disabled={!input.trim()}
-              className="rounded-lg bg-cornell-red px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cornell-dark disabled:opacity-50"
+              className="rounded-lg bg-cornell-red px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cornell-dark disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cornell-red focus:ring-offset-2"
             >
               Send
             </button>

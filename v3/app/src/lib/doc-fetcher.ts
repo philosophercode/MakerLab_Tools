@@ -1,6 +1,29 @@
 import "server-only";
 
 const MAX_TEXT_LENGTH = 30_000; // ~30k chars ≈ ~8k tokens
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Module-level cache persists across requests within the same serverless instance
+const docCache = new Map<string, { text: string | null; expires: number }>();
+
+function getCached(url: string): string | null | undefined {
+  const entry = docCache.get(url);
+  if (!entry) return undefined;
+  if (Date.now() > entry.expires) {
+    docCache.delete(url);
+    return undefined;
+  }
+  return entry.text;
+}
+
+function setCache(url: string, text: string | null) {
+  // Evict oldest entries if cache grows too large (max 50 docs)
+  if (docCache.size >= 50) {
+    const oldest = docCache.keys().next().value;
+    if (oldest) docCache.delete(oldest);
+  }
+  docCache.set(url, { text, expires: Date.now() + CACHE_TTL });
+}
 
 // ── Type detection ──────────────────────────────────────────────────
 
@@ -93,9 +116,14 @@ async function fetchWebPageText(url: string): Promise<string | null> {
  * Returns null if the URL isn't accessible or content can't be extracted.
  */
 export async function fetchDocContent(url: string): Promise<string | null> {
+  // Check cache first
+  const cached = getCached(url);
+  if (cached !== undefined) return cached;
+
   try {
     // Skip YouTube — transcript APIs are currently broken
     if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      setCache(url, null);
       return null;
     }
 
@@ -109,9 +137,11 @@ export async function fetchDocContent(url: string): Promise<string | null> {
       text = await fetchWebPageText(url);
     }
 
-    if (!text) return null;
-    return text.slice(0, MAX_TEXT_LENGTH);
+    const result = text ? text.slice(0, MAX_TEXT_LENGTH) : null;
+    setCache(url, result);
+    return result;
   } catch {
+    setCache(url, null);
     return null;
   }
 }

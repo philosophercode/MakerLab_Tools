@@ -17,6 +17,7 @@ import {
   createMaintenanceLog,
 } from "@/lib/airtable";
 import { fetchDocContent } from "@/lib/doc-fetcher";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -104,6 +105,15 @@ ${inventory}
 }
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const { allowed } = rateLimit(`chat:${ip}`, { limit: 20, windowMs: 60_000 });
+  if (!allowed) {
+    return Response.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429 }
+    );
+  }
+
   try {
   const { messages, toolId }: { messages: UIMessage[]; toolId?: string } =
     await req.json();

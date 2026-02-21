@@ -47,6 +47,18 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+/* Global focus ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--cornell-red);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default focus outline (focus-visible handles keyboard) */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
