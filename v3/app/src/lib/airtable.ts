@@ -26,6 +26,7 @@ const TABLES = {
   locations: "tblbwtZhuvtuBKlPO",
   units: "tblDtKMcCxTyQbXwi",
   maintenance_logs: "tbl22sgbMLCFbvynl",
+  flags: "tblTODO_RUN_SETUP_FLAGS", // Run v3/scripts/setup_flags_table.py and replace with actual ID
 } as const;
 
 // ── Core fetch helper ───────────────────────────────────────────────
