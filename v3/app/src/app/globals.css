@@ -12,6 +12,9 @@
   --success: #16A34A;
   --warning: #F59E0B;
   --danger: #DC2626;
+  --accent-teal: #0D9488;
+  --accent-blue: #6366F1;
+  --accent-amber: #D97706;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,6 +25,9 @@
     --card-border: #2D2D44;
     --muted: #9CA3AF;
     --muted-bg: #1F1F35;
+    --accent-teal: #2DD4BF;
+    --accent-blue: #818CF8;
+    --accent-amber: #FBBF24;
   }
 }
 
@@ -37,6 +43,9 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-amber: var(--accent-amber);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -97,6 +106,12 @@ body {
 }
 .chat-markdown li {
   margin: 0.15em 0;
+}
+.chat-markdown li > p:first-child {
+  margin-top: 0;
+}
+.chat-markdown li > p:last-child {
+  margin-bottom: 0;
 }
 .chat-markdown li > ul,
 .chat-markdown li > ol {

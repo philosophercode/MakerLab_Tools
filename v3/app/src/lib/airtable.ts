@@ -12,6 +12,8 @@ import type {
   UnitRecord,
   MaintenanceLogFields,
   MaintenanceLogRecord,
+  FlagFields,
+  FlagRecord,
 } from "./types";
 
 const API_URL = "https://api.airtable.com/v0";
@@ -26,6 +28,7 @@ const TABLES = {
   locations: "tblbwtZhuvtuBKlPO",
   units: "tblDtKMcCxTyQbXwi",
   maintenance_logs: "tbl22sgbMLCFbvynl",
+  flags: "tblTODO_RUN_SETUP_FLAGS", // Run v3/scripts/setup_flags_table.py and replace with actual ID
 } as const;
 
 // ── Core fetch helper ───────────────────────────────────────────────
@@ -200,6 +203,12 @@ export async function createMaintenanceLog(
   fields: Partial<MaintenanceLogFields>
 ): Promise<MaintenanceLogRecord> {
   return createRecord<MaintenanceLogFields>(TABLES.maintenance_logs, fields);
+}
+
+export async function createFlag(
+  fields: Partial<FlagFields>
+): Promise<FlagRecord> {
+  return createRecord<FlagFields>(TABLES.flags, fields);
 }
 
 // ── Upload attachment via content API ────────────────────────────────

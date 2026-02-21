@@ -13,6 +13,7 @@ import SafetyBadges from "@/components/SafetyBadges";
 import DocLinks from "@/components/DocLinks";
 import UnitStatusTable from "@/components/UnitStatusTable";
 import Chat from "@/components/Chat";
+import FlagButton from "@/components/FlagButton";
 
 export const revalidate = 300;
 
@@ -59,36 +60,56 @@ export default async function ToolDetailPage({
         {/* Left column: Info */}
         <div className="space-y-6">
           {/* Image */}
-          <ImageGallery
-            images={tool.image_attachments}
-            toolName={tool.name}
-          />
+          <div className="group relative">
+            <ImageGallery
+              images={tool.image_attachments}
+              toolName={tool.name}
+            />
+            <div className="absolute top-2 right-2">
+              <FlagButton toolId={id} field="image" />
+            </div>
+          </div>
 
           {/* Name + description */}
-          <div>
-            <h1 className="text-2xl font-bold">{tool.name}</h1>
-            <p className="mt-2 text-muted leading-relaxed">
-              {tool.description}
-            </p>
+          <div className="group">
+            <div className="flex items-start justify-between gap-2">
+              <h1 className="text-2xl font-bold">{tool.name}</h1>
+              <FlagButton toolId={id} field="name" />
+            </div>
+            <div className="flex items-start justify-between gap-2 mt-2">
+              <p className="text-muted leading-relaxed">
+                {tool.description}
+              </p>
+              <FlagButton toolId={id} field="description" />
+            </div>
           </div>
 
           {/* Safety */}
-          <SafetyBadges
-            ppe_required={tool.ppe_required}
-            training_required={tool.training_required}
-            authorized_only={tool.authorized_only}
-          />
+          <div className="group flex items-start justify-between gap-2">
+            <SafetyBadges
+              ppe_required={tool.ppe_required}
+              training_required={tool.training_required}
+              authorized_only={tool.authorized_only}
+            />
+            <FlagButton toolId={id} field="safety_info" />
+          </div>
 
           {/* Metadata */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-xs font-medium text-muted">Category</h3>
+            <div className="group">
+              <div className="flex items-center gap-1">
+                <h3 className="text-xs font-medium text-muted">Category</h3>
+                <FlagButton toolId={id} field="category" />
+              </div>
               <p className="mt-0.5 text-sm">
                 {tool.category_group} — {tool.category_sub}
               </p>
             </div>
-            <div>
-              <h3 className="text-xs font-medium text-muted">Location</h3>
+            <div className="group">
+              <div className="flex items-center gap-1">
+                <h3 className="text-xs font-medium text-muted">Location</h3>
+                <FlagButton toolId={id} field="location" />
+              </div>
               <p className="mt-0.5 text-sm">
                 {tool.location_room} — {tool.location_zone}
               </p>
@@ -97,10 +118,13 @@ export default async function ToolDetailPage({
 
           {/* Materials */}
           {tool.materials.length > 0 && (
-            <div>
-              <h3 className="text-xs font-medium text-muted mb-1.5">
-                Compatible Materials
-              </h3>
+            <div className="group">
+              <div className="flex items-center gap-1 mb-1.5">
+                <h3 className="text-xs font-medium text-muted">
+                  Compatible Materials
+                </h3>
+                <FlagButton toolId={id} field="materials" />
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {tool.materials.map((m) => (
                   <span
