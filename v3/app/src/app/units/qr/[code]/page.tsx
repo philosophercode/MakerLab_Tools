@@ -14,5 +14,12 @@ export default async function QrRedirectPage({
     notFound();
   }
 
+  // Redirect to the parent tool page (not the unit page)
+  const toolId = unit.fields.tool?.[0];
+  if (toolId) {
+    redirect(`/tools/${toolId}`);
+  }
+
+  // Fallback: if unit has no linked tool, go to the unit page
   redirect(`/units/${unit.id}`);
 }
