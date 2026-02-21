@@ -56,8 +56,14 @@ function initStore() {
   currentStore = loadStore();
 }
 
+const emptyStore: ChatStore = {};
+
 function getSnapshot(): ChatStore {
   return currentStore;
+}
+
+function getServerSnapshot(): ChatStore {
+  return emptyStore;
 }
 
 function subscribe(listener: () => void): () => void {
@@ -86,7 +92,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     initialized.current = true;
   }
 
-  const store = useSyncExternalStore(subscribe, getSnapshot, () => ({}) as ChatStore);
+  const store = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const getMessages = useCallback(
     (conversationId: string): UIMessage[] => {

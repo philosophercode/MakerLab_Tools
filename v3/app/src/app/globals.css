@@ -107,6 +107,12 @@ body {
 .chat-markdown li {
   margin: 0.15em 0;
 }
+.chat-markdown li > p:first-child {
+  margin-top: 0;
+}
+.chat-markdown li > p:last-child {
+  margin-bottom: 0;
+}
 .chat-markdown li > ul,
 .chat-markdown li > ol {
   margin: 0.1em 0;

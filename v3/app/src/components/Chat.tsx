@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useChatStore } from "@/components/ChatProvider";
@@ -11,7 +11,6 @@ interface ChatProps {
   toolId?: string;
   suggestions?: string[];
   header?: string;
-  mode?: "general" | "planner";
 }
 
 /** Fix malformed markdown lists where the bullet and content are on separate lines */
@@ -20,7 +19,9 @@ function normalizeMarkdown(text: string): string {
     // Fix: "- \n\nContent" or "* \n\nContent" → "- Content"
     .replace(/^([*-])\s*\n\n+/gm, "$1 ")
     // Fix: "- \nContent" → "- Content"
-    .replace(/^([*-])\s*\n(?!\n)/gm, "$1 ");
+    .replace(/^([*-])\s*\n(?!\n)/gm, "$1 ")
+    // Collapse blank lines between consecutive list items to prevent loose lists
+    .replace(/^([*-] .+)\n\n+(?=[*-] )/gm, "$1\n");
 }
 
 function fileToBase64(file: File): Promise<string> {
@@ -35,7 +36,7 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
+export default function Chat({ toolId, suggestions, header }: ChatProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,17 +44,19 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
   const [pendingImage, setPendingImage] = useState<{ file: File; preview: string } | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const conversationId = toolId ? `tool:${toolId}` : mode === "planner" ? "planner" : "general";
+  const conversationId = toolId ? `tool:${toolId}` : "general";
   const { getMessages, setMessages: storeMessages, clearConversation } = useChatStore();
   const initialMessages = getMessages(conversationId);
 
-  const { messages, sendMessage, stop, status, error } = useChat({
+  const { messages, setMessages, sendMessage, stop, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: toolId ? { toolId } : mode === "planner" ? { mode: "planner" } : undefined,
+      body: toolId ? { toolId } : undefined,
     }),
     messages: initialMessages.length > 0 ? initialMessages : undefined,
   });
+
+  const isLoading = status === "streaming" || status === "submitted";
 
   // Sync messages to localStorage store
   const prevLengthRef = useRef(initialMessages.length);
@@ -64,7 +67,31 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
     }
   }, [messages, conversationId, storeMessages]);
 
-  const isLoading = status === "streaming" || status === "submitted";
+  // Save final state when streaming completes
+  const prevLoadingRef = useRef(false);
+  useEffect(() => {
+    if (prevLoadingRef.current && !isLoading && messages.length > 0) {
+      storeMessages(conversationId, messages);
+    }
+    prevLoadingRef.current = isLoading;
+  }, [isLoading, messages, conversationId, storeMessages]);
+
+  // Extract dynamic suggestions from the last assistant message
+  const dynamicSuggestions = useMemo(() => {
+    const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+    if (!lastAssistant) return null;
+    for (const part of lastAssistant.parts) {
+      const p = part as { type?: string; toolCallId?: string; output?: unknown; input?: { suggestions?: string[] } };
+      if (p.type === "tool-suggest_followups" && p.toolCallId) {
+        // Try output first (from execute), fall back to input
+        if (Array.isArray(p.output)) return p.output as string[];
+        if (Array.isArray(p.input?.suggestions)) return p.input.suggestions;
+      }
+    }
+    return null;
+  }, [messages]);
+
+  const activeSuggestions = dynamicSuggestions || suggestions;
 
   // Track if user has scrolled up
   const handleScroll = useCallback(() => {
@@ -74,12 +101,24 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
     userScrolledUp.current = distanceFromBottom > 100;
   }, []);
 
+  // Scroll to bottom on initial mount when restoring conversation
+  useEffect(() => {
+    if (scrollRef.current && messages.length > 0) {
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Smart auto-scroll: only scroll if user is near the bottom
   useEffect(() => {
     if (scrollRef.current && !userScrolledUp.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -136,7 +175,7 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
               type="button"
               onClick={() => {
                 clearConversation(conversationId);
-                window.location.reload();
+                setMessages([]);
               }}
               className="text-xs text-muted hover:text-foreground transition-colors"
             >
@@ -154,10 +193,10 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
         aria-live="polite"
         aria-label="Chat messages"
       >
-        {messages.length === 0 && suggestions && (
+        {messages.length === 0 && activeSuggestions && (
           <div className="space-y-2">
             <p className="text-sm text-muted">Try asking:</p>
-            {suggestions.map((q) => (
+            {activeSuggestions.map((q) => (
               <button
                 key={q}
                 onClick={() => handleSubmit(q)}
@@ -182,35 +221,49 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
                   : "bg-accent-teal/10 text-foreground"
               }`}
             >
-              {m.parts.map((part, i) => {
-                if (part.type === "text") {
-                  if (m.role === "user") {
+              {m.role === "user" ? (
+                m.parts.map((part, i) => {
+                  if (part.type === "text") {
                     return <span key={i}>{part.text}</span>;
                   }
-                  return (
-                    <div key={i} className="chat-markdown">
-                      <Markdown remarkPlugins={[remarkGfm]}>
-                        {normalizeMarkdown(part.text)}
-                      </Markdown>
-                    </div>
-                  );
-                }
-                if (
-                  part.type === "file" &&
-                  typeof part.mediaType === "string" &&
-                  part.mediaType.startsWith("image/")
-                ) {
-                  return (
-                    <img
-                      key={i}
-                      src={part.url}
-                      alt="User uploaded image"
-                      className="max-h-48 rounded-lg mb-1"
-                    />
-                  );
-                }
-                return null;
-              })}
+                  if (
+                    part.type === "file" &&
+                    typeof part.mediaType === "string" &&
+                    part.mediaType.startsWith("image/")
+                  ) {
+                    return (
+                      <img
+                        key={i}
+                        src={part.url}
+                        alt="User uploaded image"
+                        className="max-h-48 rounded-lg mb-1"
+                      />
+                    );
+                  }
+                  return null;
+                })
+              ) : (
+                <>
+                  {m.parts.some(
+                    (p) => p.type === "file" && typeof p.mediaType === "string" && p.mediaType.startsWith("image/")
+                  ) &&
+                    m.parts
+                      .filter((p) => p.type === "file" && typeof p.mediaType === "string" && p.mediaType.startsWith("image/"))
+                      .map((p, i) => (
+                        <img key={`img-${i}`} src={(p as { url: string }).url} alt="Generated image" className="max-h-48 rounded-lg mb-1" />
+                      ))}
+                  <div className="chat-markdown">
+                    <Markdown remarkPlugins={[remarkGfm]}>
+                      {normalizeMarkdown(
+                        m.parts
+                          .filter((p) => p.type === "text")
+                          .map((p) => (p as { text: string }).text)
+                          .join("\n\n")
+                      )}
+                    </Markdown>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         ))}
@@ -228,22 +281,22 @@ export default function Chat({ toolId, suggestions, header, mode }: ChatProps) {
             Something went wrong: {error.message || "Unknown error"}
           </div>
         )}
-      </div>
 
-      {/* Collapsed suggestions after conversation starts */}
-      {messages.length > 0 && suggestions && !isLoading && (
-        <div className="flex gap-2 overflow-x-auto border-t border-card-border px-3 py-2">
-          {suggestions.map((q) => (
-            <button
-              key={q}
-              onClick={() => handleSubmit(q)}
-              className="shrink-0 rounded-full border border-card-border px-3 py-1.5 text-xs text-muted hover:bg-muted-bg hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-cornell-red"
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-      )}
+        {/* Dynamic follow-up suggestions after conversation */}
+        {!isLoading && messages.length > 0 && dynamicSuggestions && (
+          <div className="flex flex-wrap gap-2">
+            {dynamicSuggestions.map((q) => (
+              <button
+                key={q}
+                onClick={() => handleSubmit(q)}
+                className="rounded-full border border-card-border px-3 py-1.5 text-xs text-muted hover:bg-muted-bg hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-cornell-red"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Input */}
       <form

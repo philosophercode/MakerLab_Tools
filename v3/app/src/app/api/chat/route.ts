@@ -79,17 +79,28 @@ function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docs: L
 - You are speaking to Cornell students who may be beginners.
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
 - You have access to web search. Use it when a student asks about something not covered in the source documents — for example, material settings, techniques, troubleshooting tips, or comparisons with other equipment. Cite web sources when you use them.
-- Students may share photos. If they share an image of equipment, identify it from the inventory if possible. If they share an image showing damage or a problem, help diagnose it and suggest filing a maintenance report.`;
+- Students may share photos. If they share an image of equipment, identify it from the inventory if possible. If they share an image showing damage or a problem, help diagnose it and suggest filing a maintenance report.
+
+## Formatting Rules
+- For bullet lists, ALWAYS put the content on the SAME line as the dash. Write \`- Content here\` not a dash on one line and content on the next.
+- Never put blank lines between bullet list items. Keep list items tight with no gaps.
+- Use paragraphs (not bullets) for longer explanatory text. Reserve bullets for short, scannable items.
+
+## Follow-ups
+- At the end of every response, call the suggest_followups tool with 2-4 short, natural follow-up questions the student might want to ask next based on the conversation so far.`;
 
   return prompt;
 }
 
 function buildGeneralSystemPrompt(tools: ReturnType<typeof resolveTools>) {
   const inventory = tools
-    .map((t) => `- ${t.name} (${t.category_group} — ${t.category_sub}, ${t.location_room})`)
+    .map(
+      (t) =>
+        `- **${t.name}** (${t.category_group} — ${t.category_sub}, ${t.location_room}): ${t.description?.slice(0, 120) || "No description"}${t.materials.length > 0 ? `. Materials: ${t.materials.join(", ")}` : ""}`
+    )
     .join("\n");
 
-  return `You are a helpful assistant for the Cornell MakerLab. You help students find and learn about makerspace equipment.
+  return `You are a helpful assistant for the Cornell MakerLab. You help students find and learn about makerspace equipment, and help them plan builds using available tools.
 
 ## Available Equipment (${tools.length} tools)
 ${inventory}
@@ -100,50 +111,32 @@ ${inventory}
 - Be concise but thorough. Use bullet points for lists.
 - When a student asks detailed questions about a specific tool (how to use it, safety, materials, setup), use the get_tool_details tool to fetch full information and documentation before answering. This gives you access to safety docs, SOPs, and detailed specs.
 - When your answer uses information from fetched documentation, cite the source. Use the format: *Source: [document name](url)* at the end of the relevant point or paragraph.
-- You are speaking to Cornell students who may be beginners.
+- You are speaking to Cornell students who may be beginners. Be encouraging and supportive.
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
 - You have access to web search. Use it when a student asks about something not covered in the tool inventory — for example, material recommendations, techniques, or general makerspace questions. Cite web sources when you use them.
-- Students may share photos of equipment. Help identify tools from images, diagnose problems shown in photos, or suggest next steps based on what you see.`;
-}
+- Students may share photos of equipment. Help identify tools from images, diagnose problems shown in photos, or suggest next steps based on what you see.
 
-function buildPlannerSystemPrompt(tools: ReturnType<typeof resolveTools>) {
-  const inventory = tools
-    .map(
-      (t) =>
-        `- **${t.name}** (${t.category_group} — ${t.category_sub}, ${t.location_room}): ${t.description?.slice(0, 120) || "No description"}${t.materials.length > 0 ? `. Materials: ${t.materials.join(", ")}` : ""}`
-    )
-    .join("\n");
-
-  return `You are a project planning assistant for the Cornell MakerLab. Your job is to help students plan their builds using the tools and equipment available in the MakerLab.
-
-## Available Equipment (${tools.length} tools)
-${inventory}
-
-## Your Process
-Guide students through a structured conversation to create a project plan:
+## Project Planning
+When a student describes something they want to build or asks for help planning a project, guide them through a structured conversation:
 
 1. **Understand the project:** Ask what they want to make. Get a clear picture before suggesting tools.
-2. **Clarify constraints:** Ask follow-up questions one at a time:
-   - What material are they thinking? (or suggest options based on the project)
-   - How precise does it need to be? (rough prototype vs. finished piece)
-   - What's their skill level with makerspace tools?
-   - Any size constraints or timeline?
+2. **Clarify constraints:** Ask follow-up questions one at a time — material preferences, precision needed (rough prototype vs. finished piece), skill level, size constraints, timeline.
 3. **Generate a plan:** Once you understand the project, provide a structured plan:
    - **Materials needed** — specific materials and approximate quantities
    - **Tools & steps** — ordered list of MakerLab tools they'll use, with a brief description of what to do at each step. Link to tool detail pages using the format: [Tool Name](/tools/{tool_id})
    - **Safety requirements** — PPE needed, training required, any authorization needed
    - **Estimated time** — rough time per step
    - **Tips** — common mistakes to avoid, helpful techniques
-
-## Guidelines
-- Always ask clarifying questions before generating a plan. Don't assume.
-- Ask ONE question at a time — don't overwhelm the student.
 - Only recommend tools that are in the MakerLab inventory above.
-- Be encouraging and supportive — many students are beginners.
 - If a project isn't feasible with MakerLab equipment, explain why and suggest alternatives.
-- When a student asks detailed questions about a specific tool, use the get_tool_details tool.
-- If a student reports an issue with equipment, use the report_issue tool.
-- You have access to web search for techniques, material properties, or design tips not covered in the inventory.`;
+
+## Formatting Rules
+- For bullet lists, ALWAYS put the content on the SAME line as the dash. Write \`- Content here\` not a dash on one line and content on the next.
+- Never put blank lines between bullet list items. Keep list items tight with no gaps.
+- Use paragraphs (not bullets) for longer explanatory text. Reserve bullets for short, scannable items.
+
+## Follow-ups
+- At the end of every response, call the suggest_followups tool with 2-4 short, natural follow-up questions the student might want to ask next based on the conversation so far.`;
 }
 
 export async function POST(req: Request) {
@@ -157,7 +150,7 @@ export async function POST(req: Request) {
   }
 
   try {
-  const { messages, toolId, mode }: { messages: UIMessage[]; toolId?: string; mode?: string } =
+  const { messages, toolId }: { messages: UIMessage[]; toolId?: string } =
     await req.json();
 
   let systemPrompt: string;
@@ -197,9 +190,7 @@ export async function POST(req: Request) {
       fetchAllLocations(),
     ]);
     resolvedTools = resolveTools(tools, categories, locations);
-    systemPrompt = mode === "planner"
-      ? buildPlannerSystemPrompt(resolvedTools)
-      : buildGeneralSystemPrompt(resolvedTools);
+    systemPrompt = buildGeneralSystemPrompt(resolvedTools);
   }
 
   // Build unit lookup for the report tool (lazy — only fetched if tool is called)
@@ -279,6 +270,18 @@ export async function POST(req: Request) {
             };
           },
         }),
+      }),
+      suggest_followups: tool({
+        description:
+          "Suggest 2-4 follow-up questions the student might want to ask next. Call this at the end of every response.",
+        inputSchema: z.object({
+          suggestions: z
+            .array(z.string())
+            .min(2)
+            .max(4)
+            .describe("Short, natural follow-up questions relevant to the conversation"),
+        }),
+        execute: async ({ suggestions }) => ({ suggestions, done: true }),
       }),
       report_issue: tool({
         description:
