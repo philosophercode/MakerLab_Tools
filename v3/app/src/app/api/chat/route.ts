@@ -78,7 +78,8 @@ function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docs: L
 - If you don't know something specific about this tool, say so rather than guessing.
 - You are speaking to Cornell students who may be beginners.
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
-- You have access to web search. Use it when a student asks about something not covered in the source documents — for example, material settings, techniques, troubleshooting tips, or comparisons with other equipment. Cite web sources when you use them.`;
+- You have access to web search. Use it when a student asks about something not covered in the source documents — for example, material settings, techniques, troubleshooting tips, or comparisons with other equipment. Cite web sources when you use them.
+- Students may share photos. If they share an image of equipment, identify it from the inventory if possible. If they share an image showing damage or a problem, help diagnose it and suggest filing a maintenance report.`;
 
   return prompt;
 }
@@ -101,7 +102,8 @@ ${inventory}
 - When your answer uses information from fetched documentation, cite the source. Use the format: *Source: [document name](url)* at the end of the relevant point or paragraph.
 - You are speaking to Cornell students who may be beginners.
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
-- You have access to web search. Use it when a student asks about something not covered in the tool inventory — for example, material recommendations, techniques, or general makerspace questions. Cite web sources when you use them.`;
+- You have access to web search. Use it when a student asks about something not covered in the tool inventory — for example, material recommendations, techniques, or general makerspace questions. Cite web sources when you use them.
+- Students may share photos of equipment. Help identify tools from images, diagnose problems shown in photos, or suggest next steps based on what you see.`;
 }
 
 export async function POST(req: Request) {
