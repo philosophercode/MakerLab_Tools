@@ -15,7 +15,7 @@ export default function SafetyBadges({
     items.push({ label: "Authorization Required", color: "bg-danger/10 text-danger" });
   }
   if (training_required) {
-    items.push({ label: "Training Required", color: "bg-cornell-red/10 text-cornell-red" });
+    items.push({ label: "Training Required", color: "bg-accent-amber/10 text-accent-amber" });
   }
   for (const ppe of ppe_required) {
     items.push({ label: ppe, color: "bg-warning/10 text-warning" });

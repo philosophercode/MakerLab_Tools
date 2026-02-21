@@ -100,7 +100,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
               className={`max-w-[85%] break-words rounded-xl px-4 py-2.5 text-sm ${
                 m.role === "user"
                   ? "bg-cornell-red text-white"
-                  : "bg-muted-bg"
+                  : "bg-accent-teal/10 text-foreground"
               }`}
             >
               {m.parts.map((part, i) => {
