@@ -134,6 +134,59 @@ The `units/[id]/page.tsx` and `scan/page.tsx` routes are already the seed of thi
 
 ---
 
+## Post-Review Additions (merged to main since initial review)
+
+Since this review was written, several features were implemented that are worth
+noting — they reinforce some findings and shift some priorities:
+
+### Chat Persistence (ChatProvider + localStorage)
+
+Messages now persist across navigation and refresh via a React context +
+localStorage store (2MB cap with auto-pruning). This is pragmatic for a
+no-auth app, but localStorage has limits: no cross-tab sync, no export,
+and images stored as base64 eat into the quota fast.
+
+### Vision / Photo Upload
+
+Students can attach images in chat. Claude's native vision processes them —
+useful for "what is this tool?" and "is this damage?". Images are base64-encoded
+on the client and stored in localStorage alongside messages, compounding the
+storage concern above.
+
+### Content Flagging System
+
+New `Flags` table in AirTable + `/api/flag` route + `FlagButton` component.
+Students can flag inaccurate tool data (wrong description, bad image, etc.).
+Flags route through AirTable for staff review. Good community-driven QA. The
+admin side is manual (AirTable grid view), which is fine for the scale.
+
+### Project Planner (Unified Chat Mode)
+
+The chat component now supports a `planner` mode that guides students through
+"what are you making?" → materials → tools → steps → safety. System prompt
+includes full inventory context. Previously a separate page, now unified into
+the chat component with mode switching. Solid educational UX.
+
+### Expanded Color Palette
+
+Three accent colors (teal, blue, amber) complement the Cornell Red. Applied to
+chat bubbles, filter chips, flag buttons, and safety badges. Dark mode variants
+included. Accessibility audit still needed (WCAG contrast ratios).
+
+### Implications for This Review
+
+- **AirTable concern is amplified.** Flags table adds a 6th table. The more
+  features depend on AirTable, the harder migration becomes. Still recommend
+  static JSON for the catalog, with AirTable reserved for dynamic tables
+  (maintenance logs, flags).
+- **"Machine companion" thesis is strengthened.** Vision + chat persistence +
+  project planning all make the QR → mobile interaction richer. This is the
+  differentiated path.
+- **localStorage is a temporary solution.** If the app gets real usage, chat
+  history should move server-side (even a simple KV store on Vercel).
+
+---
+
 ## Concrete Recommendations
 
 ### Short-Term
