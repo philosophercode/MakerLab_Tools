@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import ChatButton from "@/components/ChatButton";
 import NavLinks from "@/components/NavLinks";
+import { ChatProvider } from "@/components/ChatProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff2",
@@ -41,8 +42,10 @@ export default function RootLayout({
             <NavLinks />
           </nav>
         </header>
-        <main>{children}</main>
-        <ChatButton />
+        <ChatProvider>
+          <main>{children}</main>
+          <ChatButton />
+        </ChatProvider>
       </body>
     </html>
   );
