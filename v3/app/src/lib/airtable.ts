@@ -151,7 +151,8 @@ export async function fetchUnitsByTool(
   toolRecordId: string
 ): Promise<UnitRecord[]> {
   return fetchTable<UnitFields>(TABLES.units, {
-    filterByFormula: `FIND("${toolRecordId}", ARRAYJOIN(RECORD_ID(tool)))`,
+    // Linked record fields already store record IDs; join them and match directly.
+    filterByFormula: `FIND("${toolRecordId}", ARRAYJOIN({tool}))`,
   });
 }
 
@@ -174,7 +175,8 @@ export async function fetchMaintenanceLogsByUnit(
   unitRecordId: string
 ): Promise<MaintenanceLogRecord[]> {
   return fetchTable<MaintenanceLogFields>(TABLES.maintenance_logs, {
-    filterByFormula: `FIND("${unitRecordId}", ARRAYJOIN(RECORD_ID(unit)))`,
+    // Linked record fields already store record IDs; join them and match directly.
+    filterByFormula: `FIND("${unitRecordId}", ARRAYJOIN({unit}))`,
     sort: [{ field: "date_reported", direction: "desc" }],
   });
 }
