@@ -12,10 +12,10 @@ export default function ChatPage() {
         <Chat
           header="MakerLab Assistant"
           suggestions={[
-            "What can cut acrylic?",
-            "Which 3D printers are available?",
-            "I want to build something",
-            "I have a class project idea",
+            "How do I laser cut a custom phone stand?",
+            "Show me how to 3D print an enclosure for my Arduino",
+            "I want to make a wooden jewelry box — what steps do I follow?",
+            "What tools can cut acrylic?",
           ]}
         />
       </div>

@@ -147,6 +147,13 @@ You have a \`visualize_project\` tool that generates a concept image of what the
 - Do NOT use it for vague requests like "I want to make something" — wait until you know what they want.
 - If the image fails, continue normally — visualization is optional.
 
+## Step-by-Step Infographics
+You have a \`generate_infographic\` tool that creates visual how-to guides.
+- Use it when a student asks "how do I make X?" and you've already outlined the steps in text.
+- First explain the steps in your message, then call generate_infographic to create a visual summary.
+- Keep steps concise (3-8 steps). Each step should be one clear action.
+- The infographic is a visual companion to your text explanation — not a replacement for it.
+
 ## Formatting Rules
 - For bullet lists, ALWAYS put the content on the SAME line as the dash. Write \`- Content here\` not a dash on one line and content on the next.
 - Never put blank lines between bullet list items. Keep list items tight with no gaps.
@@ -334,6 +341,53 @@ export async function POST(req: Request) {
                   };
                 } catch (err) {
                   const msg = err instanceof Error ? err.message : "Image generation failed";
+                  return { success: false, message: msg };
+                }
+              },
+            }),
+            generate_infographic: tool({
+              description:
+                "Generate a visual step-by-step infographic showing how to make or build something using MakerLab tools. Use when a student asks how to make something and a visual guide would help. Generate AFTER you've discussed the steps in text so the student has context.",
+              inputSchema: z.object({
+                title: z
+                  .string()
+                  .describe("Short title for the infographic, e.g. 'How to Laser Cut a Phone Stand'"),
+                steps: z
+                  .array(
+                    z.object({
+                      number: z.number(),
+                      label: z.string().describe("Short action label, e.g. 'Cut the acrylic'"),
+                      detail: z.string().describe("Brief detail, e.g. 'Use Trotec Speedy 400 at 60% power'"),
+                    })
+                  )
+                  .min(3)
+                  .max(8)
+                  .describe("The ordered steps to illustrate"),
+              }),
+              execute: async ({ title, steps }) => {
+                try {
+                  const stepDescriptions = steps
+                    .map((s) => `Step ${s.number}: "${s.label}" — ${s.detail}`)
+                    .join("\n");
+                  const prompt = `Create a clean, professional vertical infographic titled "${title}".
+Layout: numbered steps flowing top to bottom, each with a small icon/illustration and text label.
+Steps:
+${stepDescriptions}
+Style: flat design, warm color palette with Cornell red (#B31B1B) accents, white background, clear numbered circles, simple tool/object illustrations beside each step. Make it easy to read at phone screen size. Do NOT include any watermarks or logos.`;
+
+                  const { imageBase64, mimeType, text } = await generateImage(prompt);
+                  const dataUrl = `data:${mimeType};base64,${imageBase64}`;
+                  writer.write({
+                    type: "file",
+                    url: dataUrl,
+                    mediaType: mimeType,
+                  });
+                  return {
+                    success: true,
+                    message: text || "Infographic generated.",
+                  };
+                } catch (err) {
+                  const msg = err instanceof Error ? err.message : "Infographic generation failed";
                   return { success: false, message: msg };
                 }
               },

@@ -1,11 +1,20 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useCallback, useDeferredValue, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ToolWithMeta } from "@/lib/types";
-import ToolGrid from "./ToolGrid";
+import ToolGrid, { type ViewMode } from "./ToolGrid";
 import SearchAndFilters from "./SearchAndFilters";
 import FilterChips from "./FilterChips";
+
+const VIEW_MODE_KEY = "makerlab-view-mode";
 
 interface HomeClientProps {
   tools: ToolWithMeta[];
@@ -31,6 +40,19 @@ export default function HomeClient({
   // Local state for instant typing — debounced sync to URL
   const [localQuery, setLocalQuery] = useState(urlQuery);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  // View mode state — persisted in localStorage
+  const [viewMode, setViewMode] = useState<ViewMode>("compact");
+  useEffect(() => {
+    const stored = localStorage.getItem(VIEW_MODE_KEY);
+    if (stored === "compact" || stored === "grid" || stored === "table") {
+      setViewMode(stored);
+    }
+  }, []);
+  const handleViewMode = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem(VIEW_MODE_KEY, mode);
+  }, []);
 
   const updateParams = useCallback(
     (updates: Record<string, string | string[] | null>) => {
@@ -163,7 +185,79 @@ export default function HomeClient({
         />
       )}
 
-      <ToolGrid tools={filtered} />
+      {/* Result count + view mode toggles */}
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm text-muted">
+          <span className="font-medium text-foreground">{filtered.length}</span>{" "}
+          {filtered.length === 1 ? "tool" : "tools"}
+        </p>
+        <ViewToggle viewMode={viewMode} onChange={handleViewMode} />
+      </div>
+
+      <ToolGrid tools={filtered} viewMode={viewMode} />
     </>
+  );
+}
+
+/* ── View mode toggle button group ──────────────────────────── */
+
+const VIEW_OPTIONS: { mode: ViewMode; label: string; icon: React.ReactNode }[] = [
+  {
+    mode: "compact",
+    label: "Compact grid",
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" strokeWidth="2" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" strokeWidth="2" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" strokeWidth="2" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" strokeWidth="2" />
+      </svg>
+    ),
+  },
+  {
+    mode: "grid",
+    label: "Large grid",
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+      </svg>
+    ),
+  },
+  {
+    mode: "table",
+    label: "Table view",
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeWidth="2" d="M3 6h18M3 12h18M3 18h18" />
+      </svg>
+    ),
+  },
+];
+
+function ViewToggle({
+  viewMode,
+  onChange,
+}: {
+  viewMode: ViewMode;
+  onChange: (mode: ViewMode) => void;
+}) {
+  return (
+    <div className="flex rounded-lg border border-card-border overflow-hidden">
+      {VIEW_OPTIONS.map(({ mode, label, icon }) => (
+        <button
+          key={mode}
+          type="button"
+          onClick={() => onChange(mode)}
+          title={label}
+          className={`px-2.5 py-1.5 transition-colors ${
+            viewMode === mode
+              ? "bg-cornell-red text-white"
+              : "bg-muted-bg text-muted hover:text-foreground"
+          }`}
+        >
+          {icon}
+        </button>
+      ))}
+    </div>
   );
 }

@@ -174,19 +174,23 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
 
   const activeSuggestions = dynamicSuggestions || suggestions;
 
-  // Detect if visualize_project tool is currently executing (called but no image yet)
-  const isGeneratingImage = useMemo(() => {
-    if (!isLoading) return false;
+  // Detect if an image generation tool is currently executing (called but no image yet)
+  const imageGenStatus = useMemo(() => {
+    if (!isLoading) return null;
     const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
-    if (!lastAssistant) return false;
-    const hasVisualizeTool = lastAssistant.parts.some((p) => {
-      const part = p as { type?: string };
-      return part.type === "tool-visualize_project";
-    });
+    if (!lastAssistant) return null;
+    const hasVisualizeTool = lastAssistant.parts.some(
+      (p) => (p as { type?: string }).type === "tool-visualize_project"
+    );
+    const hasInfographicTool = lastAssistant.parts.some(
+      (p) => (p as { type?: string }).type === "tool-generate_infographic"
+    );
+    if (!hasVisualizeTool && !hasInfographicTool) return null;
     const hasImage = lastAssistant.parts.some(
       (p) => p.type === "file" && typeof p.mediaType === "string" && p.mediaType.startsWith("image/")
     );
-    return hasVisualizeTool && !hasImage;
+    if (hasImage) return null;
+    return hasInfographicTool ? "infographic" : "image";
   }, [messages, isLoading]);
 
   // Track if user has scrolled up
@@ -348,14 +352,14 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
                       .map((p, i) => (
                         <img key={`img-${i}`} src={(p as { url: string }).url} alt="Generated image" className="max-h-80 rounded-lg mb-1" />
                       ))}
-                  {isGeneratingImage && m === messages[messages.length - 1] && (
+                  {imageGenStatus && m === messages[messages.length - 1] && (
                     <div className="flex items-center gap-2 py-2 text-sm text-muted">
                       <span className="inline-flex gap-1">
                         <span className="h-1.5 w-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: "0ms" }} />
                         <span className="h-1.5 w-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: "150ms" }} />
                         <span className="h-1.5 w-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: "300ms" }} />
                       </span>
-                      Generating image...
+                      {imageGenStatus === "infographic" ? "Generating infographic..." : "Generating image..."}
                     </div>
                   )}
                   <div className="chat-markdown">

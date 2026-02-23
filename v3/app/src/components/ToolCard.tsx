@@ -30,7 +30,13 @@ const STATUS_MESSAGES: Record<string, { label: string; sub: string }> = {
   },
 };
 
-export default function ToolCard({ tool }: { tool: ToolWithMeta }) {
+export default function ToolCard({
+  tool,
+  compact = false,
+}: {
+  tool: ToolWithMeta;
+  compact?: boolean;
+}) {
   const hasPPE = tool.ppe_required.length > 0;
   const needsAuth = tool.authorized_only;
   const needsTraining = tool.training_required;
@@ -143,18 +149,28 @@ export default function ToolCard({ tool }: { tool: ToolWithMeta }) {
       }`}
     >
       {/* Image */}
-      <div className="relative aspect-square bg-muted-bg">
+      <div
+        className={`relative bg-muted-bg ${
+          compact ? "aspect-[4/3]" : "aspect-square"
+        }`}
+      >
         {imgSrc ? (
           <Image
             src={imgSrc}
             alt={tool.name}
             fill
-            className={`object-contain p-4 transition-all ${
+            className={`object-contain transition-all ${
+              compact ? "p-2" : "p-4"
+            } ${
               isProcessing
                 ? "opacity-30 blur-sm scale-95"
                 : "group-hover:scale-105"
             }`}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes={
+              compact
+                ? "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            }
             unoptimized
           />
         ) : (
@@ -163,8 +179,8 @@ export default function ToolCard({ tool }: { tool: ToolWithMeta }) {
           </div>
         )}
 
-        {/* Processing overlay */}
-        {status && (
+        {/* Processing overlay — hidden in compact mode */}
+        {status && !compact && (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {isProcessing && (
               <>
@@ -214,8 +230,8 @@ export default function ToolCard({ tool }: { tool: ToolWithMeta }) {
           </div>
         )}
 
-        {/* Image action buttons — visible on hover, hidden during processing */}
-        {!status && (
+        {/* Image action buttons — visible on hover, hidden in compact mode and during processing */}
+        {!status && !compact && (
           <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               type="button"
@@ -238,26 +254,34 @@ export default function ToolCard({ tool }: { tool: ToolWithMeta }) {
       </div>
 
       {/* Info */}
-      <div className="p-4">
-        <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-cornell-red transition-colors">
+      <div className={compact ? "p-2.5" : "p-4"}>
+        <h3
+          className={`font-semibold leading-tight line-clamp-2 group-hover:text-cornell-red transition-colors ${
+            compact ? "text-xs" : "text-sm"
+          }`}
+        >
           {tool.name}
         </h3>
-        <p className="mt-1 text-xs text-muted line-clamp-2">
-          {tool.description}
-        </p>
+        {!compact && (
+          <p className="mt-1 text-xs text-muted line-clamp-2">
+            {tool.description}
+          </p>
+        )}
 
         {/* Category + Location */}
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className={`flex flex-wrap gap-1 ${compact ? "mt-1" : "mt-2 gap-1.5"}`}>
           <span className="inline-block rounded-full bg-muted-bg px-2 py-0.5 text-[11px] text-muted">
             {tool.category_group}
           </span>
-          <span className="inline-block rounded-full bg-muted-bg px-2 py-0.5 text-[11px] text-muted">
-            {tool.location_room}
-          </span>
+          {!compact && (
+            <span className="inline-block rounded-full bg-muted-bg px-2 py-0.5 text-[11px] text-muted">
+              {tool.location_room}
+            </span>
+          )}
         </div>
 
         {/* Safety badges */}
-        {(hasPPE || needsAuth || needsTraining) && (
+        {!compact && (hasPPE || needsAuth || needsTraining) && (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {hasPPE && (
               <span className="inline-block rounded-full bg-warning/10 px-2 py-0.5 text-[11px] text-warning font-medium">
