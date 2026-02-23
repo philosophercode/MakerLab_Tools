@@ -1,18 +1,18 @@
-import QrScanner from "@/components/QrScanner";
+import ScanModes from "@/components/ScanModes";
 
 export const metadata = {
-  title: "Scan QR Code — MakerLab Tools",
+  title: "Scan — MakerLab Tools",
 };
 
 export default function ScanPage() {
   return (
-    <div className="mx-auto max-w-lg px-4 py-8">
-      <h1 className="mb-2 text-2xl font-bold">Scan QR Code</h1>
+    <div className="mx-auto max-w-3xl px-4 py-8">
+      <h1 className="mb-2 text-2xl font-bold">Scan Tools</h1>
       <p className="mb-6 text-sm text-muted">
-        Point your camera at the QR code on any machine to view its details,
-        status, and report issues.
+        Scan a machine QR code, or upload a photo and ask chat to identify what
+        tool it is in Studio 101.
       </p>
-      <QrScanner />
+      <ScanModes />
     </div>
   );
 }
