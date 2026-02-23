@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen overflow-x-hidden bg-background text-foreground`}
       >
         <header className="sticky top-0 z-50 border-b border-card-border bg-card-bg/80 backdrop-blur-sm">
           <nav className="flex h-14 items-center justify-between px-4">
