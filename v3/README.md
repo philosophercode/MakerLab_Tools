@@ -81,13 +81,13 @@ Set in `v3/app/.env.local` for local and in Vercel project settings for deploys.
 
 ```mermaid
 flowchart LR
-  U[User Browser] --> N[Next.js App Router]
-  N --> A[Airtable REST + Content APIs]
-  N --> C[Anthropic]
-  N --> G[Gemini API]
-  N --> W[Wikipedia API]
-  N --> F[Local image/scripts pipeline]
-  X[MCP Client] --> M[/api/mcp]
+  U["User Browser"] --> N["Next.js App Router"]
+  N --> A["Airtable REST + Content APIs"]
+  N --> C["Anthropic"]
+  N --> G["Gemini API"]
+  N --> W["Wikipedia API"]
+  N --> F["Local image/scripts pipeline"]
+  X["MCP Client"] --> M["API route: /api/mcp"]
   M --> A
   M --> C
 ```
@@ -96,14 +96,14 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  P[Page request] --> R[Server components]
-  R --> L[lib/airtable.ts fetch + resolve]
-  L --> S[data/airtable snapshots optional sync]
-  L --> T[Airtable API]
-  R --> UI[Rendered UI]
-  UI --> API[Client actions to /api/* routes]
-  API --> RL[Rate limiter]
-  API --> EXT[External service or Airtable]
+  P["Page request"] --> R["Server components"]
+  R --> L["lib/airtable.ts fetch + resolve"]
+  L --> S["data/airtable snapshots optional sync"]
+  L --> T["Airtable API"]
+  R --> UI["Rendered UI"]
+  UI --> API["Client actions to API routes"]
+  API --> RL["Rate limiter"]
+  API --> EXT["External service or Airtable"]
 ```
 
 ## 6. Primary user flows
@@ -112,45 +112,45 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-  Home[Home /] --> Tool[/tools/:id]
-  Tool --> UnitLink[Unit row link]
-  UnitLink --> Unit[/units/:id]
-  Unit --> Report[/report?unit=:id]
+  Home["Home page"] --> Tool["Tool detail route (/tools/:id)"]
+  Tool --> UnitLink["Unit row link"]
+  UnitLink --> Unit["Unit detail route (/units/:id)"]
+  Unit --> Report["Report route (/report?unit=:id)"]
 ```
 
 ### B) QR scan flow
 
 ```mermaid
 flowchart LR
-  Scan[/scan] --> QR[QR scanner]
-  QR --> QrRoute[/units/qr/:code]
-  QrRoute --> Resolve[Lookup qr_code_id in Airtable]
-  Resolve --> Unit[/units/:id]
+  Scan["Scan page (/scan)"] --> QR["QR scanner"]
+  QR --> QrRoute["QR redirect route (/units/qr/:code)"]
+  QrRoute --> Resolve["Lookup qr_code_id in Airtable"]
+  Resolve --> Unit["Unit detail route (/units/:id)"]
 ```
 
 ### C) Chat flow (general + tool scoped)
 
 ```mermaid
 flowchart TD
-  ChatUI[Chat component] --> ChatAPI[/api/chat]
-  ChatAPI --> Prompt[System prompt builder]
+  ChatUI["Chat component"] --> ChatAPI["API route (/api/chat)"]
+  ChatAPI --> Prompt["System prompt builder"]
   Prompt --> ToolScope{toolId provided?}
-  ToolScope -- yes --> ToolDocs[Fetch tool + linked docs text]
-  ToolScope -- no --> Inventory[Fetch full inventory context]
-  ChatAPI --> Model[Claude via AI SDK]
-  Model --> Tools[Tool calls: get details, report issue, followups, web search, visualize]
-  ChatAPI --> Stream[Stream response to UI]
+  ToolScope -- yes --> ToolDocs["Fetch tool + linked docs text"]
+  ToolScope -- no --> Inventory["Fetch full inventory context"]
+  ChatAPI --> Model["Claude via AI SDK"]
+  Model --> Tools["Tool calls: details, issue report, followups, web search, visualize"]
+  ChatAPI --> Stream["Stream response to UI"]
 ```
 
 ### D) Maintenance report flow
 
 ```mermaid
 flowchart LR
-  ReportPage[/report] --> Form[MaintenanceForm]
-  Form --> API[/api/maintenance]
-  API --> Create[createMaintenanceLog]
-  API --> Upload[uploadAttachment sequential]
-  Create --> Airtable[(Maintenance_Logs)]
+  ReportPage["Report page (/report)"] --> Form["MaintenanceForm"]
+  Form --> API["API route (/api/maintenance)"]
+  API --> Create["createMaintenanceLog"]
+  API --> Upload["uploadAttachment sequential"]
+  Create --> Airtable[("Maintenance_Logs table")]
   Upload --> Airtable
 ```
 
@@ -158,13 +158,13 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  Actions[ImageActions UI] --> ImgPOST[/api/image POST]
-  ImgPOST --> BG[Detached node script task]
-  Actions --> Poll[/api/image GET poll]
+  Actions["ImageActions UI"] --> ImgPOST["API route (/api/image POST)"]
+  ImgPOST --> BG["Detached node script task"]
+  Actions --> Poll["API route (/api/image GET poll)"]
   Poll --> Done{mtime newer than start?}
-  Done -- yes --> Reload[Reload page/gallery]
-  Actions --> Search[/api/image-search?q=tool]
-  Search --> Wiki[Wikipedia image candidates]
+  Done -- yes --> Reload["Reload page/gallery"]
+  Actions --> Search["API route (/api/image-search?q=tool)"]
+  Search --> Wiki["Wikipedia image candidates"]
 ```
 
 ## 7. API surface (v3/app)
