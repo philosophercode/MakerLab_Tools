@@ -2,6 +2,8 @@ import { anthropic } from "@ai-sdk/anthropic";
 import {
   streamText,
   convertToModelMessages,
+  createUIMessageStream,
+  createUIMessageStreamResponse,
   stepCountIs,
   tool,
   type UIMessage,
@@ -18,6 +20,7 @@ import {
 } from "@/lib/airtable";
 import { fetchDocContent } from "@/lib/doc-fetcher";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { generateImage } from "@/lib/gemini-image";
 
 export const maxDuration = 60;
 
@@ -130,6 +133,15 @@ When a student describes something they want to build or asks for help planning 
 - Only recommend tools that are in the MakerLab inventory above.
 - If a project isn't feasible with MakerLab equipment, explain why and suggest alternatives.
 
+## Project Visualization
+You have a \`visualize_project\` tool that generates a concept image of what the finished project could look like.
+- Use it when a student has described their project in enough detail that you can picture the end result.
+- Call it AFTER you've gathered key details (materials, size, style) — not on the very first message.
+- Write a detailed, visual prompt describing the finished object: materials, colors, textures, setting, lighting, and camera angle. Think product photography.
+- IMPORTANT: Always describe the COMPLETE finished object fully visible in the frame. Write "full view of the entire [object]" in your prompt. Never describe a close-up or partial view — the student needs to see the whole thing.
+- Do NOT use it for vague requests like "I want to make something" — wait until you know what they want.
+- If the image fails, continue normally — visualization is optional.
+
 ## Formatting Rules
 - For bullet lists, ALWAYS put the content on the SAME line as the dash. Write \`- Content here\` not a dash on one line and content on the next.
 - Never put blank lines between bullet list items. Keep list items tight with no gaps.
@@ -206,133 +218,168 @@ export async function POST(req: Request) {
     return unitLabelMap;
   }
 
-  const result = streamText({
-    model: anthropic("claude-sonnet-4-6"),
-    system: systemPrompt,
-    messages: await convertToModelMessages(messages),
-    tools: {
-      web_search: anthropic.tools.webSearch_20250305({
-        maxUses: 3,
-      }),
-      ...(!toolId && {
-        get_tool_details: tool({
-          description:
-            "Fetch detailed information and documentation for a specific tool. Use this when a student asks detailed questions about a tool — how to use it, safety info, materials, etc.",
-          inputSchema: z.object({
-            tool_name: z
-              .string()
-              .describe("The name of the tool to look up, e.g. 'Trotec Speedy 400' or 'Prusa MK4S'"),
+  const modelMessages = await convertToModelMessages(messages);
+
+  const stream = createUIMessageStream({
+    execute: async ({ writer }) => {
+      const result = streamText({
+        model: anthropic("claude-sonnet-4-6"),
+        system: systemPrompt,
+        messages: modelMessages,
+        tools: {
+          web_search: anthropic.tools.webSearch_20250305({
+            maxUses: 3,
           }),
-          execute: async ({ tool_name }) => {
-            const match = resolvedTools.find(
-              (t) => t.name.toLowerCase() === tool_name.toLowerCase()
-            ) || resolvedTools.find(
-              (t) => t.name.toLowerCase().includes(tool_name.toLowerCase())
-            );
+          ...(!toolId && {
+            get_tool_details: tool({
+              description:
+                "Fetch detailed information and documentation for a specific tool. Use this when a student asks detailed questions about a tool — how to use it, safety info, materials, etc.",
+              inputSchema: z.object({
+                tool_name: z
+                  .string()
+                  .describe("The name of the tool to look up, e.g. 'Trotec Speedy 400' or 'Prusa MK4S'"),
+              }),
+              execute: async ({ tool_name }) => {
+                const match = resolvedTools.find(
+                  (t) => t.name.toLowerCase() === tool_name.toLowerCase()
+                ) || resolvedTools.find(
+                  (t) => t.name.toLowerCase().includes(tool_name.toLowerCase())
+                );
 
-            if (!match) {
-              return { found: false, message: `No tool found matching "${tool_name}".` };
-            }
+                if (!match) {
+                  return { found: false, message: `No tool found matching "${tool_name}".` };
+                }
 
-            // Fetch linked docs (PDFs, Google Docs, etc.)
-            const docSources = [
-              { label: "Safety Document", url: match.safety_doc_url },
-              { label: "Operating Manual / SOP", url: match.sop_url },
-              { label: "Video Tutorial", url: match.video_url },
-            ].filter((d) => d.url) as { label: string; url: string }[];
+                const docSources = [
+                  { label: "Safety Document", url: match.safety_doc_url },
+                  { label: "Operating Manual / SOP", url: match.sop_url },
+                  { label: "Video Tutorial", url: match.video_url },
+                ].filter((d) => d.url) as { label: string; url: string }[];
 
-            const fetchedDocs = (
-              await Promise.all(
-                docSources.map(async (d) => {
-                  const text = await fetchDocContent(d.url);
-                  return text ? { label: d.label, url: d.url, text } : null;
-                })
-              )
-            ).filter(Boolean) as LabeledDoc[];
+                const fetchedDocs = (
+                  await Promise.all(
+                    docSources.map(async (d) => {
+                      const text = await fetchDocContent(d.url);
+                      return text ? { label: d.label, url: d.url, text } : null;
+                    })
+                  )
+                ).filter(Boolean) as LabeledDoc[];
 
-            return {
-              found: true,
-              name: match.name,
-              description: match.description,
-              category: `${match.category_group} — ${match.category_sub}`,
-              location: `${match.location_room} — ${match.location_zone}`,
-              materials: match.materials,
-              ppe_required: match.ppe_required,
-              training_required: match.training_required,
-              authorized_only: match.authorized_only,
-              use_restrictions: match.use_restrictions || null,
-              emergency_stop: match.emergency_stop || null,
-              safety_doc_url: match.safety_doc_url || null,
-              sop_url: match.sop_url || null,
-              video_url: match.video_url || null,
-              sources: fetchedDocs.map((d) => ({ label: d.label, url: d.url, excerpt: d.text.slice(0, 5000) })),
-              detail_page: `/tools/${match.id}`,
-            };
-          },
-        }),
-      }),
-      suggest_followups: tool({
-        description:
-          "Suggest 2-4 follow-up questions the student might want to ask next. Call this at the end of every response.",
-        inputSchema: z.object({
-          suggestions: z
-            .array(z.string())
-            .min(2)
-            .max(4)
-            .describe("Short, natural follow-up questions relevant to the conversation"),
-        }),
-        execute: async ({ suggestions }) => ({ suggestions, done: true }),
-      }),
-      report_issue: tool({
-        description:
-          "Report an equipment issue or maintenance request. Use this when a student describes a problem with a tool or unit.",
-        inputSchema: z.object({
-          title: z.string().describe("Brief summary of the issue"),
-          description: z.string().describe("Detailed description of the problem"),
-          unit_label: z
-            .string()
-            .optional()
-            .describe("Unit label if known, e.g. 'Prusa #1'"),
-          priority: z
-            .enum(["Critical", "High", "Medium", "Low"])
-            .default("Medium")
-            .describe("Urgency level"),
-          reported_by: z
-            .string()
-            .optional()
-            .describe("Student name or NetID if provided"),
-        }),
-        execute: async ({ title, description, unit_label, priority, reported_by }) => {
-          // Resolve unit label to record ID if provided
-          let unitId: string | undefined;
-          if (unit_label) {
-            const map = await getUnitLabelMap();
-            unitId = map.get(unit_label.toLowerCase());
-          }
+                return {
+                  found: true,
+                  name: match.name,
+                  description: match.description,
+                  category: `${match.category_group} — ${match.category_sub}`,
+                  location: `${match.location_room} — ${match.location_zone}`,
+                  materials: match.materials,
+                  ppe_required: match.ppe_required,
+                  training_required: match.training_required,
+                  authorized_only: match.authorized_only,
+                  use_restrictions: match.use_restrictions || null,
+                  emergency_stop: match.emergency_stop || null,
+                  safety_doc_url: match.safety_doc_url || null,
+                  sop_url: match.sop_url || null,
+                  video_url: match.video_url || null,
+                  sources: fetchedDocs.map((d) => ({ label: d.label, url: d.url, excerpt: d.text.slice(0, 5000) })),
+                  detail_page: `/tools/${match.id}`,
+                };
+              },
+            }),
+            visualize_project: tool({
+              description:
+                "Generate a concept image of a student's project. Use this after gathering enough detail about what they want to build. Write a detailed visual prompt describing the finished object.",
+              inputSchema: z.object({
+                prompt: z
+                  .string()
+                  .describe(
+                    "A detailed scene description for image generation: describe the finished object, materials, colors, textures, setting, lighting, and camera angle. Think product photography."
+                  ),
+              }),
+              execute: async ({ prompt }) => {
+                try {
+                  const { imageBase64, mimeType, text } = await generateImage(prompt);
+                  const dataUrl = `data:${mimeType};base64,${imageBase64}`;
+                  writer.write({
+                    type: "file",
+                    url: dataUrl,
+                    mediaType: mimeType,
+                  });
+                  return {
+                    success: true,
+                    message: text || "Image generated successfully.",
+                  };
+                } catch (err) {
+                  const msg = err instanceof Error ? err.message : "Image generation failed";
+                  return { success: false, message: msg };
+                }
+              },
+            }),
+          }),
+          suggest_followups: tool({
+            description:
+              "Suggest 2-4 follow-up questions the student might want to ask next. Call this at the end of every response.",
+            inputSchema: z.object({
+              suggestions: z
+                .array(z.string())
+                .min(2)
+                .max(4)
+                .describe("Short, natural follow-up questions relevant to the conversation"),
+            }),
+            execute: async ({ suggestions }) => ({ suggestions, done: true }),
+          }),
+          report_issue: tool({
+            description:
+              "Report an equipment issue or maintenance request. Use this when a student describes a problem with a tool or unit.",
+            inputSchema: z.object({
+              title: z.string().describe("Brief summary of the issue"),
+              description: z.string().describe("Detailed description of the problem"),
+              unit_label: z
+                .string()
+                .optional()
+                .describe("Unit label if known, e.g. 'Prusa #1'"),
+              priority: z
+                .enum(["Critical", "High", "Medium", "Low"])
+                .default("Medium")
+                .describe("Urgency level"),
+              reported_by: z
+                .string()
+                .optional()
+                .describe("Student name or NetID if provided"),
+            }),
+            execute: async ({ title, description, unit_label, priority, reported_by }) => {
+              let unitId: string | undefined;
+              if (unit_label) {
+                const map = await getUnitLabelMap();
+                unitId = map.get(unit_label.toLowerCase());
+              }
 
-          const record = await createMaintenanceLog({
-            title,
-            description,
-            type: "Issue Report",
-            priority,
-            status: "Open",
-            reported_by: reported_by || undefined,
-            unit: unitId ? [unitId] : undefined,
-            date_reported: new Date().toISOString().split("T")[0],
-          });
+              const record = await createMaintenanceLog({
+                title,
+                description,
+                type: "Issue Report",
+                priority,
+                status: "Open",
+                reported_by: reported_by || undefined,
+                unit: unitId ? [unitId] : undefined,
+                date_reported: new Date().toISOString().split("T")[0],
+              });
 
-          return {
-            success: true,
-            ticket_id: record.id,
-            message: `Issue reported successfully. Ticket ID: ${record.id}`,
-          };
+              return {
+                success: true,
+                ticket_id: record.id,
+                message: `Issue reported successfully. Ticket ID: ${record.id}`,
+              };
+            },
+          }),
         },
-      }),
+        stopWhen: stepCountIs(5),
+      });
+
+      writer.merge(result.toUIMessageStream());
     },
-    stopWhen: stepCountIs(5),
   });
 
-  return result.toUIMessageStreamResponse();
+  return createUIMessageStreamResponse({ stream });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Chat request failed";
     return Response.json({ error: message }, { status: 500 });

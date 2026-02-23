@@ -93,6 +93,21 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
 
   const activeSuggestions = dynamicSuggestions || suggestions;
 
+  // Detect if visualize_project tool is currently executing (called but no image yet)
+  const isGeneratingImage = useMemo(() => {
+    if (!isLoading) return false;
+    const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+    if (!lastAssistant) return false;
+    const hasVisualizeTool = lastAssistant.parts.some((p) => {
+      const part = p as { type?: string };
+      return part.type === "tool-visualize_project";
+    });
+    const hasImage = lastAssistant.parts.some(
+      (p) => p.type === "file" && typeof p.mediaType === "string" && p.mediaType.startsWith("image/")
+    );
+    return hasVisualizeTool && !hasImage;
+  }, [messages, isLoading]);
+
   // Track if user has scrolled up
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -250,8 +265,18 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
                     m.parts
                       .filter((p) => p.type === "file" && typeof p.mediaType === "string" && p.mediaType.startsWith("image/"))
                       .map((p, i) => (
-                        <img key={`img-${i}`} src={(p as { url: string }).url} alt="Generated image" className="max-h-48 rounded-lg mb-1" />
+                        <img key={`img-${i}`} src={(p as { url: string }).url} alt="Generated image" className="max-h-80 rounded-lg mb-1" />
                       ))}
+                  {isGeneratingImage && m === messages[messages.length - 1] && (
+                    <div className="flex items-center gap-2 py-2 text-sm text-muted">
+                      <span className="inline-flex gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="h-1.5 w-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="h-1.5 w-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </span>
+                      Generating image...
+                    </div>
+                  )}
                   <div className="chat-markdown">
                     <Markdown remarkPlugins={[remarkGfm]}>
                       {normalizeMarkdown(
