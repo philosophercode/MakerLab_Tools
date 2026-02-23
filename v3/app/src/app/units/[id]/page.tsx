@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import {
   fetchUnit,
   fetchTool,
@@ -8,6 +7,8 @@ import {
   fetchMaintenanceLogsByUnit,
   resolveTools,
 } from "@/lib/airtable";
+import ImageGallery from "@/components/ImageGallery";
+import type { Attachment } from "@/lib/types";
 
 export const revalidate = 60; // 1 minute — status changes often
 
@@ -45,7 +46,12 @@ export default async function UnitDetailPage({
   const fields = unit.fields;
 
   // Resolve parent tool
-  let parentTool: { id: string; name: string; imageUrl: string | null } | null = null;
+  let parentTool: {
+    id: string;
+    name: string;
+    imageUrl: string | null;
+    imageAttachments: Attachment[];
+  } | null = null;
   if (fields.tool?.[0]) {
     try {
       const [toolRecord, categories, locations] = await Promise.all([
@@ -58,6 +64,7 @@ export default async function UnitDetailPage({
         id: resolved.id,
         name: resolved.name,
         imageUrl: resolved.image_url,
+        imageAttachments: resolved.image_attachments,
       };
     } catch {
       // Continue without parent tool info
@@ -105,14 +112,12 @@ export default async function UnitDetailPage({
             {parentTool.name}
           </a>
         )}
-        {parentTool?.imageUrl && (
-          <div className="mt-4 relative aspect-square max-w-sm overflow-hidden rounded-xl border border-card-border bg-muted-bg">
-            <Image
-              src={parentTool.imageUrl}
-              alt={parentTool.name}
-              fill
-              className="object-contain p-4"
-              sizes="(max-width: 768px) 100vw, 24rem"
+        {parentTool && (
+          <div className="mt-4 max-w-sm">
+            <ImageGallery
+              images={parentTool.imageAttachments}
+              toolName={parentTool.name}
+              localImageUrl={parentTool.imageUrl || undefined}
             />
           </div>
         )}

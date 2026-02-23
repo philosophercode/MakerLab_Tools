@@ -1,0 +1,1113 @@
+[
+  {
+    "name": "AIRAJ HackSaw",
+    "status": "PASS",
+    "image_filename": "AIRAJ HackSaw.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "An AIRAJ branded hacksaw with a red and black ergonomic handle, gray metal frame, an installed 12\"X1/2\"X24T blade, and three additional replacement blades shown below",
+      "reasoning": "The image clearly shows an AIRAJ hacksaw with a professional product photo presentation, matching the listed tool name, brand, and description of a multi-purpose hacksaw that accommodates standard 12-inch blades."
+    }
+  },
+  {
+    "name": "AOYUE Int 2703A+",
+    "status": "PASS",
+    "image_filename": "AOYUE Int 2703A+.png",
+    "eval": {
+      "match": true,
+      "confidence": "medium",
+      "image_shows": "A soldering station with a hot air gun resting on a coiled spring holder, a soldering iron station with brass tip cleaner, and what appears to be a multi-function rework station unit in the background",
+      "reasoning": "The image appears to show an AOYUE-branded multi-function soldering/rework station consistent with the 2703A+ model, which typically includes both a hot air gun and soldering iron station, though the blurred background makes exact model confirmation difficult."
+    }
+  },
+  {
+    "name": "Apple Pencil",
+    "status": "PASS",
+    "image_filename": "Apple Pencil.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white Apple Pencil stylus on a white background, showing the slim cylindrical design with a pointed tip and Apple branding near the top",
+      "reasoning": "The image clearly shows an Apple Pencil stylus with the characteristic design, Apple logo, and product styling consistent with a professional product listing photo."
+    }
+  },
+  {
+    "name": "BGA Rework Station",
+    "status": "FAIL",
+    "image_filename": "BGA Rework Station.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "An Apple iPad tablet in Space Gray color showing the home screen with iOS apps",
+      "reasoning": "The image shows an Apple iPad consumer tablet, which has absolutely nothing to do with a BGA Rework Station used for circuit board repairs."
+    }
+  },
+  {
+    "name": "BOSCH GST 150 BCE",
+    "status": "PASS",
+    "image_filename": "BOSCH GST 150 BCE.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Bosch GST 150 BCE Professional jigsaw in blue and black with barrel-grip design, jigsaw blade attached, and dust extraction port visible",
+      "reasoning": "The image clearly shows a Bosch GST 150 BCE Professional jigsaw with matching model name visible on the tool body, correct barrel-grip design, and professional blue/black color scheme consistent with the listing description."
+    }
+  },
+  {
+    "name": "Bambu Lab X1-Carbon Combo 3D Printer",
+    "status": "PASS",
+    "image_filename": "Bambu Lab X1-Carbon Combo 3D Printer.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Bambu Lab X1-Carbon 3D printer with transparent front panel showing internal CoreXY mechanics, build plate, Z-axis lead screw, and touchscreen interface displaying temperature controls, with Bambu Lab branding visible",
+      "reasoning": "The image clearly shows a Bambu Lab X1-Carbon 3D printer with the correct branding, model name, build volume specification (256\u00d7256\u00d7256mm) visible on the front panel, and matching design features including the touchscreen, CoreXY gantry system, and enclosed chamber."
+    }
+  },
+  {
+    "name": "Bantam Desktop PCB Milling Machine (Othermill Pro)",
+    "status": "PASS",
+    "image_filename": "Bantam Desktop PCB Milling Machine (Othermill Pro).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Bantam Tools Desktop CNC Milling Machine, black enclosed unit with clear side panels, showing the spindle/cutting head assembly and work bed, labeled '4th Axis Compatible'",
+      "reasoning": "The image clearly shows a Bantam Tools Desktop CNC Milling Machine matching the described product \u2014 an enclosed, compact desktop CNC mill consistent with the Othermill Pro/Bantam Desktop PCB Milling Machine, with the Bantam Tools branding prominently displayed."
+    }
+  },
+  {
+    "name": "Bantam Tools Desktop CNC Milling Machine",
+    "status": "PASS",
+    "image_filename": "Bantam Tools Desktop CNC Milling Machine.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Bantam Tools Desktop CNC Milling Machine, black enclosed unit with red branding, showing the spindle, gantry, and bed with 4th axis compatibility label",
+      "reasoning": "The image clearly shows a Bantam Tools Desktop CNC Milling Machine with visible branding, enclosed design, and '4th Axis Compatible' label, matching the tool name and description exactly."
+    }
+  },
+  {
+    "name": "Bofa AD500 Fume Extractor",
+    "status": "PASS",
+    "image_filename": "Bofa AD500 Fume Extractor.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A dark gray/black industrial cabinet-style fume extractor on casters with a control panel and display on top, matching the BOFA brand design",
+      "reasoning": "The image shows a BOFA-branded industrial fume extractor that matches the AD500 series design with its characteristic cabinet form factor, caster wheels, and top-mounted control panel typical of BOFA extraction units used in laser and soldering environments."
+    }
+  },
+  {
+    "name": "Brother Compact Monochrome Laser Printer",
+    "status": "PASS",
+    "image_filename": "Brother Compact Monochrome Laser Printer.png",
+    "eval": {
+      "match": true,
+      "confidence": "medium",
+      "image_shows": "A Brother monochrome laser printer with a 'Refresh Brother Ink & Toner EZ Print Subscription' promotional sticker overlay on the image",
+      "reasoning": "The image does show a Brother compact monochrome laser printer matching the tool description, but the large promotional subscription service sticker overlay reduces the quality as a clean product photo for a tool listing."
+    }
+  },
+  {
+    "name": "Cowryman Router Plane",
+    "status": "PASS",
+    "image_filename": "Cowryman Router Plane.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Cowryman .003 Router Plane with a stainless steel body, threaded depth adjustment screw with knurled knob, a blade/iron at the base, and two detached wooden mushroom-style handles",
+      "reasoning": "The image clearly shows a Cowryman branded router plane (labeled '.003 Router Plane' on the body) with all characteristic features of a hand router plane including adjustable blade depth mechanism, matching the product listing exactly."
+    }
+  },
+  {
+    "name": "Cricut Easy Press 3",
+    "status": "PASS",
+    "image_filename": "Cricut Easy Press 3.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white and mint green Cricut-branded heat press machine with a digital display, sitting on a black perforated base mat, with a power cord attached",
+      "reasoning": "The image clearly shows a Cricut Easy Press heat press with the Cricut logo visible, digital temperature/timer controls, and the characteristic design matching the Easy Press 3 product line, presented as a clean product photo on white background."
+    }
+  },
+  {
+    "name": "Cricut Maker\u00ae 3",
+    "status": "PASS",
+    "image_filename": "Cricut Maker\u00ae 3.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A silver/gray Cricut branded digital cutting machine shown from the front against a white background",
+      "reasoning": "The image clearly shows a Cricut cutting machine with the 'cricut' logo visible on the front panel, matching the sleek silver design consistent with the Cricut Maker 3 model, and is a clean professional product photo appropriate for this listing."
+    }
+  },
+  {
+    "name": "DEWALT DCB107 12V/20V MAX Lithium Ion Charger",
+    "status": "PASS",
+    "image_filename": "DEWALT DCB107 12V_20V MAX Lithium Ion Charger.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A DEWALT DCB107 12V/20V MAX lithium-ion battery charger in black and yellow colors",
+      "reasoning": "The image clearly shows a DEWALT DCB107 charger with visible branding and model number on the yellow label, matching exactly the tool name and description provided."
+    }
+  },
+  {
+    "name": "DEWALT Orbital Sander DWE6421",
+    "status": "PASS",
+    "image_filename": "DEWALT Orbital Sander DWE6421.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A DEWALT branded random orbital sander in yellow and black, shown from a 3/4 angle against a white background, displaying the circular sanding pad base and ergonomic handle",
+      "reasoning": "The image clearly shows a DEWALT random orbital sander consistent with the DWE6421 description, featuring the characteristic 5-inch circular pad, DEWALT branding, yellow and black color scheme, and is a professional product photo suitable for a listing."
+    }
+  },
+  {
+    "name": "DEWALT Screwdriver Bit Set",
+    "status": "PASS",
+    "image_filename": "DEWALT Screwdriver Bit Set.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "An open yellow DEWALT case containing an assorted set of screwdriver bits (Phillips, flathead, Torx), nut drivers, drill bits, and a quick-change adapter",
+      "reasoning": "The image clearly shows a DEWALT branded screwdriver bit set in a compact yellow carrying case with multiple bit profiles including Phillips, flathead, and Torx, matching the product description exactly."
+    }
+  },
+  {
+    "name": "DREMEL Workstation 220",
+    "status": "PASS",
+    "image_filename": "DREMEL Workstation 220.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Dremel Workstation 220 drill press stand with a metal base plate, vertical column, plunge mechanism with blue handle, and rotary tool holder/clamp at the top",
+      "reasoning": "The image clearly shows the Dremel Workstation 220 with its distinctive blue and black color scheme, cast metal base with cross-slot pattern, plunge arm with blue teardrop handle, and rotary tool mounting system, matching the described drill press stand exactly."
+    }
+  },
+  {
+    "name": "DeWalt Drill (DCD777C2)",
+    "status": "PASS",
+    "image_filename": "DeWalt Drill (DCD777C2).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A DeWalt 20V MAX brushless cordless drill/driver kit with two 20V lithium-ion batteries, a charger, and a yellow DeWalt carrying bag",
+      "reasoning": "The image clearly shows a DeWalt 20V MAX brushless drill/driver matching the DCD777C2 kit description, including the compact brushless drill, two 20V MAX lithium-ion batteries, a charger (DCB107), and a carrying bag, all in DeWalt's signature yellow and black colors."
+    }
+  },
+  {
+    "name": "Dremel 3000",
+    "status": "PASS",
+    "image_filename": "Dremel 3000.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Dremel 3000 corded rotary tool in silver and black, shown in a clean side-profile product photo with the brand name and model number clearly visible",
+      "reasoning": "The image is a professional product photo that clearly displays the Dremel 3000 rotary tool with matching branding, model number, and design consistent with the listed tool description."
+    }
+  },
+  {
+    "name": "Drill master Heat Gun",
+    "status": "FAIL",
+    "image_filename": "Drill master Heat Gun.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A Warrior-branded heat gun with black and orange color scheme, featuring a chrome nozzle and power cord",
+      "reasoning": "The image shows a Warrior-branded heat gun, not a Drill Master heat gun as listed \u2014 while the tool type (heat gun) is correct, the brand name on the product does not match the listing."
+    }
+  },
+  {
+    "name": "Dust Masks",
+    "status": "PASS",
+    "image_filename": "Dust Masks.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "3M 8210 N95 disposable particulate respirator masks shown in a bulk pack of approximately 20 masks",
+      "reasoning": "The image clearly shows 3M model 8210 N95 disposable respirator masks, which are exactly the type of dust/particulate protection masks described in the tool listing for workshop use."
+    }
+  },
+  {
+    "name": "Epilog Helix 24 laser (8000 Laser System)",
+    "status": "PASS",
+    "image_filename": "Epilog Helix 24 laser (8000 Laser System).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "An Epilog Laser Helix CO2 laser cutter/engraver machine with blue and white exterior, transparent lid, and control panel",
+      "reasoning": "The image clearly shows an Epilog Laser Helix model, matching the tool name and description of a CO2 laser cutter/engraver, with the brand name and model visibly printed on the front of the machine."
+    }
+  },
+  {
+    "name": "EverSewn Sparrow X2 Sewing & Embroidery Machine",
+    "status": "PASS",
+    "image_filename": "EverSewn Sparrow X2 Sewing & Embroidery Machine.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white and blue computerized sewing and embroidery machine with an attached embroidery hoop, LCD display panel, and the EverSewn Sparrow X2 branding visible on the body",
+      "reasoning": "The image clearly shows the EverSewn Sparrow X2 sewing and embroidery machine with its distinctive blue control panel, attached 4x4 embroidery hoop, and matching branding, making it a high-confidence match to the listed product."
+    }
+  },
+  {
+    "name": "FESTOOL PS 300 EQ-PLUS TRION JIGSAW",
+    "status": "PASS",
+    "image_filename": "FESTOOL PS 300 EQ-PLUS TRION JIGSAW.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Festool PS 300 EQ Trion barrel-grip jigsaw in dark blue/anthracite with green accents, shown in a clean product photo against white background",
+      "reasoning": "The image clearly shows a Festool PS 300 EQ Trion jigsaw matching the brand, model number, and barrel-grip design described in the listing, presented as a professional product photo suitable for the listing."
+    }
+  },
+  {
+    "name": "FULTON Hose Ring Clamp",
+    "status": "PASS",
+    "image_filename": "FULTON Hose Ring Clamp.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A set of stainless steel hose clamps with blue thumb-turn knobs, shown as both a fanned-out group and a single assembled clamp",
+      "reasoning": "The image clearly shows metal ring/hose clamps with a hand-tightenable blue knob design, consistent with the FULTON Hose Ring Clamp description for securing dust collection hoses, and the product photo professionally displays both multiple units and a single unit view typical of a product listing."
+    }
+  },
+  {
+    "name": "Festool 575267 Dust Extractor CT Midi Hepa",
+    "status": "PASS",
+    "image_filename": "Festool 575267 Dust Extractor CT Midi Hepa.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Festool CTL Midi dust extractor in white and black with green accents, featuring a coiled green hose stored on top, caster wheels, suction power control knob, AUTO/MAN/0 selector, and STOP foot pedal",
+      "reasoning": "The image clearly shows a Festool Cleantec CTL Midi dust extractor with the characteristic design, branding, and auto-start selector switch matching the CT Midi HEPA dust extractor description, and is a clean professional product photo suitable for a listing."
+    }
+  },
+  {
+    "name": "Festool Bench",
+    "status": "PASS",
+    "image_filename": "Festool Bench.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Festool MFT/3 Multi-Function Work Table with perforated MDF top, aluminum frame, folding legs, guide rail, and angle stop/fence system",
+      "reasoning": "The image clearly shows a Festool-branded MFT/3 work table with all characteristic features including the dog hole perforated top, green guide rail, aluminum extrusion frame, folding legs, and the Festool logo visible on the corner brackets, matching the listing description exactly."
+    }
+  },
+  {
+    "name": "Form 2",
+    "status": "PASS",
+    "image_filename": "Form 2.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Formlabs SLA 3D printer with an orange translucent cover, silver base, and a glowing lattice print in progress, with 'Print Complete' displayed on the front panel",
+      "reasoning": "The image clearly shows a Formlabs-branded SLA resin 3D printer (Form 2) with its characteristic orange cover, silver enclosure, and front control panel, matching the tool description exactly."
+    }
+  },
+  {
+    "name": "Form 4",
+    "status": "PASS",
+    "image_filename": "Form 4.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Formlabs resin 3D printer with an orange transparent cover, silver/white base, touchscreen interface, and printed parts visible inside on the build platform",
+      "reasoning": "The image clearly shows a Formlabs-branded MSLA resin 3D printer with the Form 4's distinctive orange enclosure, touchscreen display showing a completed print, and the Formlabs logo on the base, consistent with the Form 4 product description."
+    }
+  },
+  {
+    "name": "Form Cure",
+    "status": "PASS",
+    "image_filename": "Form Cure.png",
+    "eval": {
+      "match": true,
+      "confidence": "medium",
+      "image_shows": "A UV post-curing station with a transparent enclosure lit by blue/UV light, containing a white resin 3D printed model of a building/dome, with a control panel showing time (20:10), temperature (60\u00b0C), and duration (60min)",
+      "reasoning": "The image shows a UV post-curing station consistent with the Form Cure's description, featuring UV LEDs, temperature control, and a resin print inside, though the exact brand cannot be confirmed with certainty from the image alone."
+    }
+  },
+  {
+    "name": "Form Wash",
+    "status": "PASS",
+    "image_filename": "Form Wash.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Formlabs Form Wash station with a blue SLA 3D printed part submerged in isopropyl alcohol, displaying a timer reading 09:22 on its front panel",
+      "reasoning": "The image clearly shows the Formlabs Form Wash automated wash station with its characteristic design, digital timer display, and a resin 3D print being washed in IPA solution, matching the tool description exactly."
+    }
+  },
+  {
+    "name": "GoPro 7 Hero Black",
+    "status": "PASS",
+    "image_filename": "GoPro 7 Hero Black.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A GoPro action camera shown from the front, displaying '4K 60W' and '00:07' on its LCD screen, with the GoPro logo visible, consistent with a Hero 7 Black model",
+      "reasoning": "The image clearly shows a GoPro Hero 7 Black action camera with the GoPro branding, wide-angle lens, and front LCD displaying 4K60 mode, which matches the tool listing exactly."
+    }
+  },
+  {
+    "name": "HAKKO FX-888D",
+    "status": "PASS",
+    "image_filename": "HAKKO FX-888D.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Hakko-branded digital soldering station in blue and yellow with a digital temperature display, UP and ENTER buttons, a soldering iron with coiled cord, and a separate iron holder with brass tip cleaner and sponge",
+      "reasoning": "The image clearly shows a Hakko FX-888D soldering station with its distinctive blue and yellow color scheme, digital display, and matching iron holder, exactly matching the listed product."
+    }
+  },
+  {
+    "name": "HP Sprout (J4W72AA#ABA)",
+    "status": "PASS",
+    "image_filename": "HP Sprout (J4W72AA#ABA).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "An HP Sprout all-in-one desktop computer displaying the Sprout interface on its touchscreen monitor, with the characteristic base/mat unit visible at the bottom",
+      "reasoning": "The image clearly shows the HP Sprout all-in-one PC with its distinctive design including the HP logo, the Sprout branding on screen, and the unique base housing which contains the touch mat projector system, matching the product description exactly."
+    }
+  },
+  {
+    "name": "Heat Gun (TruePower / DrillMaster)",
+    "status": "PASS",
+    "image_filename": "Heat Gun (TruePower _ DrillMaster).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A DrillMaster branded heat gun with black and red coloring, metal nozzle, pistol grip handle, and power cord",
+      "reasoning": "The image clearly shows a DrillMaster heat gun matching the listed brand and tool type, presented as a clean product photo suitable for a tool listing."
+    }
+  },
+  {
+    "name": "Hercules Sanding Sheets",
+    "status": "PASS",
+    "image_filename": "Hercules Sanding Sheets.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A 5-pack of Hercules 100 Grit 9x11 inch dry ceramic sanding sheets with anti-clog coating",
+      "reasoning": "The image clearly shows Hercules brand sanding sheets matching the tool listing, though the product uses standard dry sheets rather than hook-and-loop or adhesive backing as described, which is a minor discrepancy but the core product category matches well."
+    }
+  },
+  {
+    "name": "Hi-Spec 16 Piece Metal Hand & Needle Files Tool Set Kit",
+    "status": "PASS",
+    "image_filename": "Hi-Spec 16 Piece Metal Hand & Needle Files Tool Set Kit.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A set of metal hand files and needle files arranged in a red and black zip-up storage pouch/case, showing approximately 16 files of various sizes and profiles",
+      "reasoning": "The image clearly shows a collection of metal files in various sizes (larger hand files and smaller needle files) stored in a branded carrying case, consistent with a 16-piece metal file set as described in the listing."
+    }
+  },
+  {
+    "name": "Husky Coping Saw",
+    "status": "PASS",
+    "image_filename": "Husky Coping Saw.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Husky brand Deep Cut Coping Saw with a hardwood handle, heavy duty steel frame, and adjustable blade, shown in its retail packaging",
+      "reasoning": "The image clearly shows a Husky coping saw matching the tool name, though the description mentions a quick-release blade tension mechanism which cannot be verified from the image, and the product is labeled 'Deep Cut' which is a variant detail not in the listing."
+    }
+  },
+  {
+    "name": "Infrared IC Heater",
+    "status": "PASS",
+    "image_filename": "Infrared IC Heater.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A T-962 Infrared IC Heater reflow oven with LCD display, function buttons, fan indicator, lamp indicator, and a sliding drawer tray for circuit boards",
+      "reasoning": "The image clearly shows a T-962 Infrared IC Heater, which is exactly the type of infrared heating station described for BGA and IC rework, complete with the model label, temperature profile chart, and all relevant controls visible on the unit."
+    }
+  },
+  {
+    "name": "KOOTANS Spokeshave Planer",
+    "status": "PASS",
+    "image_filename": "KOOTANS Spokeshave Planer.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "Two adjustable flat-bottom spokeshaves with black handles and red blade adjustment mechanism, plus a combination rasp/file accessory",
+      "reasoning": "The image clearly shows spokeshave planers with adjustable flat bottoms, black ergonomic handles, and brass adjustment knobs matching the KOOTANS Adjustable Spokeshave description, shown from two angles with an included rasp file."
+    }
+  },
+  {
+    "name": "Label Maker AC Adapter",
+    "status": "PASS",
+    "image_filename": "Label Maker AC Adapter.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A black Brother-branded AC power adapter with European two-pin plug and a barrel connector cable",
+      "reasoning": "The image shows a Brother AC power adapter with a wall plug and output cable with barrel connector, which is consistent with an AC adapter designed for Brother label makers, and the product photo is clean and professional."
+    }
+  },
+  {
+    "name": "MAKITA Plunge Base",
+    "status": "PASS",
+    "image_filename": "MAKITA Plunge Base.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Makita plunge base attachment in silver/aluminum with two black ergonomic knobs, depth adjustment rod with scale, depth stop turret, and clear chip guard on a rectangular base plate",
+      "reasoning": "The image clearly shows a Makita-branded plunge base with the Makita logo visible on the housing, featuring all typical plunge base components including depth adjustment, plunge columns, and ergonomic handles, consistent with the RT0701C compatible plunge base description."
+    }
+  },
+  {
+    "name": "MAKITA RT0701C",
+    "status": "PASS",
+    "image_filename": "MAKITA RT0701C.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Makita compact trim router with teal/turquoise motor housing, silver aluminum body, cam lock lever, and fixed base on a white background",
+      "reasoning": "The image clearly shows a Makita-branded compact router matching the RT0701C's distinctive teal housing, slim ergonomic profile, quick-release cam lock system, and overall design consistent with the listed specifications."
+    }
+  },
+  {
+    "name": "Marples MPS10189 Japanese Style Pull Saw",
+    "status": "PASS",
+    "image_filename": "Marples MPS10189 Japanese Style Pull Saw.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Marples brand Japanese Style Pull Saw Mini Detail model MPS10189 in packaging, featuring a blue ergonomic handle and a small rectangular blade, with 22-point extra fine teeth",
+      "reasoning": "The image clearly shows the exact product described \u2014 a Marples Japanese Style Pull Saw with model number MPS10189 visible on the packaging, matching the tool name and description provided."
+    }
+  },
+  {
+    "name": "Marvey Hotwire Foam Cutter",
+    "status": "PASS",
+    "image_filename": "Marvey Hotwire Foam Cutter.png",
+    "eval": {
+      "match": true,
+      "confidence": "medium",
+      "image_shows": "A white rectangular base unit with a metal wire arm/bow forming an arch above it, consistent with a hotwire foam cutter design",
+      "reasoning": "The image shows a device with a nichrome wire stretched across a bow-style arm mounted on a flat base, which is consistent with the form factor of a hotwire foam cutter like the Marvey brand, though the brand label is not clearly legible."
+    }
+  },
+  {
+    "name": "Matter and Form 3D Scanner",
+    "status": "PASS",
+    "image_filename": "Matter and Form 3D Scanner.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Matter and Form desktop 3D scanner with a rotating turntable base, vertical column, and scanning head, in black and white/silver colors",
+      "reasoning": "The image clearly shows a Matter and Form branded 3D scanner with the characteristic turntable platform, vertical scanning arm, and camera/laser assembly that matches the described desktop 3D scanner product."
+    }
+  },
+  {
+    "name": "Mayku Form Box Vacuum Former",
+    "status": "PASS",
+    "image_filename": "Mayku Form Box Vacuum Former.png",
+    "eval": {
+      "match": true,
+      "confidence": "medium",
+      "image_shows": "A desktop vacuum forming machine with a upper heating/pressing unit mounted on two vertical posts above a lower base platform with yellow clamps/handles and yellow control knobs",
+      "reasoning": "The device matches the general form factor of a desktop vacuum former like the Mayku FormBox, featuring a clamshell design with an upper heating unit, lower forming platform, side clamps, and control knobs, though the color scheme (dark gray/yellow) differs slightly from the typical Mayku FormBox appearance."
+    }
+  },
+  {
+    "name": "Meta Quest 2 VR Headset",
+    "status": "PASS",
+    "image_filename": "Meta Quest 2 VR Headset.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white Meta Quest 2 standalone VR headset with fabric head straps featuring a purple/lavender tint, shown from a front-angled perspective on a white background",
+      "reasoning": "The image clearly shows a Meta Quest 2 VR headset with its distinctive white shell, inside-out tracking cameras on the front face, and elastic fabric head straps, which perfectly matches the listed tool description."
+    }
+  },
+  {
+    "name": "Original Prusa i3 MK3S+ Enclosure Bundle",
+    "status": "PASS",
+    "image_filename": "Original Prusa i3 MK3S+ Enclosure Bundle.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Prusa i3 MK3S+ 3D printer inside a black-framed acrylic enclosure with orange accents, showing the printer with an orange filament spool mounted inside the enclosed unit",
+      "reasoning": "The image clearly shows an Original Prusa i3 MK3S+ printer (identifiable by the orange/black color scheme, LCD display labeled 'Original Prusa', and characteristic frame design) housed within a transparent acrylic enclosure with a black frame, which perfectly matches the described enclosure bundle product."
+    }
+  },
+  {
+    "name": "Oscilloscope Textronix",
+    "status": "PASS",
+    "image_filename": "Oscilloscope Textronix.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Tektronix TBS1202C digital oscilloscope with a blue and white color scheme, displaying square and sine waveforms on its screen",
+      "reasoning": "The image clearly shows a Tektronix branded digital oscilloscope (model TBS1202C) which matches the tool listing for a 'Oscilloscope Textronix' and is a professional product photo suitable for the listing."
+    }
+  },
+  {
+    "name": "PEACHTREE WOODWORKING SUPPLY PVC Hose",
+    "status": "PASS",
+    "image_filename": "PEACHTREE WOODWORKING SUPPLY PVC Hose.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A coiled clear flexible PVC dust collection hose with wire reinforcement spiral, shown with two metal hose clamps",
+      "reasoning": "The image clearly shows a flexible PVC hose with wire reinforcement consistent with dust collection applications, along with hose clamps typically included with such products, matching the Peachtree Woodworking Supply PVC Hose description perfectly."
+    }
+  },
+  {
+    "name": "POWERTEC Hose Coupler (70136)",
+    "status": "FAIL",
+    "image_filename": "POWERTEC Hose Coupler (70136).png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A POWERTEC 70136 dust collection reducer fitting that connects 4-inch hose to 2-1/2-inch hose",
+      "reasoning": "The image shows a POWERTEC reducer (4\" to 2-1/2\") with the correct model number 70136, but the listing describes it as a 'Hose Coupler' for quick-connecting hoses, when it is actually a reducer fitting that steps down hose diameter \u2014 these are different products with different functions."
+    }
+  },
+  {
+    "name": "Plunge Cut Track Saw TS 55 REQ-F-Plus",
+    "status": "PASS",
+    "image_filename": "Plunge Cut Track Saw TS 55 REQ-F-Plus.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Festool TS 55 REQ plunge-cut track saw with green and navy blue coloring, showing the circular blade, depth scale, Fast Fix blade change system, and Festool branding clearly visible",
+      "reasoning": "The image clearly shows a Festool TS 55 REQ plunge-cut track saw matching the listed model name, with all characteristic features visible including the plunge mechanism, guide rail interface, and Festool's signature green/navy color scheme, making it a high-quality product photo appropriate for this listing."
+    }
+  },
+  {
+    "name": "Plywood Stacking Rolling Cart",
+    "status": "PASS",
+    "image_filename": "Plywood Stacking Rolling Cart.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A red metal rolling cart with vertical dividers/separators designed to hold large flat panels upright, loaded with plywood sheets, being operated by a person in a red uniform",
+      "reasoning": "The image clearly shows a wheeled cart specifically designed for storing and transporting sheet goods and plywood in a vertical orientation, which perfectly matches the described 'Plywood Stacking Rolling Cart' tool listing."
+    }
+  },
+  {
+    "name": "Prusa i3 MK3S+",
+    "status": "FAIL",
+    "image_filename": "Prusa i3 MK3S+.png",
+    "eval": {
+      "match": false,
+      "confidence": "medium",
+      "image_shows": "Two spools of 3D printer filament (orange and black) above a Prusa i3 MK3S+ control panel/LCD display unit shown at an angle with some smoke or vapor",
+      "reasoning": "While the image does show a Prusa i3 MK3S+ branded LCD control panel, it does not show the complete printer as a product \u2014 it shows filament spools and only a partial, oddly-angled view of the printer's control interface, making it an unreasonable product photo for this tool listing."
+    }
+  },
+  {
+    "name": "RYOBI Drill Press",
+    "status": "PASS",
+    "image_filename": "RYOBI Drill Press.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI branded benchtop drill press with a lime green head, adjustable work table, column, and base, featuring a chuck, depth stop, and speed controls",
+      "reasoning": "The image clearly shows a RYOBI drill press matching the listing description, with visible features including adjustable table height, drill chuck for precise drilling, and control switches, presented as a clean product photo on a white background."
+    }
+  },
+  {
+    "name": "RYOBI Nail Gun",
+    "status": "PASS",
+    "image_filename": "RYOBI Nail Gun.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI ONE+ HP 18V cordless brad nailer in lime green and black, labeled 18 gauge for brad nails",
+      "reasoning": "The image clearly shows a RYOBI ONE+ HP 18-gauge brad nailer that matches the described tool \u2014 a cordless 18V nail gun used for trim and molding tasks, displayed as a clean product photo against a white background."
+    }
+  },
+  {
+    "name": "RYOBI ONE+ 18V Lithium-Ion 1.5 Ah Battery PBP002",
+    "status": "PASS",
+    "image_filename": "RYOBI ONE+ 18V Lithium-Ion 1.5 Ah Battery PBP002.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI ONE+ 18V Lithium-Ion 1.5 Ah battery pack in dark gray/black color with yellow accent text",
+      "reasoning": "The image clearly shows a RYOBI ONE+ branded 18V Lithium-Ion 1.5 Ah battery pack with all matching specifications (brand, voltage, capacity, and ONE+ compatibility) visible on the product."
+    }
+  },
+  {
+    "name": "RYOBI ONE+ 18V Lithium-Ion 3.0 Ah Battery P103",
+    "status": "PASS",
+    "image_filename": "RYOBI ONE+ 18V Lithium-Ion 3.0 Ah Battery P103.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "An 18V Lithium-Ion battery pack model P103 rated at 3000mAh with green charge indicator LEDs, black and yellow-green color scheme consistent with RYOBI ONE+ branding",
+      "reasoning": "The image clearly shows a battery labeled 'Model: P103', '18V 3000mAh' (3.0 Ah), with RYOBI ONE+ compatible form factor and color scheme, matching the listed product exactly."
+    }
+  },
+  {
+    "name": "RYOBI ONE+ 18V Lithium-Ion 4 Ah Battery PBP004",
+    "status": "PASS",
+    "image_filename": "RYOBI ONE+ 18V Lithium-Ion 4 Ah Battery PBP004.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI ONE+ 18V Lithium-Ion 4Ah High Performance battery pack, black and silver with green accents, showing the brand name, voltage, and capacity clearly",
+      "reasoning": "The image clearly shows a RYOBI ONE+ 18V 4Ah Lithium-Ion High Performance battery that matches the product name and description, with all key specifications (18V, 4Ah, ONE+ compatibility) visible on the battery itself."
+    }
+  },
+  {
+    "name": "RYOBI ONE+ 18V Lithium-Ion Charger PCG002",
+    "status": "PASS",
+    "image_filename": "RYOBI ONE+ 18V Lithium-Ion Charger PCG002.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI branded battery charger in lime green and black with indicator lights and a power cord, labeled with ONE+ compatibility",
+      "reasoning": "The image clearly shows a RYOBI ONE+ battery charger with the correct brand logo, lime green color scheme, indicator LEDs, and form factor consistent with the PCG002 18V lithium-ion charger model."
+    }
+  },
+  {
+    "name": "RYOBI P117 Dual Chemistry 12V - 18V Battery Charger Replacement",
+    "status": "PASS",
+    "image_filename": "RYOBI P117 Dual Chemistry 12V - 18V Battery Charger Replacement.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A bright green P117 battery charger with dual USB ports, LED diagnostic indicators, a battery docking slot, and a power cord with US plug",
+      "reasoning": "The image clearly shows a P117 model dual chemistry charger labeled '12V~18V' with diagnostic LEDs and USB power ports, matching the RYOBI P117 Dual Chemistry 12V-18V Battery Charger Replacement listing exactly."
+    }
+  },
+  {
+    "name": "RYOBI P209D Drill Driver",
+    "status": "PASS",
+    "image_filename": "RYOBI P209D Drill Driver.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI branded cordless drill/driver in lime green and black, featuring a keyless chuck, numbered clutch ring (up to 24 positions visible), two-speed selector, and ONE+ battery platform base, shown without battery",
+      "reasoning": "The image clearly shows a RYOBI ONE+ cordless drill/driver with a 24-position clutch ring, keyless chuck, and ONE+ branding on the battery base, consistent with the P209D model description."
+    }
+  },
+  {
+    "name": "RYOBI P305 ONE+ 18V Lithium Ion Cordless Hot Glue Gun",
+    "status": "PASS",
+    "image_filename": "RYOBI P305 ONE+ 18V Lithium Ion Cordless Hot Glue Gun.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI branded cordless hot glue gun in lime green and gray with ONE+ battery platform compatibility, shown without battery",
+      "reasoning": "The image clearly shows a RYOBI ONE+ cordless hot glue gun matching the P305 description, displaying the RYOBI logo, ONE+ branding on the base, cordless design, and characteristic lime green color scheme consistent with RYOBI's 18V tool line."
+    }
+  },
+  {
+    "name": "RYOBI P322 Brad Nailer",
+    "status": "PASS",
+    "image_filename": "RYOBI P322 Brad Nailer.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI ONE+ HP 18-gauge brad nailer in signature green and black color scheme, clearly labeled with RYOBI, ONE+ HP, and 18 GAUGE markings, with 18GA BRAD NAIL indicated on the magazine",
+      "reasoning": "The image clearly shows a RYOBI ONE+ HP 18-gauge brad nailer matching all described features including the brushless cordless design, consistent with the P322 model listing."
+    }
+  },
+  {
+    "name": "RYOBI P593 18-Volt ONE+ Lithium Ion Cordless PVC and Pex Cutter",
+    "status": "PASS",
+    "image_filename": "RYOBI P593 18-Volt ONE+ Lithium Ion Cordless PVC and Pex Cutter.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI 18V ONE+ cordless pipe/PVC cutter with lime green and black color scheme, featuring a ratcheting jaw mechanism and pistol-grip handle, shown without battery",
+      "reasoning": "The image clearly shows a RYOBI ONE+ 18V cordless ratcheting cutter with the characteristic jaw design used for cutting PVC pipe and PEX tubing, matching the P593 product description exactly."
+    }
+  },
+  {
+    "name": "RYOBI PCL235 ONE+ 18V Drill/ Driver",
+    "status": "FAIL",
+    "image_filename": "RYOBI PCL235 ONE+ 18V Drill_ Driver.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A RYOBI ONE+ 18V impact driver (likely PCL235B or similar), characterized by its hex chuck and compact impact driver form factor",
+      "reasoning": "The image shows a RYOBI impact driver with a hex bit chuck, not a drill/driver, which would have a keyless chuck and a 24-position clutch collar around it."
+    }
+  },
+  {
+    "name": "RYOBI Vacuum Cleaner P7131",
+    "status": "PASS",
+    "image_filename": "RYOBI Vacuum Cleaner P7131.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI branded 18V cordless handheld vacuum cleaner in lime green and dark gray colors with a wide-mouth nozzle design",
+      "reasoning": "The image clearly shows a RYOBI-branded cordless handheld vacuum with the characteristic lime green ONE+ color scheme, wide-mouth nozzle, and battery slot consistent with the P7131 model description."
+    }
+  },
+  {
+    "name": "Rockwell BladeRunner X2 (RK7323)",
+    "status": "PASS",
+    "image_filename": "Rockwell BladeRunner X2 (RK7323).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Rockwell-branded portable tabletop saw with a black and green color scheme, blade guard, fence, and red safety switch",
+      "reasoning": "The image clearly shows the Rockwell BladeRunner X2 tabletop saw with the Rockwell branding visible on the base, matching the described compact portable tabletop tool that uses jigsaw-style blades, and is a clean product photo suitable for a listing."
+    }
+  },
+  {
+    "name": "Roland Camm-1 GS-24 Desktop Vinyl Cutter",
+    "status": "PASS",
+    "image_filename": "Roland Camm-1 GS-24 Desktop Vinyl Cutter.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Roland branded vinyl cutter on a rolling stand, showing the characteristic design of the Roland CAMM-1 GS-24 series with its feed rollers and control panel",
+      "reasoning": "The image clearly shows a Roland CAMM-1 series vinyl cutter with the Roland branding visible twice, matching the described GS-24 desktop vinyl cutter on its optional floor stand."
+    }
+  },
+  {
+    "name": "SKIL Multi - Detail Sander",
+    "status": "PASS",
+    "image_filename": "SKIL Multi - Detail Sander.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A SKIL branded 4-in-1 multi detail sander in red and black, shown with multiple triangular sanding pad attachments, sandpaper sheets in various sizes, a dust collection bag, and a micro-filtration dust canister",
+      "reasoning": "The image clearly shows a SKIL Multi-Detail Sander with its characteristic triangular sanding pad designed for tight corners, along with multiple accessory attachments and sandpaper sheets, matching the product name and description exactly."
+    }
+  },
+  {
+    "name": "SMD Rework Station",
+    "status": "PASS",
+    "image_filename": "SMD Rework Station.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "Hakko 851 SMD hot air rework station with hot air gun handpiece, soldering iron handpiece, and control unit featuring AIR and HEATER adjustment knobs with POWER switch",
+      "reasoning": "The Hakko 851 is a classic SMD rework station with adjustable hot air and temperature controls, exactly matching the described tool for removing and replacing surface-mount components on PCBs."
+    }
+  },
+  {
+    "name": "SPEAR & JACKSON Traditional Brass Back Tenon Saw 9550B",
+    "status": "FAIL",
+    "image_filename": "SPEAR & JACKSON Traditional Brass Back Tenon Saw 9550B.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A Spear & Jackson Traditional Brass Back Tenon Saw with 15 PPI (points per inch), featuring a wooden handle and brass spine",
+      "reasoning": "While the image does show a Spear & Jackson Traditional Brass Back Tenon Saw, the blade is labeled as 15PPI, which differs from the listing description of a 10-inch hardpoint blade, indicating this is a different model variant (likely the 9550B/15 rather than the standard 9550B)."
+    }
+  },
+  {
+    "name": "STANLEY 20-221 10-Inch 12 Points Per Inch SharpTooth Mini Utility Saw",
+    "status": "PASS",
+    "image_filename": "STANLEY 20-221 10-Inch 12 Points Per Inch SharpTooth Mini Utility Saw.png",
+    "eval": {
+      "match": true,
+      "confidence": "medium",
+      "image_shows": "A handsaw with a wooden handle branded 'Stanley', showing the pistol-grip style wooden handle with two black rivets and a partially visible blade extending to the left",
+      "reasoning": "The image shows a Stanley-branded handsaw with a classic wooden handle consistent with the STANLEY 20-221 Mini Utility Saw, though the blade is mostly washed out/overexposed making it difficult to fully verify the 10-inch length and tooth details."
+    }
+  },
+  {
+    "name": "STANLEY 20-807 10-Inch Mini-Hack Light-Duty Utility Saw",
+    "status": "PASS",
+    "image_filename": "STANLEY 20-807 10-Inch Mini-Hack Light-Duty Utility Saw.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "Stanley MiniHack Utility Hacksaw model 20-807 in original retail packaging, showing a compact black hacksaw with pistol-grip handle and blade",
+      "reasoning": "The image clearly shows the Stanley MiniHack model 20-807 in retail packaging with matching branding, product name, and model number, confirming it is the correct product for this listing."
+    }
+  },
+  {
+    "name": "STANLEY Coping Saw",
+    "status": "FAIL",
+    "image_filename": "STANLEY Coping Saw.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A Stanley FatMax screwdriver with a black and yellow ergonomic handle and a long thin shaft",
+      "reasoning": "The image shows a Stanley FatMax screwdriver, not a coping saw, which would have a C-shaped frame with a fine-toothed blade."
+    }
+  },
+  {
+    "name": "STANLEY Hand Planer, Contractor Grade, Low Angle",
+    "status": "PASS",
+    "image_filename": "STANLEY Hand Planer, Contractor Grade, Low Angle.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Stanley brand low-angle block plane with black body, brass adjustment knob, and silver blade assembly shown in profile against white background",
+      "reasoning": "The image clearly shows a Stanley-branded low-angle hand plane/block plane with the characteristic low-angle bed, brass depth adjustment knob, and black body consistent with a contractor-grade hand planer used for trimming and smoothing end grain."
+    }
+  },
+  {
+    "name": "STANLEY Heavy Duty Extreme Staple Gun TR150",
+    "status": "FAIL",
+    "image_filename": "STANLEY Heavy Duty Extreme Staple Gun TR150.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A Stanley Aircraft Aluminum staple gun, which appears to be a lighter-duty model rather than the Heavy Duty Extreme TR150",
+      "reasoning": "The image shows a Stanley 'Aircraft Aluminum' staple gun, not the Heavy Duty Extreme TR150, as evidenced by the different branding and model designation visible on the tool's body."
+    }
+  },
+  {
+    "name": "STANLEY Saw 15-206",
+    "status": "FAIL",
+    "image_filename": "STANLEY Saw 15-206.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A Stanley 15-206 jab saw (keyhole saw) with a short serrated blade approximately 6 inches long and a wooden handle",
+      "reasoning": "The image shows a Stanley jab/keyhole saw (model 15-206) with a short blade, not a 15-inch SharpTooth hand saw with 12 TPI as described in the listing."
+    }
+  },
+  {
+    "name": "STANLEY SharpTooth Heavy Duty Saw 15-087",
+    "status": "FAIL",
+    "image_filename": "STANLEY SharpTooth Heavy Duty Saw 15-087.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A Stanley SharpTooth hand saw model 15-087 with a wooden handle, 20-inch/500mm blade length and 9 points per inch",
+      "reasoning": "The image shows Stanley SharpTooth model 15-087 with a 20-inch blade and 9 TPI, while the listing describes model 15-087 as a 26-inch 12 TPI saw, making the blade length and tooth count both incorrect for this listing."
+    }
+  },
+  {
+    "name": "SUIZAN Dozuki Dovetail Saw",
+    "status": "PASS",
+    "image_filename": "SUIZAN Dozuki Dovetail Saw.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Japanese pull saw with a thin steel blade featuring fine teeth along the spine edge, a dark spine reinforcement, and a traditional light-colored wooden handle with a dark collar, branded 'SUIZAN Made in Japan'",
+      "reasoning": "The image clearly shows a SUIZAN-branded Japanese dozuki-style pull saw with a reinforced spine, fine teeth characteristic of dovetail/precision joinery work, and the traditional Japanese handle design, matching the listed product exactly."
+    }
+  },
+  {
+    "name": "SUIZAN Replacement Blade",
+    "status": "PASS",
+    "image_filename": "SUIZAN Replacement Blade.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A SUIZAN replacement saw blade made in Japan with fine crosscut teeth along both edges, showing the brand name and kanji characters on the blade body",
+      "reasoning": "The image clearly shows a SUIZAN-branded replacement blade with fine crosscut tooth pattern consistent with a Dozuki dovetail saw blade, matching the product listing description exactly."
+    }
+  },
+  {
+    "name": "Shaper Origin",
+    "status": "PASS",
+    "image_filename": "Shaper Origin.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Shaper Origin handheld CNC router with a touchscreen display showing a design interface, two ergonomic handles with red and green buttons, a transparent dust collection shroud, and the Shaper Origin branding visible on the body",
+      "reasoning": "The image clearly shows the Shaper Origin handheld CNC router with its distinctive touchscreen, dual handles, and all identifying features matching the product description exactly."
+    }
+  },
+  {
+    "name": "Shopbot Buddy BT48[L36\u201d x W76\u201d x H67\u201d]",
+    "status": "FAIL",
+    "image_filename": "Shopbot Buddy BT48[L36\u201d x W76\u201d x H67\u201d].png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A ShopBot PRS Alpha CNC router, which is a larger full-size gantry-style CNC router with a cutting area significantly larger than 48x24 inches, featuring a vacuum hold-down system with PVC plumbing underneath",
+      "reasoning": "The image shows a ShopBot PRS Alpha model (visible on the gantry label), which is a much larger machine than the Buddy BT48 \u2014 the BT48 is a compact benchtop/smaller unit with a 48\"x24\" cutting area, while the machine pictured appears to be a 4x8 foot or larger format router with a full vacuum table system."
+    }
+  },
+  {
+    "name": "Singer Stylist 7258",
+    "status": "PASS",
+    "image_filename": "Singer Stylist 7258.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white and teal Singer Stylist computerized sewing machine with LCD display, stitch selection panel showing numerous built-in stitches, and control buttons",
+      "reasoning": "The image clearly shows a Singer Stylist branded computerized sewing machine with a teal accent panel displaying what appears to be 100 built-in stitches, an LCD screen, and the characteristic features matching the Singer Stylist 7258 description."
+    }
+  },
+  {
+    "name": "Stanley 1-12-137 62-Low Angle Sweetheart Jack Plane",
+    "status": "PASS",
+    "image_filename": "Stanley 1-12-137 62-Low Angle Sweetheart Jack Plane.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Stanley Sweetheart low-angle jack plane with ductile cast iron body, wooden tote (rear handle) and knob (front handle), brass adjusters, and the Stanley SW logo visible on the cap iron",
+      "reasoning": "The image clearly shows a Stanley Sweetheart jack plane with the characteristic low-angle bed, cast iron body, wooden handles, brass hardware, and Stanley SW branding that matches the 62-Low Angle Sweetheart Jack Plane description."
+    }
+  },
+  {
+    "name": "Structure Sensor",
+    "status": "PASS",
+    "image_filename": "Structure Sensor.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Structure Sensor 3D scanning device shown from the side/top view, with multiple cameras/sensors visible and a Lightning connector cable for iPad attachment",
+      "reasoning": "The image clearly shows the Occipital Structure Sensor with its characteristic elongated form factor, multiple depth-sensing cameras, and Lightning connector for iPad attachment, matching the described product exactly."
+    }
+  },
+  {
+    "name": "Tripod with adapter",
+    "status": "PASS",
+    "image_filename": "Tripod with adapter.png",
+    "eval": {
+      "match": true,
+      "confidence": "medium",
+      "image_shows": "A black adjustable camera tripod with three extendable legs, rubber feet, a pan/tilt fluid head, and a side handle for smooth movement control",
+      "reasoning": "The image clearly shows an adjustable tripod that matches the core tool described, though the 'universal adapter mount' is not visibly distinct in the image \u2014 the pan head could serve as such, making this a reasonable product photo for the listing."
+    }
+  },
+  {
+    "name": "Trotec Speedy 400, 80w",
+    "status": "FAIL",
+    "image_filename": "Trotec Speedy 400, 80w.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "A Trotec Speedy 360 laser engraver/cutter in red and gray coloring",
+      "reasoning": "The image clearly shows a Trotec Speedy 360, not a Speedy 400, as indicated by the model name printed on the machine itself, and these are different models with different work area dimensions."
+    }
+  },
+  {
+    "name": "Ultimaker 3 Extended",
+    "status": "PASS",
+    "image_filename": "Ultimaker 3 Extended.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white Ultimaker 3 Extended 3D printer with dual print heads, glass build plate, and characteristic tall extended build volume enclosure",
+      "reasoning": "The image clearly shows an Ultimaker 3 Extended 3D printer with the brand name visibly labeled on the machine, matching the dual-extrusion FDM printer with extended build volume described in the listing."
+    }
+  },
+  {
+    "name": "Ultimaker 3",
+    "status": "FAIL",
+    "image_filename": "Ultimaker 3.png",
+    "eval": {
+      "match": false,
+      "confidence": "high",
+      "image_shows": "An Ultimaker branded 3D printer, likely the Ultimaker S3 or S5 model, with a enclosed glass chamber, white frame, and touchscreen display",
+      "reasoning": "While this is an Ultimaker brand 3D printer, the design matches the Ultimaker S3 (or possibly S5) with its distinctive enclosed glass panels and modern touchscreen, not the Ultimaker 3 which has a different aesthetic with open sides and a different control interface."
+    }
+  },
+  {
+    "name": "Ultimaker Metal Expansion Kit",
+    "status": "PASS",
+    "image_filename": "Ultimaker Metal Expansion Kit.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A cardboard box labeled 'Ultimaker Metal Expansion Kit' alongside two metal components - a circular perforated disc and a small bracket/feeder part",
+      "reasoning": "The image clearly shows the Ultimaker Metal Expansion Kit product box with matching branding and name, along with what appear to be the included hardened steel nozzle and modified feeder components described in the listing."
+    }
+  },
+  {
+    "name": "Ultimaker S5 Air Manager",
+    "status": "PASS",
+    "image_filename": "Ultimaker S5 Air Manager.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A transparent plastic enclosure with internal components including what appears to be a filter/fan unit, mounted on a base with handles and feet",
+      "reasoning": "The image shows a transparent enclosure unit with filtration components that matches the description of the Ultimaker S5 Air Manager, which is designed to fit over the printer as an enclosed air filtration add-on."
+    }
+  },
+  {
+    "name": "Ultimaker S5",
+    "status": "PASS",
+    "image_filename": "Ultimaker S5.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "An Ultimaker branded enclosed FDM 3D printer with glass doors, dual filament tubes, touchscreen display showing print completion, and a dark 3D printed object on the build plate",
+      "reasoning": "The image clearly shows an Ultimaker S5 3D printer with its characteristic enclosed chamber, dual Bowden tube setup, large build volume, glass front doors, and touchscreen interface, matching all described features of the Ultimaker S5."
+    }
+  },
+  {
+    "name": "Valley Craft A Frame Bin Cart",
+    "status": "PASS",
+    "image_filename": "Valley Craft A Frame Bin Cart.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A red A-frame cart on casters with multiple yellow storage bins/containers mounted on both sides of a pegboard panel",
+      "reasoning": "The image clearly shows a Valley Craft style A-frame bin cart with the characteristic upright panel design, yellow storage bins, pegboard backing, and wheeled base used for organizing and transporting parts in a workshop setting."
+    }
+  },
+  {
+    "name": "WAZER - Waterjet Pro",
+    "status": "PASS",
+    "image_filename": "WAZER - Waterjet Pro.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A WAZER branded desktop waterjet cutter with silver/gray housing, showing the cutting bed on top and pump unit on the bottom with a pressure gauge",
+      "reasoning": "The image clearly shows a WAZER-branded machine with the exact two-unit design (cutter on top, pump on bottom) characteristic of the WAZER desktop waterjet cutter, with the brand name visibly displayed on the unit."
+    }
+  },
+  {
+    "name": "WEN Benchtop Belt and Disc Sander (6502T)",
+    "status": "PASS",
+    "image_filename": "WEN Benchtop Belt and Disc Sander (6502T).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "WEN 4x36 inch belt and 6 inch disc combination benchtop sander in black and orange, model 6502T, shown from a three-quarter angle on a white background",
+      "reasoning": "The image clearly shows the WEN 6502T benchtop belt and disc sander with matching specifications (4\"x36\" belt, 6\" disc), brand logo, and model label visible on the machine, making it an excellent product photo for this listing."
+    }
+  },
+  {
+    "name": "WEN Woodworking Dust Collector (DC3401)",
+    "status": "PASS",
+    "image_filename": "WEN Woodworking Dust Collector (DC3401).png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A WEN branded dust collector with a large white cylindrical collection bag and orange motor/blower unit mounted on a wheeled black cart frame",
+      "reasoning": "The image clearly shows a WEN dust collector with the characteristic large white collection bag, orange motor housing, and wheeled base that matches the WEN DC3401 dust collector description for woodworking applications."
+    }
+  },
+  {
+    "name": "Weller WESD51",
+    "status": "PASS",
+    "image_filename": "Weller WESD51.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "Weller WESD51 digital soldering station with control unit, PES51 soldering iron, iron holder stand with sponge, and coiled cord",
+      "reasoning": "The image clearly shows the Weller WESD51 soldering station with the model number visible on the front panel, along with the ESD-safe logo, digital display, temperature control knob, and the complete kit components matching the product description."
+    }
+  },
+  {
+    "name": "Woodworking Tools & Storage Bench",
+    "status": "PASS",
+    "image_filename": "Woodworking Tools & Storage Bench.png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A wooden workbench with tools on the surface including pliers and other hand tools, an anvil mounted on the right, a drawer pulled open, an Olympia Tools bag on the lower shelf, and a mallet hanging on the side",
+      "reasoning": "The image clearly shows a heavy-duty wooden workbench with built-in storage (drawer and lower shelf), woodworking hand tools displayed on the surface, and tool storage accessories, which directly matches the described 'Woodworking Tools & Storage Bench' listing."
+    }
+  },
+  {
+    "name": "iPad 6th generation [MR7F2LL./A]",
+    "status": "PASS",
+    "image_filename": "iPad 6th generation [MR7F2LL._A].png",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "Apple iPad in Space Gray color showing the front screen with iOS home screen and the back of the device, consistent with a 6th generation iPad with 9.7-inch display",
+      "reasoning": "The image shows an Apple iPad with a 9.7-inch display in Space Gray, displaying a classic iOS home screen layout consistent with the 6th generation iPad (2018), making it a strong match for the listed tool."
+    }
+  }
+]

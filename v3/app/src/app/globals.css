@@ -56,6 +56,16 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+/* Keep logo black in light mode, white in dark mode. */
+.logo-invert-dark {
+  filter: none;
+}
+@media (prefers-color-scheme: dark) {
+  .logo-invert-dark {
+    filter: invert(1);
+  }
+}
+
 /* Global focus ring for keyboard navigation */
 :focus-visible {
   outline: 2px solid var(--cornell-red);

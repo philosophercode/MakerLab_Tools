@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
       {
         pathname: "/tool-images/**",
       },
+      {
+        pathname: "/logo-transparent.png",
+      },
+      {
+        pathname: "/makerlab-logo-transparent.png",
+      },
+      {
+        pathname: "/makerlab-logo-blackonly.png",
+      },
     ],
     remotePatterns: [
       {

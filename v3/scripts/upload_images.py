@@ -10,6 +10,7 @@ Usage:
 """
 
 import base64
+import argparse
 import json
 import mimetypes
 import os
@@ -22,7 +23,7 @@ API_URL = "https://api.airtable.com/v0"
 CONTENT_URL = "https://content.airtable.com/v0"
 IMG_DIR = os.path.join(os.path.dirname(__file__), "tool_images")
 TOOLS_TABLE_ID = "tblXHIT0mN2nOzdhd"
-IMAGE_FIELD_ID = "fldvEe7Z9VrymHRTy"
+IMAGE_FIELD_NAME = "image_attachments"
 
 # Manual overrides for filenames that don't exactly match tool names
 FILENAME_TO_TOOL = {
@@ -118,7 +119,7 @@ def upload_attachment(token, base_id, record_id, file_path):
         "file": base64.encodebytes(file_data).decode("utf8"),
     }
 
-    url = f"{CONTENT_URL}/{base_id}/{record_id}/{IMAGE_FIELD_ID}/uploadAttachment"
+    url = f"{CONTENT_URL}/{base_id}/{record_id}/{IMAGE_FIELD_NAME}/uploadAttachment"
     body = json.dumps(payload).encode()
 
     req = urllib.request.Request(
@@ -140,8 +141,33 @@ def upload_attachment(token, base_id, record_id, file_path):
         return None
 
 
+def clear_attachments(token, base_id, record_id):
+    """Clear existing attachments on image_attachments field."""
+    url = f"{API_URL}/{base_id}/{TOOLS_TABLE_ID}/{record_id}"
+    payload = {"fields": {"image_attachments": []}}
+    result = api_request("PATCH", url, token, payload)
+    return bool(result)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--img-dir",
+        default=os.environ.get("IMG_DIR", IMG_DIR),
+        help="Directory containing local images to upload",
+    )
+    parser.add_argument(
+        "--force-replace",
+        action="store_true",
+        help="Replace existing Airtable image attachments with local files",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     token, base_id = get_config()
+    img_dir = args.img_dir
 
     # Fetch all tool records to get name -> record_id mapping
     print("Fetching tool records from AirTable...")
@@ -157,7 +183,7 @@ def main():
     print(f"  Found {len(name_to_record)} tools ({len(already_has_image)} already have images)")
 
     # Build image file -> tool name mapping
-    img_files = [f for f in os.listdir(IMG_DIR) if not f.startswith(".")]
+    img_files = [f for f in os.listdir(img_dir) if not f.startswith(".")]
     print(f"  Found {len(img_files)} images on disk")
 
     matched = []
@@ -169,7 +195,9 @@ def main():
         # Check manual override first, then exact match
         tool_name = FILENAME_TO_TOOL.get(stem, stem)
 
-        if tool_name in name_to_record and tool_name not in already_has_image:
+        if tool_name in name_to_record and (
+            args.force_replace or tool_name not in already_has_image
+        ):
             matched.append((img_file, tool_name, name_to_record[tool_name]))
         elif tool_name in already_has_image:
             pass  # skip, already uploaded
@@ -189,10 +217,20 @@ def main():
     errors = 0
 
     for i, (img_file, tool_name, record_id) in enumerate(matched, 1):
-        file_path = os.path.join(IMG_DIR, img_file)
+        file_path = os.path.join(img_dir, img_file)
         file_size = os.path.getsize(file_path)
 
         print(f"  [{i}/{len(matched)}] {tool_name} ({file_size // 1024}KB)...", end=" ", flush=True)
+
+        if args.force_replace:
+            ok = clear_attachments(token, base_id, record_id)
+            if not ok:
+                errors += 1
+                print("FAILED (clear)")
+                time.sleep(0.3)
+                continue
+            # Small pause between clear and upload for API consistency.
+            time.sleep(0.15)
 
         result = upload_attachment(token, base_id, record_id, file_path)
 

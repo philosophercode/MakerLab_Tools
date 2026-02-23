@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Marvey Hotwire Foam Cutter",
+    "status": "PASS",
+    "image_filename": "Marvey Hotwire Foam Cutter.jpg",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white tabletop hot wire foam cutter with a metal arch/bow frame holding a thin cutting wire, mounted on a flat rectangular base with rubber feet",
+      "reasoning": "The image clearly shows a tabletop hotwire foam cutter with the characteristic arch frame and nichrome cutting wire, consistent with the Marvey Hotwire Foam Cutter description used for cutting EPS foam."
+    }
+  },
+  {
+    "name": "Singer Stylist 7258",
+    "status": "PASS",
+    "image_filename": "Singer Stylist 7258.jpg",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white and teal/turquoise computerized sewing machine with the Singer Stylist branding visible on the front panel, featuring a digital display and stitch selection panel",
+      "reasoning": "The image clearly shows a Singer Stylist computerized sewing machine with the characteristic teal color scheme, digital display, and extensive stitch selection panel consistent with the 7258 model description of 100 built-in stitches."
+    }
+  },
+  {
+    "name": "RYOBI P209D Drill Driver",
+    "status": "PASS",
+    "image_filename": "RYOBI P209D Drill Driver.jpg",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A RYOBI ONE+ branded cordless drill/driver in lime green and gray, shown without battery, with a keyless chuck, clutch adjustment ring with numbered positions, and a pistol-grip handle",
+      "reasoning": "The image clearly shows a RYOBI ONE+ cordless drill/driver matching the described P209D model, featuring the characteristic lime green color, numbered clutch positions (visible 16-20 range consistent with a 24-position clutch), keyless chuck, and ONE+ battery compatibility label, presented as a clean product photo on white background."
+    }
+  },
+  {
+    "name": "Ultimaker 3",
+    "status": "PASS",
+    "image_filename": "Ultimaker 3.jpg",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A white Ultimaker branded dual-extrusion FDM 3D printer with two filament tubes, a touchscreen display, and a glass-enclosed build chamber",
+      "reasoning": "The image clearly shows an Ultimaker-branded 3D printer with dual extrusion capability (two filament tubes visible), matching the Ultimaker 3's known design with its white enclosure, touchscreen interface, and dual print head system."
+    }
+  },
+  {
+    "name": "Plunge Cut Track Saw TS 55 REQ-F-Plus",
+    "status": "PASS",
+    "image_filename": "Plunge Cut Track Saw TS 55 REQ-F-Plus.jpg",
+    "eval": {
+      "match": true,
+      "confidence": "high",
+      "image_shows": "A Festool TS 55 REQ plunge-cut track saw with green and dark blue/black housing, featuring a circular saw blade, depth adjustment scale, and Fast Fix system",
+      "reasoning": "The image clearly shows a Festool TS 55 REQ plunge-cut track saw with the brand name and model number visible on the tool body, matching the listed product exactly, and the professional studio-style photo is appropriate for a product listing."
+    }
+  }
+]

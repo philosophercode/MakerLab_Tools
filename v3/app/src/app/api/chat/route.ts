@@ -102,7 +102,7 @@ function buildGeneralSystemPrompt(tools: ReturnType<typeof resolveTools>) {
   const inventory = tools
     .map(
       (t) =>
-        `- **${t.name}** (${t.category_group} — ${t.category_sub}, ${t.location_room}): ${t.description?.slice(0, 120) || "No description"}${t.materials.length > 0 ? `. Materials: ${t.materials.join(", ")}` : ""}`
+        `- **${t.name}** [id: ${t.id}] (${t.category_group} — ${t.category_sub}, ${t.location_room}): ${t.description?.slice(0, 120) || "No description"}${t.materials.length > 0 ? `. Materials: ${t.materials.join(", ")}` : ""}`
     )
     .join("\n");
 
@@ -135,6 +135,7 @@ When a student describes something they want to build or asks for help planning 
    - **Estimated time** — rough time per step
    - **Tips** — common mistakes to avoid, helpful techniques
 - Only recommend tools that are in the MakerLab inventory above.
+- When linking to a tool detail page, ALWAYS use the exact id shown in inventory lines (\`[id: ...]\`) and format links as \`/tools/<id>\`. Never invent or guess IDs.
 - If a project isn't feasible with MakerLab equipment, explain why and suggest alternatives.
 
 ## Project Visualization

@@ -32,7 +32,7 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">MakerLab Tools</h1>
+        <h1 className="text-3xl font-bold">Tools</h1>
         <p className="mt-1 text-muted">
           Browse {resolved.length} tools and equipment in the Cornell MakerLab.
         </p>

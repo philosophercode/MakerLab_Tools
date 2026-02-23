@@ -1,6 +1,4 @@
 import "server-only";
-import { existsSync } from "fs";
-import { join } from "path";
 import type {
   AirtableRecord,
   ToolFields,
@@ -237,6 +235,10 @@ export function resolveTools(
 ): ToolWithMeta[] {
   const catMap = new Map(categories.map((c) => [c.id, c.fields]));
   const locMap = new Map(locations.map((l) => [l.id, l.fields]));
+  const useLocalToolImages =
+    (process.env.USE_LOCAL_TOOL_IMAGES ||
+      process.env.NEXT_PUBLIC_USE_LOCAL_TOOL_IMAGES ||
+      "").toLowerCase() === "true";
 
   return tools.map((tool) => {
     const catId = tool.fields.category?.[0];
@@ -244,17 +246,14 @@ export function resolveTools(
     const cat = catId ? catMap.get(catId) : undefined;
     const loc = locId ? locMap.get(locId) : undefined;
 
-    const firstImage = tool.fields.image_attachments?.[0];
-
-    // Prefer local background-removed image; fall back to AirTable remote URL
+    // Single source selection for gallery + unit pages:
+    // default remote Airtable image, optionally force local git-versioned image via env flag.
     const safeName = tool.fields.name.replace(/\//g, "_");
     const localFilename = `${safeName}.png`;
     const localPath = `/tool-images/${encodeURIComponent(localFilename)}`;
-    const localFileExists = existsSync(
-      join(process.cwd(), "public", "tool-images", localFilename)
-    );
+    const firstImage = tool.fields.image_attachments?.[0];
     const airtableUrl = firstImage?.thumbnails?.large?.url || firstImage?.url || null;
-    const imageUrl = localFileExists ? localPath : airtableUrl;
+    const imageUrl = useLocalToolImages ? localPath : airtableUrl;
 
     return {
       id: tool.id,

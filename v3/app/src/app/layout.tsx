@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Image from "next/image";
+import Link from "next/link";
 import "./globals.css";
 import ChatButton from "@/components/ChatButton";
 import NavLinks from "@/components/NavLinks";
@@ -35,10 +37,16 @@ export default function RootLayout({
       >
         <header className="sticky top-0 z-50 border-b border-card-border bg-card-bg/80 backdrop-blur-sm">
           <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-            <a href="/" className="flex items-center gap-2 font-semibold">
-              <span className="text-cornell-red text-lg">◆</span>
-              <span>MakerLab Tools</span>
-            </a>
+            <Link href="/" className="flex items-center" aria-label="MakerLab Tools home">
+              <Image
+                src="/makerlab-logo-blackonly.png"
+                alt="MakerLab Tools"
+                width={1502}
+                height={173}
+                className="logo-invert-dark h-6 w-auto max-w-[46vw] md:h-7"
+                priority
+              />
+            </Link>
             <NavLinks />
           </nav>
         </header>

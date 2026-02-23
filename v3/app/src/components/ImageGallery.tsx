@@ -12,12 +12,12 @@ interface ImageGalleryProps {
 
 export default function ImageGallery({ images, toolName, localImageUrl }: ImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  // Use local image if provided
   const safeName = toolName.replace(/\//g, "_");
-  const localUrl = localImageUrl || `/tool-images/${encodeURIComponent(`${safeName}.png`)}`;
-  const hasLocalImage = localUrl.startsWith("/tool-images/");
+  const preferredUrl =
+    localImageUrl || `/tool-images/${encodeURIComponent(`${safeName}.png`)}`;
+  const hasLocalImage = preferredUrl.startsWith("/tool-images/");
 
-  if (images.length === 0 && !localUrl) {
+  if (images.length === 0 && !preferredUrl) {
     return (
       <div className="flex aspect-square items-center justify-center rounded-xl bg-muted-bg text-muted">
         No image available
@@ -26,10 +26,10 @@ export default function ImageGallery({ images, toolName, localImageUrl }: ImageG
   }
 
   const imageUrl = hasLocalImage
-    ? localUrl
-    : images[selectedIndex]?.thumbnails?.large?.url ||
-      images[selectedIndex]?.url ||
-      localUrl;
+    ? preferredUrl
+    : (images[selectedIndex]?.thumbnails?.large?.url ??
+      images[selectedIndex]?.url ??
+      preferredUrl);
 
   return (
     <div className="space-y-3">
@@ -50,7 +50,7 @@ export default function ImageGallery({ images, toolName, localImageUrl }: ImageG
         <div className="flex gap-2 overflow-x-auto">
           {images.map((img, i) => {
             const thumbUrl =
-              img.thumbnails?.small?.url || img.url;
+              img.thumbnails?.small?.url || img.url || preferredUrl;
             return (
               <button
                 key={img.id}
