@@ -15,6 +15,8 @@ import {
   fetchAllLocations,
   fetchAllTools,
   fetchAllUnits,
+  fetchUnit,
+  fetchMaintenanceLogsByUnit,
   resolveTools,
   createMaintenanceLog,
 } from "@/lib/airtable";
@@ -314,6 +316,73 @@ export async function POST(req: Request) {
                 }
               },
             }),
+          }),
+          get_unit_details: tool({
+            description:
+              "Fetch details for a specific unit (individual machine instance), including its status, condition, maintenance history, and parent tool's SOP/safety docs. Use when a student asks about a specific unit like 'Prusa #1' or reports an issue with a numbered unit.",
+            inputSchema: z.object({
+              unit_label: z.string().describe("Unit label, e.g. 'Prusa #1', 'Form 2 #1'"),
+            }),
+            execute: async ({ unit_label }) => {
+              // Try exact match first
+              const allUnits = await fetchAllUnits();
+              const unit = allUnits.find(
+                (u) => u.fields.unit_label.toLowerCase() === unit_label.toLowerCase()
+              ) || allUnits.find(
+                (u) => u.fields.unit_label.toLowerCase().includes(unit_label.toLowerCase())
+              );
+
+              if (!unit) {
+                return { found: false, message: `No unit found matching "${unit_label}". Available units: ${allUnits.slice(0, 10).map((u) => u.fields.unit_label).join(", ")}...` };
+              }
+
+              // Fetch maintenance logs
+              const logs = await fetchMaintenanceLogsByUnit(unit.id);
+
+              // Resolve parent tool
+              const toolId = unit.fields.tool?.[0];
+              let parentToolInfo = null;
+              if (toolId) {
+                try {
+                  const toolRecord = await fetchTool(toolId);
+                  const [categories, locations] = await Promise.all([
+                    fetchAllCategories(),
+                    fetchAllLocations(),
+                  ]);
+                  const [resolved] = resolveTools([toolRecord], categories, locations);
+                  parentToolInfo = {
+                    name: resolved.name,
+                    sop_url: resolved.sop_url,
+                    safety_doc_url: resolved.safety_doc_url,
+                    video_url: resolved.video_url,
+                    training_required: resolved.training_required,
+                    authorized_only: resolved.authorized_only,
+                    detail_page: `/tools/${resolved.id}`,
+                  };
+                } catch { /* skip */ }
+              }
+
+              return {
+                found: true,
+                unit_label: unit.fields.unit_label,
+                id: unit.id,
+                status: unit.fields.status || "Unknown",
+                condition: unit.fields.condition || "Unknown",
+                serial_number: unit.fields.serial_number || null,
+                asset_tag: unit.fields.asset_tag || null,
+                date_acquired: unit.fields.date_acquired || null,
+                notes: unit.fields.notes || null,
+                parent_tool: parentToolInfo,
+                maintenance_logs: logs.slice(0, 10).map((l) => ({
+                  title: l.fields.title,
+                  type: l.fields.type || "",
+                  priority: l.fields.priority || "",
+                  status: l.fields.status || "",
+                  date_reported: l.fields.date_reported || "",
+                  description: l.fields.description || "",
+                })),
+              };
+            },
           }),
           suggest_followups: tool({
             description:
