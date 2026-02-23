@@ -108,6 +108,7 @@ export default function HomeClient({
   return (
     <>
       <SearchAndFilters
+        tools={tools}
         query={localQuery}
         categoryGroups={categoryGroups}
         rooms={rooms}

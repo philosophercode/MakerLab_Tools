@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import type { ToolWithMeta } from "@/lib/types";
 
 // ── Static data ────────────────────────────────────────────────────
 
@@ -128,6 +129,7 @@ function groupMaterials(allMaterials: string[]) {
 // ── Props ───────────────────────────────────────────────────────────
 
 interface SearchAndFiltersProps {
+  tools: ToolWithMeta[];
   query: string;
   categoryGroups: string[];
   rooms: string[];
@@ -147,10 +149,12 @@ function CategoryCarousel({
   categories,
   selected,
   onChange,
+  counts,
 }: {
   categories: string[];
   selected: string[];
   onChange: (cats: string[]) => void;
+  counts: Record<string, number>;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showFade, setShowFade] = useState(false);
@@ -189,12 +193,14 @@ function CategoryCarousel({
       >
         {categories.map((cat) => {
           const active = selected.includes(cat);
+          const count = counts[cat] ?? 0;
           return (
             <button
               key={cat}
               onClick={() => toggle(cat)}
               aria-pressed={active}
-              className={`snap-start flex flex-col items-center gap-1.5 rounded-xl border-2 px-3 py-2.5 text-xs font-medium transition-colors shrink-0 min-w-[5rem] ${
+              title={`${cat} (${count} tools)`}
+              className={`group/cat snap-start flex flex-col items-center gap-1.5 rounded-xl border-2 px-3 py-2.5 text-xs font-medium transition-colors shrink-0 min-w-[5rem] ${
                 active
                   ? "border-cornell-red bg-cornell-red/5 text-cornell-red"
                   : "border-card-border bg-card-bg text-muted hover:border-foreground/20 hover:text-foreground"
@@ -209,6 +215,12 @@ function CategoryCarousel({
                 )}
               </span>
               <span className="whitespace-nowrap leading-tight">{cat}</span>
+              {/* Count shown inline on hover */}
+              <span className={`text-[10px] font-semibold opacity-0 transition-opacity group-hover/cat:opacity-100 ${
+                active ? "text-cornell-red" : "text-muted"
+              }`}>
+                {count} {count === 1 ? "tool" : "tools"}
+              </span>
             </button>
           );
         })}
@@ -271,22 +283,32 @@ function PillChip({
   label,
   active,
   onClick,
+  count,
 }: {
   label: string;
   active: boolean;
   onClick: () => void;
+  count?: number;
 }) {
   return (
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full px-3 py-1.5 text-xs transition-colors ${
+      title={count !== undefined ? `${label} (${count} tools)` : label}
+      className={`group/pill relative rounded-full px-3 py-1.5 text-xs transition-colors ${
         active
           ? "bg-cornell-red text-white"
           : "bg-muted-bg text-muted hover:bg-card-border hover:text-foreground"
       }`}
     >
       {label}
+      {count !== undefined && (
+        <span className={`ml-1 inline-block text-[10px] opacity-0 transition-opacity group-hover/pill:opacity-100 ${
+          active ? "text-white/70" : "text-muted"
+        }`}>
+          {count}
+        </span>
+      )}
     </button>
   );
 }
@@ -294,6 +316,7 @@ function PillChip({
 // ── Main component ──────────────────────────────────────────────────
 
 export default function SearchAndFilters({
+  tools,
   query,
   categoryGroups,
   rooms,
@@ -307,6 +330,31 @@ export default function SearchAndFilters({
   onMaterialChange,
 }: SearchAndFiltersProps) {
   const materialGrouped = groupMaterials(materials);
+
+  // Precompute tool counts per filter value
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cat of categoryGroups) {
+      counts[cat] = tools.filter((t) => t.category_group === cat).length;
+    }
+    return counts;
+  }, [tools, categoryGroups]);
+
+  const roomCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const room of rooms) {
+      counts[room] = tools.filter((t) => t.location_room === room).length;
+    }
+    return counts;
+  }, [tools, rooms]);
+
+  const materialCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const mat of materials) {
+      counts[mat] = tools.filter((t) => t.materials.includes(mat)).length;
+    }
+    return counts;
+  }, [tools, materials]);
 
   const totalFilterCount =
     selectedCategories.length + selectedRooms.length + selectedMaterials.length;
@@ -364,6 +412,7 @@ export default function SearchAndFilters({
         categories={categoryGroups}
         selected={selectedCategories}
         onChange={onCategoryChange}
+        counts={categoryCounts}
       />
 
       {/* Filter accordion */}
@@ -387,7 +436,6 @@ export default function SearchAndFilters({
           {/* Materials accordion */}
           <AccordionSection
             title="Materials"
-            defaultOpen
             count={selectedMaterials.length}
           >
             <div className="space-y-3">
@@ -403,6 +451,7 @@ export default function SearchAndFilters({
                         label={mat}
                         active={selectedMaterials.includes(mat)}
                         onClick={() => toggleMaterial(mat)}
+                        count={materialCounts[mat]}
                       />
                     ))}
                   </div>
@@ -423,6 +472,7 @@ export default function SearchAndFilters({
                   label={room}
                   active={selectedRooms.includes(room)}
                   onClick={() => toggleRoom(room)}
+                  count={roomCounts[room]}
                 />
               ))}
             </div>
