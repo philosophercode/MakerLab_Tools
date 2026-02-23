@@ -12,6 +12,7 @@ import DocLinks from "@/components/DocLinks";
 import UnitStatusTable from "@/components/UnitStatusTable";
 import Chat from "@/components/Chat";
 import FlagButton from "@/components/FlagButton";
+import ImageActions from "@/components/ImageActions";
 
 export const revalidate = 300;
 
@@ -59,11 +60,13 @@ export default async function ToolDetailPage({
             <ImageGallery
               images={tool.image_attachments}
               toolName={tool.name}
+              localImageUrl={tool.image_url || undefined}
             />
             <div className="absolute top-2 right-2">
               <FlagButton toolId={id} field="image" />
             </div>
           </div>
+          <ImageActions toolName={tool.name} />
 
           {/* Name + description */}
           <div className="group">

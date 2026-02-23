@@ -1,4 +1,6 @@
 import "server-only";
+import { existsSync } from "fs";
+import { join } from "path";
 import type {
   AirtableRecord,
   ToolFields,
@@ -244,6 +246,16 @@ export function resolveTools(
 
     const firstImage = tool.fields.image_attachments?.[0];
 
+    // Prefer local background-removed image; fall back to AirTable remote URL
+    const safeName = tool.fields.name.replace(/\//g, "_");
+    const localFilename = `${safeName}.png`;
+    const localPath = `/tool-images/${encodeURIComponent(localFilename)}`;
+    const localFileExists = existsSync(
+      join(process.cwd(), "public", "tool-images", localFilename)
+    );
+    const airtableUrl = firstImage?.thumbnails?.large?.url || firstImage?.url || null;
+    const imageUrl = localFileExists ? localPath : airtableUrl;
+
     return {
       id: tool.id,
       name: tool.fields.name,
@@ -263,7 +275,7 @@ export function resolveTools(
       sop_url: tool.fields.sop_url || null,
       video_url: tool.fields.video_url || null,
       map_tag: tool.fields.map_tag || null,
-      image_url: firstImage?.thumbnails?.large?.url || firstImage?.url || null,
+      image_url: imageUrl,
       image_attachments: tool.fields.image_attachments || [],
       manual_attachments: tool.fields.manual_attachments || [],
     };

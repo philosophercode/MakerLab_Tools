@@ -7,12 +7,17 @@ import type { Attachment } from "@/lib/types";
 interface ImageGalleryProps {
   images: Attachment[];
   toolName: string;
+  localImageUrl?: string;
 }
 
-export default function ImageGallery({ images, toolName }: ImageGalleryProps) {
+export default function ImageGallery({ images, toolName, localImageUrl }: ImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  // Use local image if provided
+  const safeName = toolName.replace(/\//g, "_");
+  const localUrl = localImageUrl || `/tool-images/${encodeURIComponent(`${safeName}.png`)}`;
+  const hasLocalImage = localUrl.startsWith("/tool-images/");
 
-  if (images.length === 0) {
+  if (images.length === 0 && !localUrl) {
     return (
       <div className="flex aspect-square items-center justify-center rounded-xl bg-muted-bg text-muted">
         No image available
@@ -20,11 +25,11 @@ export default function ImageGallery({ images, toolName }: ImageGalleryProps) {
     );
   }
 
-  const selected = images[selectedIndex];
-  const imageUrl =
-    selected.thumbnails?.full?.url ||
-    selected.thumbnails?.large?.url ||
-    selected.url;
+  const imageUrl = hasLocalImage
+    ? localUrl
+    : images[selectedIndex]?.thumbnails?.large?.url ||
+      images[selectedIndex]?.url ||
+      localUrl;
 
   return (
     <div className="space-y-3">
@@ -41,7 +46,7 @@ export default function ImageGallery({ images, toolName }: ImageGalleryProps) {
       </div>
 
       {/* Thumbnails */}
-      {images.length > 1 && (
+      {!hasLocalImage && images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto">
           {images.map((img, i) => {
             const thumbUrl =

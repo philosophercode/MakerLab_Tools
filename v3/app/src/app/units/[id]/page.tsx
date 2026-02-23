@@ -1,8 +1,12 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import {
   fetchUnit,
   fetchTool,
+  fetchAllCategories,
+  fetchAllLocations,
   fetchMaintenanceLogsByUnit,
+  resolveTools,
 } from "@/lib/airtable";
 
 export const revalidate = 60; // 1 minute — status changes often
@@ -41,11 +45,20 @@ export default async function UnitDetailPage({
   const fields = unit.fields;
 
   // Resolve parent tool
-  let parentTool: { id: string; name: string } | null = null;
+  let parentTool: { id: string; name: string; imageUrl: string | null } | null = null;
   if (fields.tool?.[0]) {
     try {
-      const toolRecord = await fetchTool(fields.tool[0]);
-      parentTool = { id: toolRecord.id, name: toolRecord.fields.name };
+      const [toolRecord, categories, locations] = await Promise.all([
+        fetchTool(fields.tool[0]),
+        fetchAllCategories(),
+        fetchAllLocations(),
+      ]);
+      const resolved = resolveTools([toolRecord], categories, locations)[0];
+      parentTool = {
+        id: resolved.id,
+        name: resolved.name,
+        imageUrl: resolved.image_url,
+      };
     } catch {
       // Continue without parent tool info
     }
@@ -91,6 +104,17 @@ export default async function UnitDetailPage({
           >
             {parentTool.name}
           </a>
+        )}
+        {parentTool?.imageUrl && (
+          <div className="mt-4 relative aspect-square max-w-sm overflow-hidden rounded-xl border border-card-border bg-muted-bg">
+            <Image
+              src={parentTool.imageUrl}
+              alt={parentTool.name}
+              fill
+              className="object-contain p-4"
+              sizes="(max-width: 768px) 100vw, 24rem"
+            />
+          </div>
         )}
       </div>
 
