@@ -85,6 +85,7 @@ function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docs: L
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
 - You have access to web search. Use it when a student asks about something not covered in the source documents — for example, material settings, techniques, troubleshooting tips, or comparisons with other equipment. Cite web sources when you use them.
 - Students may share photos. If they share an image of equipment, identify it from the inventory if possible. If they share an image showing damage or a problem, help diagnose it and suggest filing a maintenance report.
+- If you identify a specific unit, call \`get_unit_details\` and include a clickable unit link in your answer using this exact format: \`[Unit Label](/units/{unit_id})\`.
 
 ## Formatting Rules
 - For bullet lists, ALWAYS put the content on the SAME line as the dash. Write \`- Content here\` not a dash on one line and content on the next.
@@ -120,6 +121,7 @@ ${inventory}
 - If a student reports an issue or problem with equipment, use the report_issue tool to log it. Gather a brief title and description from the conversation. Ask for their name if they haven't provided it.
 - You have access to web search. Use it when a student asks about something not covered in the tool inventory — for example, material recommendations, techniques, or general makerspace questions. Cite web sources when you use them.
 - Students may share photos of equipment. Help identify tools from images, diagnose problems shown in photos, or suggest next steps based on what you see.
+- If you identify a specific unit from a photo, call \`get_unit_details\` and include a clickable unit link in your answer using this exact format: \`[Unit Label](/units/{unit_id})\`.
 
 ## Project Planning
 When a student describes something they want to build or asks for help planning a project, guide them through a structured conversation:
@@ -366,6 +368,7 @@ export async function POST(req: Request) {
                 found: true,
                 unit_label: unit.fields.unit_label,
                 id: unit.id,
+                detail_page: `/units/${unit.id}`,
                 status: unit.fields.status || "Unknown",
                 condition: unit.fields.condition || "Unknown",
                 serial_number: unit.fields.serial_number || null,
