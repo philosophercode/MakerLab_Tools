@@ -1,0 +1,530 @@
+{
+  "baseId": "appQv9Q4jm4UzLpFK",
+  "recordCount": 43,
+  "records": [
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "reco8GlhWfPGcwElW"
+        ],
+        "group": "Printing & Large Format",
+        "name": "Laser Printer"
+      },
+      "id": "rec0YQJYy8Va8nvpB"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recDmFvjEXkhmRqwe",
+          "recTY10tIqHGbsBk6",
+          "recLXiOGnJAoUJw6v",
+          "recF3maxjXUvM3CGW",
+          "recZGP8khCQuvhBZ2",
+          "recSv4pRDnIaYfPCF",
+          "recBXI2QstvAK59wv"
+        ],
+        "group": "Woodworking",
+        "name": "Accessory"
+      },
+      "id": "rec1gc1czPCy5QTLP"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recW0d685JVDoBxxy"
+        ],
+        "group": "Electronics",
+        "name": "Test Equipment"
+      },
+      "id": "rec1WrSzCABn56VdQ"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "group": "Printing & Large Format",
+        "name": "Plotter"
+      },
+      "id": "rec2e1uqRBks9c4nM"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recAmVALSf183SXup",
+          "recw66bovAeSgd09D"
+        ],
+        "group": "Laser Cutting",
+        "name": "Laser Cutter"
+      },
+      "id": "rec2FGD4pAS3mHstK"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recswfyJRTK1Gqdis"
+        ],
+        "group": "Scanning & VR",
+        "name": "3D Scanner"
+      },
+      "id": "rec3GkTHrUfKOgEzx"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recw51mUf0IEpgjWs"
+        ],
+        "group": "Sewing & Textiles",
+        "name": "Heat Press"
+      },
+      "id": "rec5AqRV0Viz8rkJ1"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "group": "Safety & Infrastructure",
+        "name": "Fume Extraction"
+      },
+      "id": "rec5Xr5jTTFxe1Ihq"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recOiXkJeCDQaWIRO",
+          "recCjp275XeUJ5OUP",
+          "rec5Q4zdolQmqkQmP"
+        ],
+        "group": "Scanning & VR",
+        "name": "Tablet/Accessory"
+      },
+      "id": "rec6QATeyRD5hMOH8"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "reczRJVdQgPJAlBVL"
+        ],
+        "group": "Woodworking",
+        "name": "Router"
+      },
+      "id": "rec6sUuiqpU97arZA"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "rec23OWkkd6j4j0I2"
+        ],
+        "group": "CNC & Digital Fabrication",
+        "name": "Waterjet"
+      },
+      "id": "rec6tNFQWq418wXI3"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recPSJN9Rb3VLEVUX"
+        ],
+        "group": "Sewing & Textiles",
+        "name": "Embroidery Machine"
+      },
+      "id": "rec8fsGOyyHPPUqJl"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recFmh9YWY0IDbi2n"
+        ],
+        "group": "3D Printing",
+        "name": "Vacuum Former"
+      },
+      "id": "rec9oqn0z3q8faqp8"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recTS5EgPruymDfXt",
+          "recp6ylATv9xrQu4o",
+          "recSd1Mf4UjwnBpgA",
+          "recZe9u41jiXaw8G2"
+        ],
+        "group": "Woodworking",
+        "name": "Sander"
+      },
+      "id": "recag23IyktOvberV"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "receNDxwwApTFGpW3",
+          "recLcPqIQVSBiEbtO",
+          "recTxGYSeq5ssZf6d",
+          "reciVN5HBEYZYbFNA",
+          "recRHbB1DUXfQNy1P",
+          "recUcbbNecTv1aIT6",
+          "rec4vBUTZ9RTtwbJr",
+          "recOkS85SkDhWMVOU",
+          "recTM9n41XHeKj6Xz",
+          "recHSzvUc5Sz8JoWj"
+        ],
+        "group": "Woodworking",
+        "name": "Hand Saw"
+      },
+      "id": "recCGSBHiZGa3efEs"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recKWWKzrkk1U0JJo",
+          "recfb2iVhBPzTFO3f",
+          "rec1XuXG8kIeQuYtA",
+          "recjKz1fM10JzrGI9"
+        ],
+        "group": "Woodworking",
+        "name": "Drill/Driver"
+      },
+      "id": "recclUuzhBcDQoE0i"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recg3Ls5OOulU7aUE",
+          "rec4vHP9LR0BZI2W9",
+          "reczxMmdj0Ik3bWOt"
+        ],
+        "group": "Woodworking",
+        "name": "Nailer/Stapler"
+      },
+      "id": "recdG5ZmyOWDGzfuo"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "rec3Yjqf4qOUTMHWi"
+        ],
+        "group": "Scanning & VR",
+        "name": "VR Headset"
+      },
+      "id": "recdh3C2ZKNVeUwSi"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recYUlYLAkfNFnYYU",
+          "recWTKIQhZip0uexA",
+          "rec0906u35irPfAjw",
+          "rec1wXH6pXPQVOwQi",
+          "rech5luYgGWOHIVSG",
+          "recSt0uAOjYkrtuBW"
+        ],
+        "group": "Woodworking",
+        "name": "Power Saw"
+      },
+      "id": "recF3yCo2hrQy1BXn"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recWSQOw6k1Pc3udN",
+          "recTfX7Aqi3koULwe"
+        ],
+        "group": "Safety & Infrastructure",
+        "name": "Dust Extraction"
+      },
+      "id": "recF7o2nLpB6YVdYZ"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recohXvrLHiv7X6Ih",
+          "reckY0HP8yVmwrUXW",
+          "rec1j0T4xi6SpUn56",
+          "rec3KXyzVg0kOQin7",
+          "reccMLQgu2VOcSdbg"
+        ],
+        "group": "3D Printing",
+        "name": "FDM Printer"
+      },
+      "id": "recGRQMFpqTStTYD5"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "group": "Woodworking",
+        "name": "Clamp"
+      },
+      "id": "rechmm96ObAxqgeXZ"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recNXk4vNqNPzQ7Sx"
+        ],
+        "group": "Scanning & VR",
+        "name": "Camera"
+      },
+      "id": "recIidqFfAyT2EWXW"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "rec7sGJdFqK5XBlB3"
+        ],
+        "group": "Laser Cutting",
+        "name": "Fume Extractor"
+      },
+      "id": "recJJeUzORjpQHd7j"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "rec3apbYmyQoyVYC9",
+          "recyNHGSOCpMJMUNe"
+        ],
+        "group": "3D Printing",
+        "name": "Post-Processing"
+      },
+      "id": "recjkOUPId9oiMHwL"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recceDyt06Ufm049u",
+          "recQ0ZQJSCpe19d46",
+          "recRGFHuHZGNxwS91"
+        ],
+        "group": "Electronics",
+        "name": "Rework Station"
+      },
+      "id": "recjVBSimg61NfWWg"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recjPV6WZmTi6CMi6"
+        ],
+        "group": "Woodworking",
+        "name": "Chisel/Scraper"
+      },
+      "id": "reckC2FPFBjBleCa0"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recvKwWnnrM2V2D1k"
+        ],
+        "group": "Electronics",
+        "name": "Workstation"
+      },
+      "id": "recLh0bm66lYCBPea"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recOfbCCzkBVXE0uj",
+          "recIcWWZVUliliiq6",
+          "rec2dOPLtPZk8qOPF",
+          "recm3pOMWp69W1mm9"
+        ],
+        "group": "CNC & Digital Fabrication",
+        "name": "Workstation"
+      },
+      "id": "recM2u0eBqRP6dov2"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recZ8ZQPXi6bkiuAH",
+          "recMFrmUHCY5WF6eI",
+          "recNSXSVww31GdV0L"
+        ],
+        "group": "Electronics",
+        "name": "Soldering"
+      },
+      "id": "recM8Eb1mBLDEoCUY"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recpd1jcl1c0hTh8z",
+          "recrmUPR7GbcCFSZ5"
+        ],
+        "group": "3D Printing",
+        "name": "SLA Printer"
+      },
+      "id": "recMnkrOKS4E2mu4z"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "group": "Safety & Infrastructure",
+        "name": "Air Compressor"
+      },
+      "id": "recQhkzAmXi6e677p"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recNW7e730FmOzH2Y",
+          "reciis2I0h4jvVWUZ",
+          "recbSRwXzkdSKa8Jv",
+          "recCgYAvKCflKa1G3",
+          "reclDtAjyXSS1AhXd"
+        ],
+        "group": "Woodworking",
+        "name": "Plane"
+      },
+      "id": "recseeI00j0B1xrlL"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "rec23bmK590LxnlNo"
+        ],
+        "group": "Safety & Infrastructure",
+        "name": "PPE"
+      },
+      "id": "recSnibCHTTTZ2Hqi"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recrwOsn2B2KiZudh",
+          "recRaYFLScZenvd5o",
+          "recOvKSRe4frre1PM"
+        ],
+        "group": "Safety & Infrastructure",
+        "name": "Hose/Accessory"
+      },
+      "id": "recTb8StzSA1MSDB8"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:43.000Z",
+      "fields": {
+        "Tools_v2": [
+          "rec2Lnn0W2cQMeLeo"
+        ],
+        "group": "Printing & Large Format",
+        "name": "Label Maker"
+      },
+      "id": "rectcZZVWOuSj64ws"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recqcm3dK7lQSbSb7",
+          "rec8lADY1sC4WoqEU",
+          "recs868jZYYZdqc34",
+          "recfAegYFqXO51KQr",
+          "reclX5WrI29WK37yi",
+          "recI7HoOzeHcOgzJZ"
+        ],
+        "group": "Woodworking",
+        "name": "General Hand Tool"
+      },
+      "id": "recTpTCr5NqqckEqB"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "group": "Woodworking",
+        "name": "Measuring"
+      },
+      "id": "recujjX26cloQ9tCc"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recsxQuhH0IMDWEHp",
+          "rec8af2JxBnj4U0P1",
+          "recl0R15enUrtiOvY"
+        ],
+        "group": "3D Printing",
+        "name": "Accessory"
+      },
+      "id": "recun1amXNBQt5Mpy"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recan8CdxdwILVu71",
+          "rec8ChrPgMEiqQn3u"
+        ],
+        "group": "CNC & Digital Fabrication",
+        "name": "Vinyl Cutter"
+      },
+      "id": "recvqLSuEsRHITClu"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:44.000Z",
+      "fields": {
+        "Tools_v2": [
+          "rec0MBFevqtHoo7os"
+        ],
+        "group": "Sewing & Textiles",
+        "name": "Sewing Machine"
+      },
+      "id": "recwBXPnoz3xKWedK"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recYGf0rpxIYiuogy",
+          "rechvVjk7bdZQuff7",
+          "recAL3eOuvoF1CiFf",
+          "reczn3ybnevPnpDvm"
+        ],
+        "group": "CNC & Digital Fabrication",
+        "name": "CNC Mill"
+      },
+      "id": "recWOiImXqrA7vBI0"
+    },
+    {
+      "createdTime": "2026-02-20T05:11:42.000Z",
+      "fields": {
+        "Tools_v2": [
+          "recGnLubR1Ikn2fSz",
+          "recOjf23lXyjwB0DY"
+        ],
+        "group": "3D Printing",
+        "name": "3D Scanner"
+      },
+      "id": "recZ4OQ8hbbULH0sp"
+    }
+  ],
+  "schemaVersion": 1,
+  "table": "categories",
+  "tableId": "tblNpVHquh7H0S8Bc"
+}

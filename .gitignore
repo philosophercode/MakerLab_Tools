@@ -1,6 +1,9 @@
 node_modules/
 dist/
 public/
+!v3/app/public/
+!v3/app/public/tool-images/
+!v3/app/public/tool-images/*.png
 .env
 .env.local
 *.log

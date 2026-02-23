@@ -3,10 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npm run sync:startup",
     "dev": "next dev",
+    "prebuild": "npm run sync:startup",
+    "prestart": "npm run sync:startup",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync:startup": "npm run sync:all:startup",
+    "sync:all": "npm run sync:pull && npm run sync:images",
+    "sync:all:startup": "npm run sync:pull:startup && npm run sync:images:startup",
+    "sync:pull:startup": "node scripts/airtable-sync.mjs pull --startup",
+    "sync:images:startup": "node scripts/sync-airtable-images.ts --max-pixels=2000000 || true",
+    "sync:pull": "node scripts/airtable-sync.mjs pull",
+    "sync:images": "node scripts/sync-airtable-images.ts --max-pixels=2000000",
+    "sync:push": "node scripts/airtable-sync.mjs push",
+    "sync:status": "node scripts/airtable-sync.mjs status"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.46",
