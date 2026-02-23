@@ -2,6 +2,8 @@
 
 A digital tool inventory and discovery system for the Cornell MakerLab. Browse tools, view documentation, and get AI-powered assistance for operating equipment.
 
+[DeepWiki documentation](https://deepwiki.com/philosophercode/MakerLab_Tools)
+
 ---
 
 ## Repository Structure
