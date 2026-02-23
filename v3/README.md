@@ -4,6 +4,7 @@ Comprehensive technical documentation for the `v3` stack:
 - Next.js web app (`v3/app`)
 - MCP server implementations (`v3/app/src/app/api/mcp/route.ts` and `v3/mcp`)
 - Airtable-backed data model and sync workflow
+- [DeepWiki documentation](https://deepwiki.com/philosophercode/MakerLab_Tools)
 
 ## 1. What v3 includes
 
