@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
-import ChatButton from "@/components/ChatButton";
 import NavLinks from "@/components/NavLinks";
 import { ChatProvider } from "@/components/ChatProvider";
 
@@ -52,7 +51,6 @@ export default function RootLayout({
         </header>
         <ChatProvider>
           <main>{children}</main>
-          <ChatButton />
         </ChatProvider>
       </body>
     </html>
