@@ -1,5 +1,5 @@
 import { createFlag } from "@/lib/airtable";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const flagSchema = z.object({
@@ -23,7 +23,7 @@ const flagSchema = z.object({
 
 export async function POST(req: Request) {
   const ip = getClientIp(req);
-  const { allowed } = rateLimit(`flag:${ip}`, { limit: 10, windowMs: 60_000 });
+  const { allowed } = await rateLimitAsync(`flag:${ip}`, { limit: 10, windowMs: 60_000 });
   if (!allowed) {
     return Response.json(
       { error: "Too many requests. Please wait a moment." },

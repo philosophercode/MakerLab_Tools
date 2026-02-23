@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createMaintenanceLog, uploadAttachment } from "@/lib/airtable";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
@@ -44,7 +44,7 @@ const maintenanceSchema = z.object({
 
 export async function POST(req: Request) {
   const ip = getClientIp(req);
-  const { allowed } = rateLimit(`maint:${ip}`, { limit: 5, windowMs: 60_000 });
+  const { allowed } = await rateLimitAsync(`maint:${ip}`, { limit: 5, windowMs: 60_000 });
   if (!allowed) {
     return Response.json(
       { success: false, error: "Too many requests. Please wait a moment." },

@@ -311,7 +311,11 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className="max-w-[85%] break-words text-sm text-foreground"
+              className={`max-w-[85%] break-words rounded-xl px-4 py-2.5 text-sm ${
+                m.role === "user"
+                  ? "bg-accent-blue text-white"
+                  : "bg-accent-teal/10 text-foreground"
+              }`}
             >
               {m.role === "user" ? (
                 m.parts.map((part, i) => {

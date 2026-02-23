@@ -117,7 +117,6 @@ export default async function UnitDetailPage({
             <ImageGallery
               images={parentTool.imageAttachments}
               toolName={parentTool.name}
-              localImageUrl={parentTool.imageUrl || undefined}
             />
           </div>
         )}

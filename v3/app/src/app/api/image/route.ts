@@ -1,13 +1,86 @@
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import { spawn } from "child_process";
 import path from "path";
 import fs from "fs/promises";
+import { lookup } from "dns/promises";
+import net from "net";
 
 const SCRIPTS_DIR = path.resolve(process.cwd(), "..", "scripts");
 const PUBLIC_IMAGES_DIR = path.resolve(process.cwd(), "public", "tool-images");
 const NOBG_DIR = path.join(SCRIPTS_DIR, "tool_images_nobg");
 const GENERATED_DIR = path.join(SCRIPTS_DIR, "tool_images_generated");
+const IMAGE_TASK_SCRIPT = "scripts/run-image-task.mjs";
+const ALLOWED_IMAGE_HOSTS = new Set([
+  "upload.wikimedia.org",
+  "commons.wikimedia.org",
+  "wikipedia.org",
+  "images.unsplash.com",
+  "images.pexels.com",
+]);
+
+function isPrivateIp(ip: string): boolean {
+  if (net.isIPv4(ip)) {
+    if (ip.startsWith("10.")) return true;
+    if (ip.startsWith("127.")) return true;
+    if (ip.startsWith("192.168.")) return true;
+    const parts = ip.split(".").map(Number);
+    if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+    if (parts[0] === 169 && parts[1] === 254) return true;
+    if (ip === "0.0.0.0") return true;
+    return false;
+  }
+  if (net.isIPv6(ip)) {
+    const v = ip.toLowerCase();
+    if (v === "::1") return true;
+    if (v.startsWith("fc") || v.startsWith("fd")) return true; // ULA
+    if (v.startsWith("fe80:")) return true; // link-local
+    return false;
+  }
+  return true;
+}
+
+async function validateSourceUrl(raw: string): Promise<string | null> {
+  let parsed: URL;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    return "Invalid sourceUrl";
+  }
+
+  if (parsed.protocol !== "https:") {
+    return "Only https source URLs are allowed";
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+  if (
+    hostname === "localhost" ||
+    hostname.endsWith(".localhost") ||
+    hostname.endsWith(".local") ||
+    hostname.endsWith(".internal")
+  ) {
+    return "Host is not allowed";
+  }
+
+  const hostAllowed = [...ALLOWED_IMAGE_HOSTS].some(
+    (h) => hostname === h || hostname.endsWith(`.${h}`)
+  );
+  if (!hostAllowed) {
+    return "Source host is not allowed";
+  }
+
+  // Defense in depth against DNS-based SSRF.
+  try {
+    const resolved = await lookup(hostname, { all: true });
+    if (resolved.some((r) => isPrivateIp(r.address))) {
+      return "Resolved address is not allowed";
+    }
+  } catch {
+    return "Could not resolve source host";
+  }
+
+  return null;
+}
 
 /**
  * GET /api/image?toolName=xxx&since=timestamp
@@ -41,7 +114,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const { allowed } = rateLimit(`image:${ip}`, { limit: 5, windowMs: 60_000 });
+  const { allowed } = await rateLimitAsync(`image:${ip}`, { limit: 5, windowMs: 60_000 });
   if (!allowed) {
     return NextResponse.json(
       { error: "Too many requests. Please wait a moment." },
@@ -61,6 +134,9 @@ export async function POST(req: NextRequest) {
   if (!toolName || typeof toolName !== "string") {
     return NextResponse.json({ error: "toolName required" }, { status: 400 });
   }
+  if (toolName.length > 200) {
+    return NextResponse.json({ error: "toolName too long" }, { status: 400 });
+  }
 
   if (!["regenerate", "remove-bg", "replace-from-url"].includes(action)) {
     return NextResponse.json(
@@ -69,48 +145,36 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const safeName = toolName.replace(/\//g, "_");
-  const outputPath = path.join(PUBLIC_IMAGES_DIR, `${safeName}.png`);
-
-  // Build a shell command that runs the script and copies the result
-  // to all target directories. Runs detached so it survives page refresh.
-  let command: string;
-
-  if (action === "regenerate") {
-    const escapedName = toolName.replace(/'/g, "'\\''");
-    command = [
-      `cd '${SCRIPTS_DIR}'`,
-      `python3 generate_images.py --tool '${escapedName}'`,
-      `cp '${path.join(GENERATED_DIR, `${safeName}.png`)}' '${outputPath}'`,
-      `cp '${path.join(GENERATED_DIR, `${safeName}.png`)}' '${path.join(NOBG_DIR, `${safeName}.png`)}'`,
-    ].join(" && ");
-  } else if (action === "remove-bg") {
-    const escapedName = toolName.replace(/'/g, "'\\''");
-    command = [
-      `cd '${SCRIPTS_DIR}'`,
-      `python3 remove_backgrounds.py --tool '${escapedName}' --local`,
-      `cp '${path.join(NOBG_DIR, `${safeName}.png`)}' '${outputPath}'`,
-    ].join(" && ");
-  } else {
+  if (action === "replace-from-url") {
     if (!sourceUrl || typeof sourceUrl !== "string") {
       return NextResponse.json(
         { error: "sourceUrl required for replace-from-url" },
         { status: 400 }
       );
     }
-    const escapedName = toolName.replace(/'/g, "'\\''");
-    const escapedUrl = sourceUrl.replace(/'/g, "'\\''");
-    command = [
-      `cd '${SCRIPTS_DIR}'`,
-      `python3 replace_from_url.py --tool '${escapedName}' --url '${escapedUrl}'`,
-      `cp '${path.join(NOBG_DIR, `${safeName}.png`)}' '${outputPath}'`,
-    ].join(" && ");
+    const validationError = await validateSourceUrl(sourceUrl);
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
   }
 
-  // Spawn detached — the process continues even if the HTTP connection drops
-  const child = spawn("sh", ["-c", command], {
+  const args = [
+    IMAGE_TASK_SCRIPT,
+    "--action",
+    action,
+    "--tool",
+    toolName,
+  ];
+  if (action === "replace-from-url" && sourceUrl) {
+    args.push("--sourceUrl", sourceUrl);
+  }
+
+  // Spawn detached — process continues even if HTTP connection drops.
+  const child = spawn("node", args, {
     detached: true,
     stdio: "ignore",
+    env: process.env,
+    cwd: process.cwd(),
   });
   child.unref();
 

@@ -77,25 +77,37 @@ async function createRecord(tableId, fields) {
     });
     return res.json();
 }
+// ── TTL cache ──────────────────────────────────────────────────────
+const CACHE_TTL_MS = 60_000; // 60 seconds
+function createCache(fetcher) {
+    let entry = null;
+    let inflight = null;
+    return async () => {
+        if (entry && Date.now() < entry.expiresAt)
+            return entry.data;
+        if (inflight)
+            return inflight;
+        inflight = fetcher().then((data) => {
+            entry = { data, expiresAt: Date.now() + CACHE_TTL_MS };
+            inflight = null;
+            return data;
+        });
+        return inflight;
+    };
+}
 // ── Public API ─────────────────────────────────────────────────────
-let categoryCache = null;
-let locationCache = null;
-async function getCategories() {
-    if (!categoryCache) {
-        categoryCache = await fetchTable(TABLES.categories, {
-            sort: [{ field: "group", direction: "asc" }],
-        });
-    }
-    return categoryCache;
-}
-async function getLocations() {
-    if (!locationCache) {
-        locationCache = await fetchTable(TABLES.locations, {
-            sort: [{ field: "room", direction: "asc" }],
-        });
-    }
-    return locationCache;
-}
+const getCategories = createCache(() => fetchTable(TABLES.categories, {
+    sort: [{ field: "group", direction: "asc" }],
+}));
+const getLocations = createCache(() => fetchTable(TABLES.locations, {
+    sort: [{ field: "room", direction: "asc" }],
+}));
+const getAllToolsRaw = createCache(() => fetchTable(TABLES.tools, {
+    sort: [{ field: "name", direction: "asc" }],
+}));
+const getAllUnitsRaw = createCache(() => fetchTable(TABLES.units, {
+    sort: [{ field: "unit_label", direction: "asc" }],
+}));
 function resolveToolRecord(tool, catMap, locMap) {
     const catId = tool.fields.category?.[0];
     const locId = tool.fields.location?.[0];
@@ -129,12 +141,21 @@ async function buildLookupMaps() {
     const locMap = new Map(locations.map((l) => [l.id, l.fields]));
     return { catMap, locMap };
 }
+/** Resolve all tools with category/location names (cached). */
+async function getResolvedTools() {
+    const [tools, { catMap, locMap }] = await Promise.all([
+        getAllToolsRaw(),
+        buildLookupMaps(),
+    ]);
+    return tools.map((t) => resolveToolRecord(t, catMap, locMap));
+}
+/** Build a Map from tool record ID → tool name (from cache). */
+async function getToolNameMap() {
+    const tools = await getAllToolsRaw();
+    return new Map(tools.map((t) => [t.id, t.fields.name]));
+}
 export async function listTools(filters) {
-    const tools = await fetchTable(TABLES.tools, {
-        sort: [{ field: "name", direction: "asc" }],
-    });
-    const { catMap, locMap } = await buildLookupMaps();
-    let resolved = tools.map((t) => resolveToolRecord(t, catMap, locMap));
+    let resolved = await getResolvedTools();
     if (filters?.category) {
         const cat = filters.category.toLowerCase();
         resolved = resolved.filter((t) => t.category_group.toLowerCase().includes(cat) ||
@@ -148,120 +169,72 @@ export async function listTools(filters) {
     return resolved;
 }
 export async function getTool(nameOrId) {
-    // Try fetching by record ID first
+    const resolved = await getResolvedTools();
     if (nameOrId.startsWith("rec")) {
-        try {
-            const tool = await fetchRecord(TABLES.tools, nameOrId);
-            const { catMap, locMap } = await buildLookupMaps();
-            return resolveToolRecord(tool, catMap, locMap);
-        }
-        catch {
-            // Fall through to name search
-        }
+        const match = resolved.find((t) => t.id === nameOrId);
+        if (match)
+            return match;
     }
     // Search by name (case-insensitive)
-    const tools = await fetchTable(TABLES.tools, {
-        filterByFormula: `LOWER({name}) = LOWER("${nameOrId.replace(/"/g, '\\"')}")`,
-    });
-    if (tools.length === 0)
-        return null;
-    const { catMap, locMap } = await buildLookupMaps();
-    return resolveToolRecord(tools[0], catMap, locMap);
+    return (resolved.find((t) => t.name.toLowerCase() === nameOrId.toLowerCase()) || null);
 }
 export async function searchTools(query) {
     const q = query.toLowerCase();
-    // AirTable doesn't support full-text search, so we fetch all and filter
-    const tools = await fetchTable(TABLES.tools, {
-        sort: [{ field: "name", direction: "asc" }],
-    });
-    const { catMap, locMap } = await buildLookupMaps();
-    return tools
-        .filter((t) => {
-        const f = t.fields;
+    const resolved = await getResolvedTools();
+    return resolved.filter((t) => {
         const searchable = [
-            f.name,
-            f.description || "",
-            ...(f.materials || []),
-            ...(f.tags || []),
+            t.name,
+            t.description,
+            ...t.materials,
+            ...t.tags,
         ]
             .join(" ")
             .toLowerCase();
         return searchable.includes(q);
-    })
-        .map((t) => resolveToolRecord(t, catMap, locMap));
+    });
 }
 export async function listUnits(toolName) {
-    let units;
+    const [units, toolNameMap] = await Promise.all([
+        getAllUnitsRaw(),
+        getToolNameMap(),
+    ]);
+    let filtered = units;
     if (toolName) {
-        // Find the tool record first
-        const toolResult = await getTool(toolName);
-        if (!toolResult)
+        // Find matching tool ID from cache
+        const toolEntry = [...toolNameMap.entries()].find(([, name]) => name.toLowerCase() === toolName.toLowerCase());
+        if (!toolEntry)
             return [];
-        units = await fetchTable(TABLES.units, {
-            filterByFormula: `FIND("${toolResult.id}", ARRAYJOIN(RECORD_ID(tool)))`,
-        });
+        const toolId = toolEntry[0];
+        filtered = units.filter((u) => u.fields.tool?.includes(toolId));
     }
-    else {
-        units = await fetchTable(TABLES.units, {
-            sort: [{ field: "unit_label", direction: "asc" }],
-        });
-    }
-    // Resolve tool names for each unit
-    const toolIds = new Set(units.flatMap((u) => u.fields.tool || []));
-    const toolNames = new Map();
-    for (const tid of toolIds) {
-        try {
-            const tool = await fetchRecord(TABLES.tools, tid);
-            toolNames.set(tid, tool.fields.name);
-        }
-        catch {
-            toolNames.set(tid, "Unknown");
-        }
-    }
-    return units.map((u) => ({
+    return filtered.map((u) => ({
         id: u.id,
         unit_label: u.fields.unit_label,
-        tool_name: toolNames.get(u.fields.tool?.[0] || "") || "Unknown",
+        tool_name: toolNameMap.get(u.fields.tool?.[0] || "") || "Unknown",
         status: u.fields.status || "Unknown",
         condition: u.fields.condition || "Unknown",
     }));
 }
 export async function getUnit(labelOrId) {
-    let unit = null;
-    // Try by record ID
+    const units = await getAllUnitsRaw();
+    let unit;
     if (labelOrId.startsWith("rec")) {
-        try {
-            unit = await fetchRecord(TABLES.units, labelOrId);
-        }
-        catch {
-            // Fall through
-        }
+        unit = units.find((u) => u.id === labelOrId);
     }
-    // Try by label
     if (!unit) {
-        const units = await fetchTable(TABLES.units, {
-            filterByFormula: `LOWER({unit_label}) = LOWER("${labelOrId.replace(/"/g, '\\"')}")`,
-        });
-        unit = units[0] || null;
+        const q = labelOrId.toLowerCase();
+        unit = units.find((u) => u.fields.unit_label.toLowerCase() === q);
     }
     if (!unit)
         return null;
-    // Resolve parent tool for name + SOP/safety/video URLs
-    let toolName = "Unknown";
+    // Resolve parent tool from cache
     let parentTool = null;
     const toolId = unit.fields.tool?.[0];
     if (toolId) {
-        try {
-            const toolRecord = await fetchRecord(TABLES.tools, toolId);
-            const { catMap, locMap } = await buildLookupMaps();
-            parentTool = resolveToolRecord(toolRecord, catMap, locMap);
-            toolName = parentTool.name;
-        }
-        catch {
-            // keep "Unknown"
-        }
+        const resolved = await getResolvedTools();
+        parentTool = resolved.find((t) => t.id === toolId) || null;
     }
-    // Fetch maintenance logs
+    // Maintenance logs must be fetched fresh (not cached — they change)
     const logs = await fetchTable(TABLES.maintenance_logs, {
         filterByFormula: `FIND("${unit.id}", ARRAYJOIN(RECORD_ID(unit)))`,
         sort: [{ field: "date_reported", direction: "desc" }],
@@ -269,7 +242,7 @@ export async function getUnit(labelOrId) {
     return {
         id: unit.id,
         unit_label: unit.fields.unit_label,
-        tool_name: toolName,
+        tool_name: parentTool?.name || "Unknown",
         serial_number: unit.fields.serial_number || "",
         asset_tag: unit.fields.asset_tag || "",
         status: unit.fields.status || "Unknown",
@@ -292,17 +265,45 @@ export async function getUnit(labelOrId) {
         })),
     };
 }
+export async function listMaintenanceLogs(filters) {
+    const [logs, units] = await Promise.all([
+        fetchTable(TABLES.maintenance_logs, {
+            sort: [{ field: "date_reported", direction: "desc" }],
+        }),
+        getAllUnitsRaw(),
+    ]);
+    const unitMap = new Map(units.map((u) => [u.id, u.fields.unit_label]));
+    let filtered = logs;
+    if (filters?.status) {
+        const s = filters.status.toLowerCase();
+        filtered = filtered.filter((l) => (l.fields.status || "").toLowerCase() === s);
+    }
+    if (filters?.priority) {
+        const p = filters.priority.toLowerCase();
+        filtered = filtered.filter((l) => (l.fields.priority || "").toLowerCase() === p);
+    }
+    return filtered.map((l) => ({
+        id: l.id,
+        title: l.fields.title,
+        unit_label: unitMap.get(l.fields.unit?.[0] || "") || "Unknown",
+        type: l.fields.type || "",
+        priority: l.fields.priority || "",
+        status: l.fields.status || "",
+        date_reported: l.fields.date_reported || "",
+        description: l.fields.description || "",
+    }));
+}
 export async function createMaintenanceLog(fields) {
-    // Resolve unit by label
-    const units = await fetchTable(TABLES.units, {
-        filterByFormula: `LOWER({unit_label}) = LOWER("${fields.unit_label.replace(/"/g, '\\"')}")`,
-    });
-    if (units.length === 0) {
+    // Resolve unit by label from cache
+    const units = await getAllUnitsRaw();
+    const q = fields.unit_label.toLowerCase();
+    const unit = units.find((u) => u.fields.unit_label.toLowerCase() === q);
+    if (!unit) {
         throw new Error(`Unit not found: ${fields.unit_label}`);
     }
     const record = await createRecord(TABLES.maintenance_logs, {
         title: fields.title,
-        unit: [units[0].id],
+        unit: [unit.id],
         type: fields.type,
         priority: fields.priority,
         status: "Open",
@@ -313,9 +314,7 @@ export async function createMaintenanceLog(fields) {
     return { id: record.id, title: record.fields.title };
 }
 export async function getToolsWithImages() {
-    const tools = await fetchTable(TABLES.tools, {
-        sort: [{ field: "name", direction: "asc" }],
-    });
+    const tools = await getAllToolsRaw();
     return tools.map((t) => {
         const img = t.fields.image_attachments?.[0];
         const thumb = img?.thumbnails?.large;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 interface WikiPage {
   title?: string;
@@ -13,6 +14,15 @@ interface Candidate {
 }
 
 export async function GET(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { allowed } = await rateLimitAsync(`imgsearch:${ip}`, { limit: 15, windowMs: 60_000 });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429 }
+    );
+  }
+
   const q = (req.nextUrl.searchParams.get("q") || "").trim();
   if (!q) {
     return NextResponse.json({ error: "q required" }, { status: 400 });

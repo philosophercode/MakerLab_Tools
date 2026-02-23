@@ -16,6 +16,7 @@ import {
 } from "@/lib/airtable";
 import { evaluateImage, toolToImageInfo } from "@/lib/eval-images";
 import type { ToolRecord, CategoryRecord, LocationRecord, ToolWithMeta } from "@/lib/types";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -278,6 +279,36 @@ function createServer(): McpServer {
 // ── Route handler ──────────────────────────────────────────────────
 
 async function handler(req: Request): Promise<Response> {
+  const expectedApiKey = process.env.MCP_API_KEY;
+  if (!expectedApiKey) {
+    return Response.json(
+      { jsonrpc: "2.0", error: { code: -32000, message: "MCP_API_KEY is not configured" }, id: null },
+      { status: 503 }
+    );
+  }
+
+  const authHeader = req.headers.get("authorization") || "";
+  const bearer = authHeader.toLowerCase().startsWith("bearer ")
+    ? authHeader.slice(7).trim()
+    : "";
+  const headerKey = req.headers.get("x-api-key") || "";
+  const suppliedKey = bearer || headerKey;
+  if (suppliedKey !== expectedApiKey) {
+    return Response.json(
+      { jsonrpc: "2.0", error: { code: -32001, message: "Unauthorized" }, id: null },
+      { status: 401 }
+    );
+  }
+
+  const ip = getClientIp(req);
+  const { allowed } = await rateLimitAsync(`mcp:${ip}`, { limit: 30, windowMs: 60_000 });
+  if (!allowed) {
+    return Response.json(
+      { jsonrpc: "2.0", error: { code: -32000, message: "Too many requests. Please wait a moment." }, id: null },
+      { status: 429 }
+    );
+  }
+
   // GET is used for SSE streams — not supported in stateless serverless mode
   if (req.method === "GET") {
     return Response.json(

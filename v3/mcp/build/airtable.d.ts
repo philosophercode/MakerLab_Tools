@@ -142,6 +142,19 @@ export declare function getUnit(labelOrId: string): Promise<{
         description: string;
     }>;
 } | null>;
+export declare function listMaintenanceLogs(filters?: {
+    status?: string;
+    priority?: string;
+}): Promise<Array<{
+    id: string;
+    title: string;
+    unit_label: string;
+    type: string;
+    priority: string;
+    status: string;
+    date_reported: string;
+    description: string;
+}>>;
 export declare function createMaintenanceLog(fields: {
     title: string;
     unit_label: string;

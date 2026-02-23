@@ -21,7 +21,7 @@ import {
   createMaintenanceLog,
 } from "@/lib/airtable";
 import { fetchDocContent } from "@/lib/doc-fetcher";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import { generateImage } from "@/lib/gemini-image";
 
 export const maxDuration = 60;
@@ -158,7 +158,7 @@ You have a \`visualize_project\` tool that generates a concept image of what the
 
 export async function POST(req: Request) {
   const ip = getClientIp(req);
-  const { allowed } = rateLimit(`chat:${ip}`, { limit: 20, windowMs: 60_000 });
+  const { allowed } = await rateLimitAsync(`chat:${ip}`, { limit: 20, windowMs: 60_000 });
   if (!allowed) {
     return Response.json(
       { error: "Too many requests. Please wait a moment." },
@@ -167,8 +167,27 @@ export async function POST(req: Request) {
   }
 
   try {
+  const contentLength = Number(req.headers.get("content-length") || "0");
+  if (contentLength > 200_000) {
+    return Response.json(
+      { error: "Payload too large" },
+      { status: 413 }
+    );
+  }
+
   const { messages, toolId }: { messages: UIMessage[]; toolId?: string } =
     await req.json();
+  if (!Array.isArray(messages) || messages.length > 50) {
+    return Response.json({ error: "Too many messages" }, { status: 400 });
+  }
+
+  const totalText = messages
+    .flatMap((m) => m.parts || [])
+    .filter((p): p is { type: "text"; text: string } => p.type === "text" && typeof (p as { text?: unknown }).text === "string")
+    .reduce((sum, p) => sum + p.text.length, 0);
+  if (totalText > 50_000) {
+    return Response.json({ error: "Message content too large" }, { status: 413 });
+  }
 
   let systemPrompt: string;
   let resolvedTools: ReturnType<typeof resolveTools> = [];
