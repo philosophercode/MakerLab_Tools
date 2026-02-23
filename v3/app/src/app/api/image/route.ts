@@ -39,6 +39,10 @@ function isPrivateIp(ip: string): boolean {
   return true;
 }
 
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, `'\"'\"'`)}'`;
+}
+
 async function validateSourceUrl(raw: string): Promise<string | null> {
   let parsed: URL;
   try {
@@ -157,25 +161,25 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Keep script path runtime-dynamic to avoid Turbopack treating it as a static module import.
   const imageTaskScript = path.join(
     "scripts",
     process.env.IMAGE_TASK_SCRIPT_NAME || "run-image-task.mjs"
   );
-
-  const args = [
-    imageTaskScript,
+  const cmdParts = [
+    "node",
+    shellQuote(imageTaskScript),
     "--action",
-    action,
+    shellQuote(action),
     "--tool",
-    toolName,
+    shellQuote(toolName),
   ];
   if (action === "replace-from-url" && sourceUrl) {
-    args.push("--sourceUrl", sourceUrl);
+    cmdParts.push("--sourceUrl", shellQuote(sourceUrl));
   }
+  const cmd = cmdParts.join(" ");
 
   // Spawn detached — process continues even if HTTP connection drops.
-  const child = spawn("node", args, {
+  const child = spawn("sh", ["-lc", cmd], {
     detached: true,
     stdio: "ignore",
     env: process.env,

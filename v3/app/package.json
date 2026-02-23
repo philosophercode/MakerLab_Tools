@@ -5,8 +5,8 @@
   "scripts": {
     "predev": "npm run sync:startup",
     "dev": "next dev",
-    "prebuild": "npm run sync:startup",
-    "prestart": "npm run sync:startup",
+    "prebuild": "echo \"skip sync:startup during build\"",
+    "prestart": "echo \"skip sync:startup on start\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
