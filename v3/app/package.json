@@ -18,7 +18,9 @@
     "sync:pull": "node scripts/airtable-sync.mjs pull",
     "sync:images": "node scripts/sync-airtable-images.ts --max-pixels=2000000",
     "sync:push": "node scripts/airtable-sync.mjs push",
-    "sync:status": "node scripts/airtable-sync.mjs status"
+    "sync:status": "node scripts/airtable-sync.mjs status",
+    "sync:stage": "git add data/airtable public/tool-images scripts/airtable-sync.mjs scripts/sync-airtable-images.ts package.json",
+    "sync:all:stage": "npm run sync:all && npm run sync:stage"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.46",

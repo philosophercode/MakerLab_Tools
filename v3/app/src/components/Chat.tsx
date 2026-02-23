@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, type UIMessage } from "ai";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -36,6 +36,78 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
+function isImageFilePart(part: unknown): part is { type: "file"; mediaType: string } {
+  if (!part || typeof part !== "object") return false;
+  const p = part as { type?: string; mediaType?: string };
+  return p.type === "file" && typeof p.mediaType === "string" && p.mediaType.startsWith("image/");
+}
+
+function sanitizeMessagesForTransport(messages: UIMessage[]): UIMessage[] {
+  let lastUserImageIndex = -1;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    if (
+      m.role === "user" &&
+      Array.isArray(m.parts) &&
+      m.parts.some((part) => isImageFilePart(part))
+    ) {
+      lastUserImageIndex = i;
+      break;
+    }
+  }
+
+  return messages.map((m, index) => {
+    if (!Array.isArray(m.parts)) return m;
+    const keepImageParts = index === lastUserImageIndex;
+    const parts = m.parts.filter((part) => {
+      if (!isImageFilePart(part)) return true;
+      return keepImageParts;
+    });
+    return { ...m, parts };
+  });
+}
+
+async function compressImageToDataUrl(file: File): Promise<{ dataUrl: string; mediaType: string }> {
+  const MAX_DIMENSION = 1600;
+  const MAX_SIZE_BYTES = 900_000;
+
+  if (file.size <= MAX_SIZE_BYTES && file.type.startsWith("image/")) {
+    return { dataUrl: await fileToBase64(file), mediaType: file.type };
+  }
+
+  const srcDataUrl = await fileToBase64(file);
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image();
+    el.onload = () => resolve(el);
+    el.onerror = () => reject(new Error("Could not load image for compression"));
+    el.src = srcDataUrl;
+  });
+
+  const ratio = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
+  const width = Math.max(1, Math.round(img.width * ratio));
+  const height = Math.max(1, Math.round(img.height * ratio));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return { dataUrl: srcDataUrl, mediaType: file.type || "image/jpeg" };
+  }
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const qualities = [0.82, 0.72, 0.62, 0.52, 0.42];
+  let best = canvas.toDataURL("image/jpeg", qualities[0]);
+  for (const q of qualities) {
+    const candidate = canvas.toDataURL("image/jpeg", q);
+    const estimatedBytes = Math.floor(((candidate.length - "data:image/jpeg;base64,".length) * 3) / 4);
+    best = candidate;
+    if (estimatedBytes <= MAX_SIZE_BYTES) break;
+  }
+
+  return { dataUrl: best, mediaType: "image/jpeg" };
+}
+
 export default function Chat({ toolId, suggestions, header }: ChatProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -52,6 +124,15 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: toolId ? { toolId } : undefined,
+      prepareSendMessagesRequest: ({ id, messages: outgoingMessages, body, trigger, messageId }) => ({
+        body: {
+          ...body,
+          id,
+          messages: sanitizeMessagesForTransport(outgoingMessages),
+          trigger,
+          messageId,
+        },
+      }),
     }),
     messages: initialMessages.length > 0 ? initialMessages : undefined,
   });
@@ -161,11 +242,11 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
     > = [];
 
     if (pendingImage) {
-      const dataUrl = await fileToBase64(pendingImage.file);
+      const { dataUrl, mediaType } = await compressImageToDataUrl(pendingImage.file);
       parts.push({
         type: "file",
         url: dataUrl,
-        mediaType: pendingImage.file.type,
+        mediaType,
       });
       removePendingImage();
     }
@@ -230,11 +311,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[85%] break-words rounded-xl px-4 py-2.5 text-sm ${
-                m.role === "user"
-                  ? "bg-cornell-red text-white"
-                  : "bg-accent-teal/10 text-foreground"
-              }`}
+              className="max-w-[85%] break-words text-sm text-foreground"
             >
               {m.role === "user" ? (
                 m.parts.map((part, i) => {
@@ -295,9 +372,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
 
         {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
           <div className="flex justify-start">
-            <div className="rounded-xl bg-muted-bg px-4 py-2.5 text-sm text-muted">
-              Thinking...
-            </div>
+            <div className="text-sm text-muted">Thinking...</div>
           </div>
         )}
 

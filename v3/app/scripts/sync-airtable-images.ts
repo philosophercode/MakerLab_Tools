@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, stat, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { spawn } from "node:child_process";
@@ -199,6 +199,8 @@ async function main() {
   let unchanged = 0;
   let skipped = 0;
   let errors = 0;
+  let removed = 0;
+  const expectedFiles = new Set<string>();
 
   try {
     let tools = await fetchAllTools(baseId, apiKey);
@@ -211,6 +213,7 @@ async function main() {
         skipped += 1;
         continue;
       }
+      expectedFiles.add(`${safeToolName(name)}.png`);
 
       try {
         const result = await processOne(name, imageUrl, maxPixels, outputDir, tempDir);
@@ -220,6 +223,19 @@ async function main() {
         errors += 1;
         const msg = err instanceof Error ? err.message : String(err);
         console.error(`ERROR ${name}: ${msg}`);
+      }
+    }
+
+    // Keep output strictly in sync with Airtable: remove stale files.
+    // Skip pruning when running a limited test sample.
+    if (limit <= 0) {
+      const entries = await readdir(outputDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isFile()) continue;
+        if (!entry.name.toLowerCase().endsWith(".png")) continue;
+        if (expectedFiles.has(entry.name)) continue;
+        await unlink(join(outputDir, entry.name));
+        removed += 1;
       }
     }
   } finally {
@@ -234,7 +250,7 @@ async function main() {
   }
 
   console.log(
-    `sync-airtable-images complete: written=${written} unchanged=${unchanged} skipped=${skipped} errors=${errors}`
+    `sync-airtable-images complete: written=${written} unchanged=${unchanged} removed=${removed} skipped=${skipped} errors=${errors}`
   );
   if (errors > 0) process.exit(1);
 }
