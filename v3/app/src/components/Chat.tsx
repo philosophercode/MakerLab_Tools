@@ -284,7 +284,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="min-h-0 flex-1 overflow-y-auto space-y-4 p-4"
+        className="min-h-0 flex-1 overflow-y-auto space-y-4 p-4 thin-scrollbar"
         role="log"
         aria-live="polite"
         aria-label="Chat messages"

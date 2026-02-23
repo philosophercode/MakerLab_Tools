@@ -78,16 +78,28 @@ body {
   outline: none;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
+/* Hide page-level scrollbar (still scrollable) */
+body {
+  scrollbar-width: none; /* Firefox */
+}
+body::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+/* Thin scrollbar for inner scrollable areas */
+.thin-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
-::-webkit-scrollbar-track {
+.thin-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
-::-webkit-scrollbar-thumb {
+.thin-scrollbar::-webkit-scrollbar-thumb {
   background: var(--card-border);
   border-radius: 3px;
+}
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-border) transparent;
 }
 
 /* Chat markdown formatting */
