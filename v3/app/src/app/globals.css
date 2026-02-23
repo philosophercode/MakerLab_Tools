@@ -193,3 +193,12 @@ body {
   font-weight: 600;
   background: var(--muted-bg);
 }
+
+/* Hide scrollbar for carousel elements */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

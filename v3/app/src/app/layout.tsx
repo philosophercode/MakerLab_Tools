@@ -35,7 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
       >
         <header className="sticky top-0 z-50 border-b border-card-border bg-card-bg/80 backdrop-blur-sm">
-          <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+          <nav className="flex h-14 items-center justify-between px-4">
             <Link href="/" className="flex items-center" aria-label="MakerLab Tools home">
               <Image
                 src="/makerlab-logo-blackonly.png"
