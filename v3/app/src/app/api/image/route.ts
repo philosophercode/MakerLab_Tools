@@ -10,7 +10,6 @@ const SCRIPTS_DIR = path.resolve(process.cwd(), "..", "scripts");
 const PUBLIC_IMAGES_DIR = path.resolve(process.cwd(), "public", "tool-images");
 const NOBG_DIR = path.join(SCRIPTS_DIR, "tool_images_nobg");
 const GENERATED_DIR = path.join(SCRIPTS_DIR, "tool_images_generated");
-const IMAGE_TASK_SCRIPT = "scripts/run-image-task.mjs";
 const ALLOWED_IMAGE_HOSTS = new Set([
   "upload.wikimedia.org",
   "commons.wikimedia.org",
@@ -158,8 +157,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Keep script path runtime-dynamic to avoid Turbopack treating it as a static module import.
+  const imageTaskScript = path.join(
+    "scripts",
+    process.env.IMAGE_TASK_SCRIPT_NAME || "run-image-task.mjs"
+  );
+
   const args = [
-    IMAGE_TASK_SCRIPT,
+    imageTaskScript,
     "--action",
     action,
     "--tool",
