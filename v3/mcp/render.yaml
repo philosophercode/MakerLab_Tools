@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: makerlab-mcp
+    runtime: docker
+    rootDir: v3/mcp
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: AIRTABLE_API_KEY
+        sync: false
+      - key: AIRTABLE_BASE_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
