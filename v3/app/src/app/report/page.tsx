@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { fetchAllUnits, fetchAllTools } from "@/lib/airtable";
 import MaintenanceForm from "@/components/MaintenanceForm";
 
-export const revalidate = 300;
+export const revalidate = 3600; // ISR: 1 hour
 
 export const metadata = {
   title: "Report Issue — MakerLab Tools",

@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync:startup": "npm run sync:all:startup",
+    "sync:startup": "npm run sync:pull:startup",
     "sync:all": "npm run sync:pull && npm run sync:images",
     "sync:all:startup": "npm run sync:pull:startup && npm run sync:images:startup",
     "sync:pull:startup": "node scripts/airtable-sync.mjs pull --startup",

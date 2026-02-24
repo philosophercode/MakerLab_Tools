@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
         hostname: "v5.airtableusercontent.com",
       },
     ],
+    minimumCacheTTL: 86400, // cache optimized images for 24 hours on Vercel CDN
   },
 };
 

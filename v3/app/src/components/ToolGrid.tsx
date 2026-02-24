@@ -31,8 +31,8 @@ export default function ToolGrid({
 
   return (
     <div className={GRID_CLASSES[viewMode]}>
-      {tools.map((tool) => (
-        <ToolCard key={tool.id} tool={tool} compact={viewMode === "compact"} />
+      {tools.map((tool, i) => (
+        <ToolCard key={tool.id} tool={tool} compact={viewMode === "compact"} priority={i < 8} />
       ))}
     </div>
   );
@@ -73,7 +73,7 @@ function TableView({ tools }: { tools: ToolWithMeta[] }) {
                   fill
                   className="object-contain p-0.5"
                   sizes="40px"
-                  unoptimized
+                  priority={i < 12}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-muted text-[10px]">

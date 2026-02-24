@@ -33,9 +33,11 @@ const STATUS_MESSAGES: Record<string, { label: string; sub: string }> = {
 export default function ToolCard({
   tool,
   compact = false,
+  priority = false,
 }: {
   tool: ToolWithMeta;
   compact?: boolean;
+  priority?: boolean;
 }) {
   const hasPPE = tool.ppe_required.length > 0;
   const needsAuth = tool.authorized_only;
@@ -171,7 +173,7 @@ export default function ToolCard({
                 ? "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             }
-            unoptimized
+            priority={priority}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-muted text-sm">

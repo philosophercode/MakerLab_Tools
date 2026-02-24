@@ -14,7 +14,7 @@ import Chat from "@/components/Chat";
 import FlagButton from "@/components/FlagButton";
 import ImageActions from "@/components/ImageActions";
 
-export const revalidate = 300;
+export const revalidate = 3600; // ISR: 1 hour — tool data rarely changes
 
 export default async function ToolDetailPage({
   params,
