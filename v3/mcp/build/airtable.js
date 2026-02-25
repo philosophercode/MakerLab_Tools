@@ -236,7 +236,7 @@ export async function getUnit(labelOrId) {
     }
     // Maintenance logs must be fetched fresh (not cached — they change)
     const logs = await fetchTable(TABLES.maintenance_logs, {
-        filterByFormula: `FIND("${unit.id}", ARRAYJOIN(RECORD_ID(unit)))`,
+        filterByFormula: `FIND("${unit.id}", ARRAYJOIN({unit}))`,
         sort: [{ field: "date_reported", direction: "desc" }],
     });
     return {

@@ -22,6 +22,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { listTools, getTool, searchTools, listUnits, getUnit, createMaintenanceLog, getToolsWithImages, } from "./airtable.js";
 import { evaluateImage, evaluateAllImages } from "./eval-images.js";
+import { chat } from "./chat.js";
+import { generateImage } from "./gemini-image.js";
 // ── Load environment ───────────────────────────────────────────────
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../app/.env.local") });
@@ -251,6 +253,215 @@ function registerAllTools(server) {
             text += `\nWarnings (filename mismatch):\n${warnings.join("\n")}`;
         }
         return { content: [{ type: "text", text }] };
+    });
+    // ── Chat agent ──────────────────────────────────────────────────
+    server.registerTool("chat", {
+        description: "Ask the MakerLab chat assistant a question. The assistant has full access to the tool inventory, documentation, unit details, maintenance reporting, image generation, and follow-up suggestions. Use this for conversational questions, project planning, troubleshooting, or anything a student might ask. Supports multi-turn conversations via the history parameter.",
+        inputSchema: {
+            message: z.string().describe("The user's message or question"),
+            history: z
+                .array(z.object({
+                role: z.enum(["user", "assistant"]),
+                content: z.string(),
+            }))
+                .optional()
+                .describe("Previous conversation messages for multi-turn context"),
+            tool_id: z
+                .string()
+                .optional()
+                .describe("AirTable record ID or tool name to scope the conversation to a specific tool"),
+        },
+    }, async ({ message, history, tool_id }) => {
+        try {
+            const result = await chat({
+                message,
+                history: history,
+                tool_id,
+            });
+            const content = [];
+            // Add the text response
+            content.push({ type: "text", text: result.response });
+            // Add generated images
+            for (const img of result.images) {
+                content.push({
+                    type: "image",
+                    data: img.base64,
+                    mimeType: img.mimeType,
+                });
+                if (img.caption) {
+                    content.push({ type: "text", text: `*${img.caption}*` });
+                }
+            }
+            // Add suggestions
+            if (result.suggestions.length > 0) {
+                content.push({
+                    type: "text",
+                    text: `\n---\n**Suggested follow-ups:**\n${result.suggestions.map((s) => `- ${s}`).join("\n")}`,
+                });
+            }
+            return { content };
+        }
+        catch (e) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Chat error: ${e instanceof Error ? e.message : "Unknown error"}`,
+                    },
+                ],
+                isError: true,
+            };
+        }
+    });
+    // ── Image generation ────────────────────────────────────────────
+    server.registerTool("visualize_project", {
+        description: "Generate a concept image of a project or finished object using AI image generation (Gemini). Write a detailed visual prompt describing what you want to see: materials, colors, textures, setting, lighting, and camera angle.",
+        inputSchema: {
+            prompt: z
+                .string()
+                .describe("Detailed scene description for image generation. Describe the finished object, materials, colors, textures, setting, lighting, and camera angle. Think product photography."),
+        },
+    }, async ({ prompt }) => {
+        try {
+            const { imageBase64, mimeType, text } = await generateImage(prompt);
+            const content = [];
+            content.push({
+                type: "image",
+                data: imageBase64,
+                mimeType,
+            });
+            if (text) {
+                content.push({ type: "text", text });
+            }
+            return { content };
+        }
+        catch (e) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Image generation failed: ${e instanceof Error ? e.message : "Unknown error"}`,
+                    },
+                ],
+                isError: true,
+            };
+        }
+    });
+    server.registerTool("generate_infographic", {
+        description: "Generate a visual step-by-step infographic showing how to make or build something. Provide a title and 3-8 ordered steps.",
+        inputSchema: {
+            title: z
+                .string()
+                .describe("Short title for the infographic, e.g. 'How to Laser Cut a Phone Stand'"),
+            steps: z
+                .array(z.object({
+                number: z.number().describe("Step number"),
+                label: z
+                    .string()
+                    .describe("Short action label, e.g. 'Cut the acrylic'"),
+                detail: z
+                    .string()
+                    .describe("Brief detail, e.g. 'Use Trotec Speedy 400 at 60% power'"),
+            }))
+                .min(3)
+                .max(8)
+                .describe("The ordered steps to illustrate"),
+        },
+    }, async ({ title, steps }) => {
+        try {
+            const stepDescriptions = steps
+                .map((s) => `Step ${s.number}: "${s.label}" — ${s.detail}`)
+                .join("\n");
+            const prompt = `Create a clean, professional vertical infographic titled "${title}".
+Layout: numbered steps flowing top to bottom, each with a small icon/illustration and text label.
+Steps:
+${stepDescriptions}
+Style: flat design, warm color palette with Cornell red (#B31B1B) accents, white background, clear numbered circles, simple tool/object illustrations beside each step. Make it easy to read at phone screen size. Do NOT include any watermarks or logos.`;
+            const { imageBase64, mimeType, text } = await generateImage(prompt);
+            const content = [];
+            content.push({
+                type: "image",
+                data: imageBase64,
+                mimeType,
+            });
+            if (text) {
+                content.push({ type: "text", text });
+            }
+            return { content };
+        }
+        catch (e) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Infographic generation failed: ${e instanceof Error ? e.message : "Unknown error"}`,
+                    },
+                ],
+                isError: true,
+            };
+        }
+    });
+    // ── Follow-up suggestions ───────────────────────────────────────
+    server.registerTool("suggest_followups", {
+        description: "Get suggested follow-up questions based on a topic or recent conversation context. Useful for guiding students to explore more about a tool, project, or technique.",
+        inputSchema: {
+            topic: z
+                .string()
+                .describe("The topic or context to generate follow-up questions about, e.g. 'laser cutting acrylic' or 'Prusa MK4S setup'"),
+            count: z
+                .number()
+                .optional()
+                .describe("Number of suggestions to generate (2-4, default 3)"),
+        },
+    }, async ({ topic, count }) => {
+        const numSuggestions = Math.min(4, Math.max(2, count || 3));
+        try {
+            const Anthropic_ = (await import("@anthropic-ai/sdk")).default;
+            const apiKey = process.env.ANTHROPIC_API_KEY;
+            if (!apiKey)
+                throw new Error("Missing ANTHROPIC_API_KEY");
+            const client = new Anthropic_({ apiKey });
+            const response = await client.messages.create({
+                model: "claude-sonnet-4-6",
+                max_tokens: 256,
+                system: "You generate short, natural follow-up questions that a Cornell student might ask about makerspace equipment and projects. Return ONLY a JSON array of strings, no other text.",
+                messages: [
+                    {
+                        role: "user",
+                        content: `Generate ${numSuggestions} follow-up questions about: ${topic}`,
+                    },
+                ],
+            });
+            const text = response.content[0].type === "text"
+                ? response.content[0].text
+                : "[]";
+            let suggestions;
+            try {
+                suggestions = JSON.parse(text);
+            }
+            catch {
+                suggestions = [text];
+            }
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: JSON.stringify({ suggestions }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (e) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Failed to generate suggestions: ${e instanceof Error ? e.message : "Unknown error"}`,
+                    },
+                ],
+                isError: true,
+            };
+        }
     });
 }
 // ── Server factory ─────────────────────────────────────────────────
