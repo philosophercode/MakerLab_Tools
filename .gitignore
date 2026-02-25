@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.next/
 public/
 !v3/app/public/
 !v3/app/public/tool-images/
@@ -12,5 +13,13 @@ public/
 __pycache__/
 **/__pycache__/
 
+# Data & image sources
 v3/scripts/tool_images/
 *.xlsx
+
+# Pipeline artifacts (large binary outputs)
+original_photos/
+pipeline_output/
+
+# Audit reports
+audits/
