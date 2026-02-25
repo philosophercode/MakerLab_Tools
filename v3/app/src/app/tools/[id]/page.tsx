@@ -96,7 +96,7 @@ export default async function ToolDetailPage({
           <div className="grid grid-cols-2 gap-4">
             <div className="group">
               <div className="flex items-center gap-1">
-                <h3 className="text-xs font-medium text-muted">Category</h3>
+                <span className="text-xs font-medium text-muted">Category</span>
                 <FlagButton toolId={id} field="category" />
               </div>
               <p className="mt-0.5 text-sm">
@@ -105,7 +105,7 @@ export default async function ToolDetailPage({
             </div>
             <div className="group">
               <div className="flex items-center gap-1">
-                <h3 className="text-xs font-medium text-muted">Location</h3>
+                <span className="text-xs font-medium text-muted">Location</span>
                 <FlagButton toolId={id} field="location" />
               </div>
               <p className="mt-0.5 text-sm">
@@ -118,9 +118,9 @@ export default async function ToolDetailPage({
           {tool.materials.length > 0 && (
             <div className="group">
               <div className="flex items-center gap-1 mb-1.5">
-                <h3 className="text-xs font-medium text-muted">
+                <span className="text-xs font-medium text-muted">
                   Compatible Materials
-                </h3>
+                </span>
                 <FlagButton toolId={id} field="materials" />
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -139,9 +139,9 @@ export default async function ToolDetailPage({
           {/* Use restrictions */}
           {tool.use_restrictions && (
             <div>
-              <h3 className="text-xs font-medium text-muted mb-1">
+              <span className="block text-xs font-medium text-muted mb-1">
                 Use Restrictions
-              </h3>
+              </span>
               <p className="text-sm text-muted leading-relaxed">
                 {tool.use_restrictions}
               </p>
@@ -151,9 +151,9 @@ export default async function ToolDetailPage({
           {/* Emergency stop */}
           {tool.emergency_stop && (
             <div className="rounded-lg border border-danger/20 bg-danger/5 p-3">
-              <h3 className="text-xs font-semibold text-danger mb-1">
+              <span className="block text-xs font-semibold text-danger mb-1">
                 Emergency Stop
-              </h3>
+              </span>
               <p className="text-sm">{tool.emergency_stop}</p>
             </div>
           )}
@@ -168,7 +168,7 @@ export default async function ToolDetailPage({
           {/* Manual downloads */}
           {tool.manual_attachments.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-muted mb-2">Manuals</h3>
+              <span className="block text-sm font-medium text-muted mb-2">Manuals</span>
               <div className="space-y-1.5">
                 {tool.manual_attachments.map((a) => (
                   <a

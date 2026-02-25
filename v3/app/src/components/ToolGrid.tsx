@@ -73,7 +73,7 @@ function TableView({ tools }: { tools: ToolWithMeta[] }) {
                   fill
                   className="object-contain p-0.5"
                   sizes="40px"
-                  priority={i < 12}
+                  priority={i < 4}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-muted text-[10px]">

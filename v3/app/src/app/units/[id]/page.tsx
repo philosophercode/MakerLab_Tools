@@ -125,7 +125,7 @@ export default async function UnitDetailPage({
       {/* Status + Condition */}
       <div className="mb-6 grid grid-cols-2 gap-4">
         <div className="rounded-lg border border-card-border p-4">
-          <h3 className="text-xs font-medium text-muted mb-1">Status</h3>
+          <span className="block text-xs font-medium text-muted mb-1">Status</span>
           <span
             className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
               STATUS_COLORS[fields.status || ""] || "bg-muted-bg text-muted"
@@ -135,7 +135,7 @@ export default async function UnitDetailPage({
           </span>
         </div>
         <div className="rounded-lg border border-card-border p-4">
-          <h3 className="text-xs font-medium text-muted mb-1">Condition</h3>
+          <span className="block text-xs font-medium text-muted mb-1">Condition</span>
           <span
             className={`text-sm font-medium ${
               CONDITION_COLORS[fields.condition || ""] || "text-muted"
@@ -177,7 +177,7 @@ export default async function UnitDetailPage({
       {/* Notes */}
       {fields.notes && (
         <div className="mb-6 rounded-lg border border-card-border p-4">
-          <h3 className="text-xs font-medium text-muted mb-1">Notes</h3>
+          <span className="block text-xs font-medium text-muted mb-1">Notes</span>
           <p className="text-sm whitespace-pre-wrap">{fields.notes}</p>
         </div>
       )}

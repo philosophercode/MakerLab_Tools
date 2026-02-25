@@ -170,8 +170,8 @@ export default function ToolCard({
             }`}
             sizes={
               compact
-                ? "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                ? "(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
+                : "(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 23vw"
             }
             priority={priority}
           />
@@ -257,13 +257,13 @@ export default function ToolCard({
 
       {/* Info */}
       <div className={compact ? "p-2.5" : "p-4"}>
-        <h3
+        <h2
           className={`font-semibold leading-tight line-clamp-2 group-hover:text-cornell-red transition-colors ${
             compact ? "text-xs" : "text-sm"
           }`}
         >
           {tool.name}
-        </h3>
+        </h2>
         {!compact && (
           <p className="mt-1 text-xs text-muted line-clamp-2">
             {tool.description}

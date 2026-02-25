@@ -40,9 +40,9 @@ export default function RootLayout({
               <Image
                 src="/makerlab-logo-blackonly.png"
                 alt="MakerLab Tools"
-                width={1502}
-                height={173}
-                className="logo-invert-dark h-6 w-auto max-w-[46vw] md:h-7"
+                width={1501}
+                height={171}
+                className="logo-invert-dark h-auto max-h-6 w-auto max-w-[46vw] md:max-h-7"
                 priority
               />
             </Link>

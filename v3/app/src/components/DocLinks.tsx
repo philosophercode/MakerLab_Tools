@@ -36,7 +36,7 @@ export default function DocLinks({ safety_doc_url, sop_url, video_url }: DocLink
 
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium text-muted">Documentation</h3>
+      <span className="block text-sm font-medium text-muted">Documentation</span>
       <div className="space-y-1.5">
         {safety_doc_url && (
           <LinkItem href={safety_doc_url} label="Safety Document" icon="🛡" />

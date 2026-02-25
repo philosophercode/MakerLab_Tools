@@ -13,9 +13,9 @@ export default function UnitStatusTable({ units }: { units: UnitRecord[] }) {
 
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium text-muted">
+      <h2 className="text-sm font-medium text-muted">
         Units ({units.length})
-      </h3>
+      </h2>
       <div className="overflow-x-auto rounded-lg border border-card-border">
         <table className="w-full text-sm">
           <thead>
