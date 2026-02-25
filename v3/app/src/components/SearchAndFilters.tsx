@@ -141,6 +141,14 @@ interface SearchAndFiltersProps {
   onCategoryChange: (cats: string[]) => void;
   onRoomChange: (rooms: string[]) => void;
   onMaterialChange: (mats: string[]) => void;
+  /** Whether AI natural-language search is active */
+  nlSearchActive?: boolean;
+  /** Toggle AI search mode on/off */
+  onNlSearchToggle?: () => void;
+  /** Submit the current query as an NL search */
+  onNlSearchSubmit?: (query: string) => void;
+  /** Whether an NL search is in progress */
+  nlSearchLoading?: boolean;
 }
 
 // ── Category Carousel ───────────────────────────────────────────────
@@ -328,6 +336,10 @@ export default function SearchAndFilters({
   onCategoryChange,
   onRoomChange,
   onMaterialChange,
+  nlSearchActive,
+  onNlSearchToggle,
+  onNlSearchSubmit,
+  nlSearchLoading,
 }: SearchAndFiltersProps) {
   const materialGrouped = groupMaterials(materials);
 
@@ -384,28 +396,86 @@ export default function SearchAndFilters({
   return (
     <div className="mb-6 space-y-4">
       {/* Search */}
-      <div className="relative">
-        <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      <div className="relative flex items-center gap-2">
+        <div className="relative flex-1">
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {nlSearchActive ? (
+              /* Sparkle icon for AI mode */
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.5-6.5l-1.4 1.4M7.9 16.1l-1.4 1.4m12-1.4l-1.4-1.4M7.9 7.9L6.5 6.5"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            )}
+          </svg>
+          <input
+            type="text"
+            placeholder={
+              nlSearchActive
+                ? "Ask a question, e.g. \"What tools can make holes in wood?\""
+                : "Search tools by name, description, material, or tag..."
+            }
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (nlSearchActive && e.key === "Enter" && query.trim() && onNlSearchSubmit) {
+                e.preventDefault();
+                onNlSearchSubmit(query.trim());
+              }
+            }}
+            className={`w-full rounded-lg border bg-card-bg py-2.5 pl-10 pr-4 text-sm placeholder:text-muted focus:outline-none focus:ring-1 ${
+              nlSearchActive
+                ? "border-accent-teal focus:border-accent-teal focus:ring-accent-teal"
+                : "border-card-border focus:border-cornell-red focus:ring-cornell-red"
+            }`}
           />
-        </svg>
-        <input
-          type="text"
-          placeholder="Search tools by name, description, material, or tag..."
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          className="w-full rounded-lg border border-card-border bg-card-bg py-2.5 pl-10 pr-4 text-sm placeholder:text-muted focus:border-cornell-red focus:outline-none focus:ring-1 focus:ring-cornell-red"
-        />
+          {nlSearchActive && nlSearchLoading && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <svg className="h-4 w-4 animate-spin text-accent-teal" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            </div>
+          )}
+        </div>
+        {/* AI search toggle button */}
+        {onNlSearchToggle && (
+          <button
+            onClick={onNlSearchToggle}
+            title={nlSearchActive ? "Switch to keyword search" : "Switch to AI search — ask natural language questions"}
+            className={`shrink-0 rounded-lg border-2 px-3 py-2 text-xs font-medium transition-all ${
+              nlSearchActive
+                ? "border-accent-teal bg-accent-teal/10 text-accent-teal"
+                : "border-card-border bg-card-bg text-muted hover:border-foreground/20 hover:text-foreground"
+            }`}
+          >
+            <span className="flex items-center gap-1.5">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+              </svg>
+              AI
+            </span>
+          </button>
+        )}
       </div>
+      {nlSearchActive && (
+        <p className="text-xs text-accent-teal -mt-2">
+          Ask a question about what you need and press Enter. AI will find the best matching tools.
+        </p>
+      )}
 
       {/* Category icon carousel */}
       <CategoryCarousel

@@ -20,7 +20,8 @@
     "sync:push": "node scripts/airtable-sync.mjs push",
     "sync:status": "node scripts/airtable-sync.mjs status",
     "sync:stage": "git add data/airtable public/tool-images scripts/airtable-sync.mjs scripts/sync-airtable-images.ts package.json",
-    "sync:all:stage": "npm run sync:all && npm run sync:stage"
+    "sync:all:stage": "npm run sync:all && npm run sync:stage",
+    "generate:embeddings": "node scripts/generate-embeddings.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.46",
