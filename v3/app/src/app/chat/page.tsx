@@ -7,18 +7,36 @@ export const metadata = {
 
 export default function ChatPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="h-[calc(100vh-150px)] rounded-xl border border-card-border bg-card-bg overflow-hidden flex flex-col">
-        <Chat
-          header="MakerLab Assistant"
-          suggestions={[
-            "How do I laser cut a custom phone stand?",
-            "Show me how to 3D print an enclosure for my Arduino",
-            "I want to make a wooden jewelry box — what steps do I follow?",
-            "What tools can cut acrylic?",
-          ]}
-        />
+    <>
+      {/* Desktop: centered card with max-width */}
+      <div className="hidden md:block mx-auto max-w-3xl px-4 py-8">
+        <div className="h-[calc(100vh-150px)] rounded-xl border border-card-border bg-card-bg overflow-hidden flex flex-col">
+          <Chat
+            header="MakerLab Assistant"
+            suggestions={[
+              "How do I laser cut a custom phone stand?",
+              "Show me how to 3D print an enclosure for my Arduino",
+              "I want to make a wooden jewelry box — what steps do I follow?",
+              "What tools can cut acrylic?",
+            ]}
+          />
+        </div>
       </div>
-    </div>
+
+      {/* Mobile: full-bleed edge-to-edge chat */}
+      <div className="md:hidden flex flex-col" style={{ height: "calc(100vh - 3.5rem)" }}>
+        <div className="flex-1 min-h-0 bg-card-bg overflow-hidden flex flex-col">
+          <Chat
+            header="MakerLab Assistant"
+            suggestions={[
+              "How do I laser cut a custom phone stand?",
+              "Show me how to 3D print an enclosure for my Arduino",
+              "I want to make a wooden jewelry box — what steps do I follow?",
+              "What tools can cut acrylic?",
+            ]}
+          />
+        </div>
+      </div>
+    </>
   );
 }
