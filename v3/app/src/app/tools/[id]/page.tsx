@@ -218,9 +218,9 @@ export default async function ToolDetailPage({
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-4 lg:py-8 flex flex-col lg:block mobile-tool-page">
+    <div className="mx-auto max-w-7xl px-4 pb-4 lg:py-8 flex flex-col lg:block max-lg:h-[calc(100dvh-3.5rem)] max-lg:overflow-hidden">
       {/* Breadcrumb */}
-      <nav className="sticky top-14 z-40 -mx-4 mb-4 lg:mb-6 border-b border-card-border bg-background/90 px-4 py-2.5 text-sm text-muted backdrop-blur-sm flex-shrink-0">
+      <nav className="lg:sticky lg:top-14 z-40 -mx-4 mb-2 lg:mb-6 border-b border-card-border bg-background/90 px-4 py-2 lg:py-2.5 text-sm text-muted backdrop-blur-sm flex-shrink-0">
         <a href="/" className="hover:text-foreground">
           Tools
         </a>

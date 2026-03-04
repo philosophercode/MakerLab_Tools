@@ -266,7 +266,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       {header && (
         <div className="flex items-center justify-between border-b border-card-border px-4 py-3">
           <h2 className="font-semibold text-sm">{header}</h2>

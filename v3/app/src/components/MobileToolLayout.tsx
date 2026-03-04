@@ -28,7 +28,7 @@ export default function MobileToolLayout({
           </div>
         </div>
 
-        {/* Chat panel */}
+        {/* Chat panel — on mobile, fill remaining height so input pins to bottom */}
         <div
           className={`${
             tab === "chat" ? "flex min-h-0 flex-1 flex-col" : "hidden"
