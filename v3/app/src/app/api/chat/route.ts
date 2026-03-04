@@ -92,6 +92,9 @@ function buildToolSystemPrompt(tool: ReturnType<typeof resolveTools>[0], docs: L
 - Never put blank lines between bullet list items. Keep list items tight with no gaps.
 - Use paragraphs (not bullets) for longer explanatory text. Reserve bullets for short, scannable items.
 
+## Feedback
+- When you provide a direct solution, fix, or actionable answer to a student's question, call the \`offer_feedback\` tool with a brief one-sentence summary of the solution. Only call this for actionable answers, not for general conversation, greetings, or clarifying questions.
+
 ## Follow-ups
 - At the end of every response, call the suggest_followups tool with 2-4 short, natural follow-up questions the student might want to ask next based on the conversation so far.`;
 
@@ -158,6 +161,9 @@ You have a \`generate_infographic\` tool that creates visual how-to guides.
 - For bullet lists, ALWAYS put the content on the SAME line as the dash. Write \`- Content here\` not a dash on one line and content on the next.
 - Never put blank lines between bullet list items. Keep list items tight with no gaps.
 - Use paragraphs (not bullets) for longer explanatory text. Reserve bullets for short, scannable items.
+
+## Feedback
+- When you provide a direct solution, fix, or actionable answer to a student's question, call the \`offer_feedback\` tool with a brief one-sentence summary of the solution. Only call this for actionable answers, not for general conversation, greetings, or clarifying questions.
 
 ## Follow-ups
 - At the end of every response, call the suggest_followups tool with 2-4 short, natural follow-up questions the student might want to ask next based on the conversation so far.`;
@@ -460,6 +466,19 @@ Style: flat design, warm color palette with Cornell red (#B31B1B) accents, white
                 })),
               };
             },
+          }),
+          offer_feedback: tool({
+            description:
+              "Call this when you have given an actionable solution, fix, or direct answer to a student's question. Do NOT call for general conversation, greetings, or clarifying questions.",
+            inputSchema: z.object({
+              solution_summary: z
+                .string()
+                .describe("One-sentence summary of the solution you provided"),
+            }),
+            execute: async ({ solution_summary }) => ({
+              solution_summary,
+              awaiting_feedback: true,
+            }),
           }),
           suggest_followups: tool({
             description:

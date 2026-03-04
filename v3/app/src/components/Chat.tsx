@@ -6,6 +6,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useChatStore } from "@/components/ChatProvider";
+import FeedbackWidget from "@/components/FeedbackWidget";
 
 interface ChatProps {
   toolId?: string;
@@ -173,6 +174,19 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
   }, [messages]);
 
   const activeSuggestions = dynamicSuggestions || suggestions;
+
+  // Extract feedback offer from the last assistant message
+  const feedbackSummary = useMemo(() => {
+    const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+    if (!lastAssistant) return null;
+    for (const part of lastAssistant.parts) {
+      const p = part as { type?: string; output?: { solution_summary?: string; awaiting_feedback?: boolean } };
+      if (p.type === "tool-offer_feedback" && p.output?.solution_summary) {
+        return p.output.solution_summary;
+      }
+    }
+    return null;
+  }, [messages]);
 
   // Detect if an image generation tool is currently executing (called but no image yet)
   const imageGenStatus = useMemo(() => {
@@ -403,6 +417,15 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
               </button>
             ))}
           </div>
+        )}
+
+        {/* Feedback widget after solution messages */}
+        {!isLoading && feedbackSummary && (
+          <FeedbackWidget
+            solutionSummary={feedbackSummary}
+            messages={messages}
+            toolId={toolId}
+          />
         )}
       </div>
 

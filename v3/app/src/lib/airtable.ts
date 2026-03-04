@@ -14,6 +14,8 @@ import type {
   MaintenanceLogRecord,
   FlagFields,
   FlagRecord,
+  VerifiedQAFields,
+  VerifiedQARecord,
 } from "./types";
 
 const API_URL = "https://api.airtable.com/v0";
@@ -29,6 +31,7 @@ const TABLES = {
   units: "tblDtKMcCxTyQbXwi",
   maintenance_logs: "tbl22sgbMLCFbvynl",
   flags: "tblAK068QYB0vLopa",
+  verified_qa: "PLACEHOLDER_RUN_SETUP_SCRIPT",
 } as const;
 
 // ── Core fetch helper ───────────────────────────────────────────────
@@ -191,6 +194,12 @@ export async function createFlag(
   fields: Partial<FlagFields>
 ): Promise<FlagRecord> {
   return createRecord<FlagFields>(TABLES.flags, fields);
+}
+
+export async function createVerifiedQA(
+  fields: Partial<VerifiedQAFields>
+): Promise<VerifiedQARecord> {
+  return createRecord<VerifiedQAFields>(TABLES.verified_qa, fields);
 }
 
 // ── Upload attachment via content API ────────────────────────────────

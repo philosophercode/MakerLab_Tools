@@ -22,6 +22,7 @@ frozen previous versions kept for reference.
 - Units table: `tblDtKMcCxTyQbXwi`
 - Maintenance_Logs table: `tbl22sgbMLCFbvynl`
 - Flags table: `tblAK068QYB0vLopa`
+- Verified_QA table: `PLACEHOLDER_RUN_SETUP_SCRIPT` (run `v3/scripts/setup_verified_qa_table.py` to create)
 
 ## Environment
 
