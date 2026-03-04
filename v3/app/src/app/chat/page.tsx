@@ -7,8 +7,8 @@ export const metadata = {
 
 export default function ChatPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="h-[calc(100vh-150px)] rounded-xl border border-card-border bg-card-bg overflow-hidden flex flex-col">
+    <div className="flex flex-col h-[calc(100dvh-3.5rem)] lg:mx-auto lg:max-w-3xl lg:px-4 lg:py-8 lg:h-auto lg:block">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden lg:h-[calc(100vh-150px)] lg:rounded-xl lg:border lg:border-card-border lg:bg-card-bg lg:flex-none">
         <Chat
           header="MakerLab Assistant"
           suggestions={[

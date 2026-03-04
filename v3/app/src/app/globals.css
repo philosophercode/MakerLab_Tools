@@ -206,6 +206,10 @@ body::-webkit-scrollbar {
   background: var(--muted-bg);
 }
 
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Hide scrollbar for carousel elements */
 .scrollbar-hide {
   -ms-overflow-style: none;
