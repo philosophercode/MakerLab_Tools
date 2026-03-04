@@ -1,4 +1,4 @@
-import { createFlag } from "@/lib/airtable";
+import { createFlag, createAnalyticsEvents, incrementToolCounter } from "@/lib/airtable";
 import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import { z } from "zod";
 
@@ -44,6 +44,10 @@ export async function POST(req: Request) {
       status: "New",
       created_at: new Date().toISOString(),
     });
+
+    // Track flag event (fire-and-forget)
+    createAnalyticsEvents([{ event_type: "flag_submitted", tool_id: data.tool_id, detail: data.field_flagged }]).catch(() => {});
+    incrementToolCounter(data.tool_id, "flag_count").catch(() => {});
 
     return Response.json({ success: true, id: record.id });
   } catch (err) {

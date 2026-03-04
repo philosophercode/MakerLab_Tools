@@ -19,6 +19,8 @@ import {
   fetchMaintenanceLogsByUnit,
   resolveTools,
   createMaintenanceLog,
+  createAnalyticsEvents,
+  incrementToolCounter,
 } from "@/lib/airtable";
 import { fetchDocContent } from "@/lib/doc-fetcher";
 import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
@@ -280,6 +282,10 @@ export async function POST(req: Request) {
                 if (!match) {
                   return { found: false, message: `No tool found matching "${tool_name}".` };
                 }
+
+                // Track tool reference (fire-and-forget)
+                createAnalyticsEvents([{ event_type: "chat_tool_reference", tool_id: match.id, detail: tool_name }]).catch(() => {});
+                incrementToolCounter(match.id, "chat_mention_count").catch(() => {});
 
                 const docSources = [
                   { label: "Safety Document", url: match.safety_doc_url },

@@ -27,6 +27,7 @@
     "@ai-sdk/react": "^3.0.97",
     "@anthropic-ai/sdk": "^0.78.0",
     "@modelcontextprotocol/sdk": "^1.26.0",
+    "@vercel/analytics": "^1.6.1",
     "ai": "^6.0.95",
     "html5-qrcode": "^2.3.8",
     "next": "16.1.6",

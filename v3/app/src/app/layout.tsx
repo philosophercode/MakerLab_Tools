@@ -5,6 +5,8 @@ import Link from "next/link";
 import "./globals.css";
 import NavLinks from "@/components/NavLinks";
 import { ChatProvider } from "@/components/ChatProvider";
+import { Analytics } from "@vercel/analytics/next";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff2",
@@ -50,8 +52,11 @@ export default function RootLayout({
           </nav>
         </header>
         <ChatProvider>
-          <main>{children}</main>
+          <AnalyticsProvider>
+            <main>{children}</main>
+          </AnalyticsProvider>
         </ChatProvider>
+        <Analytics />
       </body>
     </html>
   );

@@ -13,6 +13,7 @@ import UnitStatusTable from "@/components/UnitStatusTable";
 import Chat from "@/components/Chat";
 import FlagButton from "@/components/FlagButton";
 import ImageActions from "@/components/ImageActions";
+import TrackPageView from "@/components/TrackPageView";
 
 export const revalidate = 3600; // ISR: 1 hour — tool data rarely changes
 
@@ -43,6 +44,7 @@ export default async function ToolDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+      <TrackPageView toolId={id} />
       {/* Breadcrumb */}
       <nav className="sticky top-14 z-40 -mx-4 mb-6 border-b border-card-border bg-background/90 px-4 py-2.5 text-sm text-muted backdrop-blur-sm">
         <a href="/" className="hover:text-foreground">

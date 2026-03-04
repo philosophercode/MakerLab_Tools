@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createMaintenanceLog, uploadAttachment } from "@/lib/airtable";
+import { createMaintenanceLog, uploadAttachment, createAnalyticsEvents } from "@/lib/airtable";
 import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 const ALLOWED_IMAGE_TYPES = [
@@ -74,6 +74,9 @@ export async function POST(req: Request) {
         await uploadAttachment(record.id, "photo_attachments", photo);
       }
     }
+
+    // Track maintenance event (fire-and-forget)
+    createAnalyticsEvents([{ event_type: "maintenance_created", detail: parsed.title }]).catch(() => {});
 
     return Response.json({
       success: true,
