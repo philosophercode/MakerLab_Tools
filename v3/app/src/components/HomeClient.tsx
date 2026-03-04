@@ -13,6 +13,7 @@ import type { ToolWithMeta } from "@/lib/types";
 import ToolGrid, { type ViewMode } from "./ToolGrid";
 import SearchAndFilters from "./SearchAndFilters";
 import FilterChips from "./FilterChips";
+import { useAnalytics } from "./AnalyticsProvider";
 
 const VIEW_MODE_KEY = "makerlab-view-mode";
 const IMAGE_MODE_KEY = "makerlab-image-mode";
@@ -33,6 +34,7 @@ export default function HomeClient({
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const { trackEvent } = useAnalytics();
   const urlQuery = searchParams.get("q") || "";
   const selectedCategories = searchParams.getAll("category");
   const selectedRooms = searchParams.getAll("room");
@@ -89,9 +91,10 @@ export default function HomeClient({
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
         updateParams({ q: q || null });
+        if (q) trackEvent("search", undefined, q);
       }, 200);
     },
-    [updateParams]
+    [updateParams, trackEvent]
   );
 
   // Defer the query used for filtering so React prioritizes input responsiveness

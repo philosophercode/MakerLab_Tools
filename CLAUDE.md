@@ -22,6 +22,7 @@ frozen previous versions kept for reference.
 - Units table: `tblDtKMcCxTyQbXwi`
 - Maintenance_Logs table: `tbl22sgbMLCFbvynl`
 - Flags table: `tblAK068QYB0vLopa`
+- Analytics_Events table: `tblcVy74Odbtuaw4x`
 
 ## Environment
 

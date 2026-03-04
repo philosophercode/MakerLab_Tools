@@ -29,6 +29,7 @@ const TABLES = {
   units: "tblDtKMcCxTyQbXwi",
   maintenance_logs: "tbl22sgbMLCFbvynl",
   flags: "tblAK068QYB0vLopa",
+  analytics_events: "tblcVy74Odbtuaw4x",
 } as const;
 
 // ── Core fetch helper ───────────────────────────────────────────────
@@ -191,6 +192,69 @@ export async function createFlag(
   fields: Partial<FlagFields>
 ): Promise<FlagRecord> {
   return createRecord<FlagFields>(TABLES.flags, fields);
+}
+
+// ── Analytics ────────────────────────────────────────────────────────
+
+export async function createAnalyticsEvents(
+  events: Array<{
+    event_type: string;
+    tool_id?: string;
+    detail?: string;
+    session_id?: string;
+  }>
+): Promise<void> {
+  const records = events.map((e) => ({
+    fields: {
+      title: e.tool_id ? `${e.event_type}: ${e.tool_id}` : e.event_type,
+      event_type: e.event_type,
+      tool: e.tool_id ? [e.tool_id] : undefined,
+      detail: e.detail?.slice(0, 200),
+      session_id: e.session_id,
+      timestamp: new Date().toISOString(),
+    },
+  }));
+
+  const res = await fetch(`${API_URL}/${BASE_ID}/${TABLES.analytics_events}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ records }),
+  });
+
+  if (res.status === 429) return; // Rate limited — silently drop
+  if (!res.ok) {
+    const body = await res.text();
+    console.error(`Analytics write failed: ${res.status} ${body}`);
+  }
+}
+
+export async function incrementToolCounter(
+  toolId: string,
+  field: "view_count" | "chat_mention_count" | "flag_count"
+): Promise<void> {
+  try {
+    const record = await fetchRecord<ToolFields>(TABLES.tools, toolId);
+    const current = record.fields[field] || 0;
+
+    const res = await fetch(`${API_URL}/${BASE_ID}/${TABLES.tools}/${toolId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fields: { [field]: current + 1 } }),
+    });
+
+    if (!res.ok && res.status !== 429) {
+      const body = await res.text();
+      console.error(`Counter increment failed: ${res.status} ${body}`);
+    }
+  } catch (err) {
+    console.error("Counter increment error:", err);
+  }
 }
 
 // ── Upload attachment via content API ────────────────────────────────
