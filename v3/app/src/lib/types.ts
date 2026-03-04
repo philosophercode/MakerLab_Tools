@@ -62,6 +62,9 @@ export interface ToolFields {
   generated_image?: Attachment[];
   manual_attachments?: Attachment[];
   notes?: string;
+  view_count?: number;
+  chat_mention_count?: number;
+  flag_count?: number;
 }
 
 export type ToolRecord = AirtableRecord<ToolFields>;
@@ -173,3 +176,24 @@ export interface FlagFields {
 }
 
 export type FlagRecord = AirtableRecord<FlagFields>;
+
+// ── Analytics_Events table ────────────────────────────────────────
+
+export type AnalyticsEventType =
+  | "page_view"
+  | "search"
+  | "chat_question"
+  | "chat_tool_reference"
+  | "flag_submitted"
+  | "maintenance_created";
+
+export interface AnalyticsEventFields {
+  title?: string;
+  event_type?: AnalyticsEventType;
+  tool?: string[]; // linked record IDs
+  detail?: string;
+  session_id?: string;
+  timestamp?: string;
+}
+
+export type AnalyticsEventRecord = AirtableRecord<AnalyticsEventFields>;

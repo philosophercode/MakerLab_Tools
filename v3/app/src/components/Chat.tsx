@@ -6,6 +6,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useChatStore } from "@/components/ChatProvider";
+import { useAnalytics } from "@/components/AnalyticsProvider";
 
 interface ChatProps {
   toolId?: string;
@@ -116,6 +117,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
   const [pendingImage, setPendingImage] = useState<{ file: File; preview: string } | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
+  const { trackEvent } = useAnalytics();
   const conversationId = toolId ? `tool:${toolId}` : "general";
   const { getMessages, setMessages: storeMessages, clearConversation } = useChatStore();
   const initialMessages = getMessages(conversationId);
@@ -259,6 +261,7 @@ export default function Chat({ toolId, suggestions, header }: ChatProps) {
       parts.push({ type: "text", text: text.trim() });
     }
 
+    trackEvent("chat_question", toolId, text.trim().slice(0, 200));
     sendMessage({ parts });
     setInput("");
     userScrolledUp.current = false;
