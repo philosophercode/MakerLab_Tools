@@ -9,6 +9,7 @@ Usage:
 
 import json
 import os
+import secrets
 import sys
 import time
 import urllib.request
@@ -250,6 +251,7 @@ def main():
                     "tool": [tool_id],
                     "status": status,
                     "condition": condition,
+                    "qr_code_id": secrets.token_hex(4),  # 8-char hex
                 }
             })
 

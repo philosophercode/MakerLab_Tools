@@ -150,10 +150,10 @@ export async function fetchUnit(id: string): Promise<UnitRecord> {
 export async function fetchUnitsByTool(
   toolRecordId: string
 ): Promise<UnitRecord[]> {
-  return fetchTable<UnitFields>(TABLES.units, {
-    // Linked record fields already store record IDs; join them and match directly.
-    filterByFormula: `FIND("${toolRecordId}", ARRAYJOIN({tool}))`,
-  });
+  // ARRAYJOIN on linked record fields joins display names, not record IDs,
+  // so server-side filtering doesn't work. Fetch all and filter client-side.
+  const all = await fetchTable<UnitFields>(TABLES.units);
+  return all.filter((u) => u.fields.tool?.includes(toolRecordId));
 }
 
 export async function fetchAllUnits(): Promise<UnitRecord[]> {
@@ -174,11 +174,12 @@ export async function fetchUnitByQrCode(
 export async function fetchMaintenanceLogsByUnit(
   unitRecordId: string
 ): Promise<MaintenanceLogRecord[]> {
-  return fetchTable<MaintenanceLogFields>(TABLES.maintenance_logs, {
-    // Linked record fields already store record IDs; join them and match directly.
-    filterByFormula: `FIND("${unitRecordId}", ARRAYJOIN({unit}))`,
+  // ARRAYJOIN on linked record fields joins display names, not record IDs,
+  // so server-side filtering doesn't work. Fetch all and filter client-side.
+  const all = await fetchTable<MaintenanceLogFields>(TABLES.maintenance_logs, {
     sort: [{ field: "date_reported", direction: "desc" }],
   });
+  return all.filter((l) => l.fields.unit?.includes(unitRecordId));
 }
 
 export async function createMaintenanceLog(
