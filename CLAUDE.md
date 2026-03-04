@@ -21,6 +21,7 @@ frozen previous versions kept for reference.
 - Locations table: `tblbwtZhuvtuBKlPO` (3 rooms, 7 zones)
 - Units table: `tblDtKMcCxTyQbXwi`
 - Maintenance_Logs table: `tbl22sgbMLCFbvynl`
+- Flags table: `tblAK068QYB0vLopa`
 
 ## Environment
 

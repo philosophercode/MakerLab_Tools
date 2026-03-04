@@ -54,6 +54,7 @@ export interface ToolFields {
   map_tag?: string;
   image_attachments?: Attachment[];
   manual_attachments?: Attachment[];
+  notes?: string;
 }
 
 export interface CategoryFields {
@@ -110,6 +111,7 @@ export interface ResolvedTool {
   training_required: boolean;
   has_image: boolean;
   image_url: string | null;
+  notes: string | null;
   sop_url: string | null;
   safety_doc_url: string | null;
   video_url: string | null;
@@ -287,6 +289,7 @@ function resolveToolRecord(
     has_image: !!firstImage,
     image_url:
       firstImage?.thumbnails?.large?.url || firstImage?.url || null,
+    notes: tool.fields.notes || null,
     sop_url: tool.fields.sop_url || null,
     safety_doc_url: tool.fields.safety_doc_url || null,
     video_url: tool.fields.video_url || null,

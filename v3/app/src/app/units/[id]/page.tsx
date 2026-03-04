@@ -50,6 +50,7 @@ export default async function UnitDetailPage({
     id: string;
     name: string;
     imageUrl: string | null;
+    generatedImageUrl: string | null;
     imageAttachments: Attachment[];
   } | null = null;
   if (fields.tool?.[0]) {
@@ -64,6 +65,7 @@ export default async function UnitDetailPage({
         id: resolved.id,
         name: resolved.name,
         imageUrl: resolved.image_url,
+        generatedImageUrl: resolved.generated_image_url,
         imageAttachments: resolved.image_attachments,
       };
     } catch {
@@ -117,6 +119,7 @@ export default async function UnitDetailPage({
             <ImageGallery
               images={parentTool.imageAttachments}
               toolName={parentTool.name}
+              generatedImageUrl={parentTool.generatedImageUrl || undefined}
             />
           </div>
         )}

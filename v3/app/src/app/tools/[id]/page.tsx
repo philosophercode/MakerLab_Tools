@@ -61,6 +61,7 @@ export default async function ToolDetailPage({
               images={tool.image_attachments}
               toolName={tool.name}
               localImageUrl={tool.image_url || undefined}
+              generatedImageUrl={tool.generated_image_url || undefined}
             />
             <div className="absolute top-2 right-2">
               <FlagButton toolId={id} field="image" />
@@ -81,6 +82,18 @@ export default async function ToolDetailPage({
               <FlagButton toolId={id} field="description" />
             </div>
           </div>
+
+          {/* Notes */}
+          {tool.notes && (
+            <div>
+              <span className="block text-xs font-medium text-muted mb-1">
+                Notes
+              </span>
+              <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap">
+                {tool.notes}
+              </p>
+            </div>
+          )}
 
           {/* Safety */}
           <div className="group flex items-start justify-between gap-2">

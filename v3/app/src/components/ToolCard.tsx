@@ -34,19 +34,30 @@ export default function ToolCard({
   tool,
   compact = false,
   priority = false,
+  showGenerated = true,
 }: {
   tool: ToolWithMeta;
   compact?: boolean;
   priority?: boolean;
+  showGenerated?: boolean;
 }) {
   const hasPPE = tool.ppe_required.length > 0;
   const needsAuth = tool.authorized_only;
   const needsTraining = tool.training_required;
   const [status, setStatus] = useState<ActionStatus>(null);
-  const [imgSrc, setImgSrc] = useState(tool.image_url);
+  const [imgSrc, setImgSrc] = useState(
+    (showGenerated && tool.generated_image_url) || tool.image_url
+  );
   const [elapsed, setElapsed] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Sync image when showGenerated toggle changes
+  useEffect(() => {
+    if (!status) {
+      setImgSrc((showGenerated && tool.generated_image_url) || tool.image_url);
+    }
+  }, [showGenerated, tool.generated_image_url, tool.image_url, status]);
 
   const isProcessing = status === "generating" || status === "removing-bg";
 

@@ -68,8 +68,8 @@ function sanitizeMessagesForTransport(messages: UIMessage[]): UIMessage[] {
 }
 
 async function compressImageToDataUrl(file: File): Promise<{ dataUrl: string; mediaType: string }> {
-  const MAX_DIMENSION = 1600;
-  const MAX_SIZE_BYTES = 900_000;
+  const MAX_DIMENSION = 1024;
+  const MAX_SIZE_BYTES = 150_000;
 
   if (file.size <= MAX_SIZE_BYTES && file.type.startsWith("image/")) {
     return { dataUrl: await fileToBase64(file), mediaType: file.type };
@@ -96,7 +96,7 @@ async function compressImageToDataUrl(file: File): Promise<{ dataUrl: string; me
   }
   ctx.drawImage(img, 0, 0, width, height);
 
-  const qualities = [0.82, 0.72, 0.62, 0.52, 0.42];
+  const qualities = [0.7, 0.5, 0.35, 0.2];
   let best = canvas.toDataURL("image/jpeg", qualities[0]);
   for (const q of qualities) {
     const candidate = canvas.toDataURL("image/jpeg", q);

@@ -28,7 +28,7 @@ const TABLES = {
   locations: "tblbwtZhuvtuBKlPO",
   units: "tblDtKMcCxTyQbXwi",
   maintenance_logs: "tbl22sgbMLCFbvynl",
-  flags: "tblTODO_RUN_SETUP_FLAGS", // Run v3/scripts/setup_flags_table.py and replace with actual ID
+  flags: "tblAK068QYB0vLopa",
 } as const;
 
 // ── Core fetch helper ───────────────────────────────────────────────
@@ -257,6 +257,9 @@ export function resolveTools(
     const airtableUrl = firstImage?.thumbnails?.large?.url || firstImage?.url || null;
     const imageUrl = useLocalToolImages ? localPath : airtableUrl;
 
+    const firstGenerated = tool.fields.generated_image?.[0];
+    const generatedUrl = firstGenerated?.thumbnails?.large?.url || firstGenerated?.url || null;
+
     return {
       id: tool.id,
       name: tool.fields.name,
@@ -272,12 +275,15 @@ export function resolveTools(
       training_required: tool.fields.training_required || false,
       use_restrictions: tool.fields.use_restrictions || null,
       emergency_stop: tool.fields.emergency_stop || null,
+      notes: tool.fields.notes || null,
       safety_doc_url: tool.fields.safety_doc_url || null,
       sop_url: tool.fields.sop_url || null,
       video_url: tool.fields.video_url || null,
       map_tag: tool.fields.map_tag || null,
       image_url: imageUrl,
+      generated_image_url: generatedUrl,
       image_attachments: tool.fields.image_attachments || [],
+      generated_image: tool.fields.generated_image || [],
       manual_attachments: tool.fields.manual_attachments || [],
     };
   });

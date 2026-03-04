@@ -12,9 +12,11 @@ const GRID_CLASSES: Record<Exclude<ViewMode, "table">, string> = {
 export default function ToolGrid({
   tools,
   viewMode = "compact",
+  showGenerated = true,
 }: {
   tools: ToolWithMeta[];
   viewMode?: ViewMode;
+  showGenerated?: boolean;
 }) {
   if (tools.length === 0) {
     return (
@@ -26,19 +28,19 @@ export default function ToolGrid({
   }
 
   if (viewMode === "table") {
-    return <TableView tools={tools} />;
+    return <TableView tools={tools} showGenerated={showGenerated} />;
   }
 
   return (
     <div className={GRID_CLASSES[viewMode]}>
       {tools.map((tool, i) => (
-        <ToolCard key={tool.id} tool={tool} compact={viewMode === "compact"} priority={i < 8} />
+        <ToolCard key={tool.id} tool={tool} compact={viewMode === "compact"} priority={i < 8} showGenerated={showGenerated} />
       ))}
     </div>
   );
 }
 
-function TableView({ tools }: { tools: ToolWithMeta[] }) {
+function TableView({ tools, showGenerated }: { tools: ToolWithMeta[]; showGenerated: boolean }) {
   return (
     <div className="overflow-hidden rounded-xl border border-card-border">
       {/* Header — hidden on mobile */}
@@ -66,9 +68,9 @@ function TableView({ tools }: { tools: ToolWithMeta[] }) {
           >
             {/* Thumbnail */}
             <div className="relative h-10 w-10 flex-shrink-0 rounded-md bg-muted-bg overflow-hidden">
-              {tool.image_url ? (
+              {(tool.image_url || tool.generated_image_url) ? (
                 <Image
-                  src={tool.image_url}
+                  src={(showGenerated && tool.generated_image_url) || tool.image_url!}
                   alt={tool.name}
                   fill
                   className="object-contain p-0.5"

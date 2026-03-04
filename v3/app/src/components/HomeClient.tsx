@@ -15,6 +15,7 @@ import SearchAndFilters from "./SearchAndFilters";
 import FilterChips from "./FilterChips";
 
 const VIEW_MODE_KEY = "makerlab-view-mode";
+const IMAGE_MODE_KEY = "makerlab-image-mode";
 
 interface HomeClientProps {
   tools: ToolWithMeta[];
@@ -43,15 +44,24 @@ export default function HomeClient({
 
   // View mode state — persisted in localStorage
   const [viewMode, setViewMode] = useState<ViewMode>("compact");
+  const [showGenerated, setShowGenerated] = useState(true);
   useEffect(() => {
     const stored = localStorage.getItem(VIEW_MODE_KEY);
     if (stored === "compact" || stored === "grid" || stored === "table") {
       setViewMode(stored);
     }
+    const imgMode = localStorage.getItem(IMAGE_MODE_KEY);
+    if (imgMode === "photo" || imgMode === "illustration") {
+      setShowGenerated(imgMode === "illustration");
+    }
   }, []);
   const handleViewMode = useCallback((mode: ViewMode) => {
     setViewMode(mode);
     localStorage.setItem(VIEW_MODE_KEY, mode);
+  }, []);
+  const handleImageMode = useCallback((generated: boolean) => {
+    setShowGenerated(generated);
+    localStorage.setItem(IMAGE_MODE_KEY, generated ? "illustration" : "photo");
   }, []);
 
   const updateParams = useCallback(
@@ -194,7 +204,10 @@ export default function HomeClient({
         <ViewToggle viewMode={viewMode} onChange={handleViewMode} />
       </div>
 
-      <ToolGrid tools={filtered} viewMode={viewMode} />
+      <ToolGrid tools={filtered} viewMode={viewMode} showGenerated={showGenerated} />
+
+      {/* Floating image mode toggle */}
+      <ImageModeToggle showGenerated={showGenerated} onChange={handleImageMode} />
     </>
   );
 }
@@ -233,6 +246,34 @@ const VIEW_OPTIONS: { mode: ViewMode; label: string; icon: React.ReactNode }[] =
     ),
   },
 ];
+
+function ImageModeToggle({
+  showGenerated,
+  onChange,
+}: {
+  showGenerated: boolean;
+  onChange: (generated: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!showGenerated)}
+      title={showGenerated ? "Show photos" : "Show illustrations"}
+      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-cornell-red text-white shadow-lg shadow-cornell-red/30 transition-transform hover:scale-105 active:scale-95"
+    >
+      {showGenerated ? (
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+        </svg>
+      ) : (
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
 function ViewToggle({
   viewMode,

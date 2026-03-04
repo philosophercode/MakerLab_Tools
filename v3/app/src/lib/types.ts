@@ -59,7 +59,9 @@ export interface ToolFields {
   video_url?: string;
   map_tag?: string;
   image_attachments?: Attachment[];
+  generated_image?: Attachment[];
   manual_attachments?: Attachment[];
+  notes?: string;
 }
 
 export type ToolRecord = AirtableRecord<ToolFields>;
@@ -80,12 +82,15 @@ export interface ToolWithMeta {
   training_required: boolean;
   use_restrictions: string | null;
   emergency_stop: string | null;
+  notes: string | null;
   safety_doc_url: string | null;
   sop_url: string | null;
   video_url: string | null;
   map_tag: string | null;
   image_url: string | null;
+  generated_image_url: string | null;
   image_attachments: Attachment[];
+  generated_image: Attachment[];
   manual_attachments: Attachment[];
 }
 

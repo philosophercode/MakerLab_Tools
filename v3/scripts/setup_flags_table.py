@@ -79,10 +79,9 @@ def create_flags_table(token, base_id):
     """Create the Flags table linked to the existing Tools table."""
     fields = [
         {
-            "name": "tool",
-            "type": "multipleRecordLinks",
-            "description": "Link to the tool whose content is being flagged",
-            "options": {"linkedTableId": TOOLS_TABLE_ID},
+            "name": "title",
+            "type": "singleLineText",
+            "description": "Auto-generated summary of the flag (primary field)",
         },
         {
             "name": "field_flagged",
@@ -99,6 +98,12 @@ def create_flags_table(token, base_id):
                     {"name": "safety_info"},
                 ]
             },
+        },
+        {
+            "name": "tool",
+            "type": "multipleRecordLinks",
+            "description": "Link to the tool whose content is being flagged",
+            "options": {"linkedTableId": TOOLS_TABLE_ID},
         },
         {
             "name": "issue_description",
