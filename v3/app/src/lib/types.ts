@@ -173,3 +173,17 @@ export interface FlagFields {
 }
 
 export type FlagRecord = AirtableRecord<FlagFields>;
+
+// ── Verified_QA table ─────────────────────────────────────────────
+
+export interface VerifiedQAFields {
+  title: string;
+  question: string;
+  answer: string;
+  tool?: string[]; // linked record IDs
+  source_summary: string;
+  helpful_count: number;
+  created_at: string;
+}
+
+export type VerifiedQARecord = AirtableRecord<VerifiedQAFields>;
